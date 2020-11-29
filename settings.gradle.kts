@@ -1,5 +1,6 @@
 rootProject.name = "PQD"
 
 include(
-        "configuration"
+        "configuration",
+        "application"
 )
