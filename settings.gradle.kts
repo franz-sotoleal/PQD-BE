@@ -2,5 +2,6 @@ rootProject.name = "PQD"
 
 include(
         "configuration",
-        "application"
+        "application",
+        "adapters:web"
 )

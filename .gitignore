@@ -1,3 +1,5 @@
 /.gradle/
 /.idea/
 /configuration/build/
+/adapters/web/build/
+/application/build/
