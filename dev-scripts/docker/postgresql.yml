@@ -1,0 +1,12 @@
+version: '2'
+services:
+  postgresql:
+    image: postgres:11.6
+    container_name: postgres
+    volumes:
+      - ./postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+    ports:
+      - 5432:5432

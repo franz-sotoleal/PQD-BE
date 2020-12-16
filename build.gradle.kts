@@ -7,6 +7,7 @@ buildscript {
 plugins {
     id("org.springframework.boot") version "2.3.2.RELEASE" apply false
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id("org.flywaydb.flyway") version "6.4.2" apply false
     java
 }
 
