@@ -6,22 +6,12 @@ plugins {
 dependencies {
     implementation(project(":application"))
     implementation(project(":adapters:web"))
+    implementation(project(":adapters:persistence"))
 
     implementation("org.flywaydb:flyway-core")
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    // TODO starting from here, move the dependencies to persistance adapter
-    runtimeOnly("org.postgresql:postgresql")
-
-    implementation("org.apache.commons:commons-lang3")
-    api("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    annotationProcessor("org.hibernate:hibernate-jpamodelgen")
-    implementation(group = "com.vladmihalcea", name = "hibernate-types-52", version = "2.9.10")
-    implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.11.0")
-    // until here
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

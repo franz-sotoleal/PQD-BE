@@ -3,5 +3,6 @@ rootProject.name = "PQD"
 include(
         "configuration",
         "application",
-        "adapters:web"
+        "adapters:web",
+        "adapters:persistence"
 )
