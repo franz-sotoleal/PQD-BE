@@ -2,10 +2,10 @@ package com.pqd.adapters.web.authentication;
 
 import java.util.Objects;
 
-import com.pqd.adapters.web.security.JwtRequest;
-import com.pqd.adapters.web.security.JwtResponse;
-import com.pqd.adapters.web.security.JwtTokenUtil;
-import com.pqd.adapters.web.security.JwtUserDetailsService;
+import com.pqd.adapters.web.security.jwt.JwtRequest;
+import com.pqd.adapters.web.security.jwt.JwtResponse;
+import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
+import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,5 +1,7 @@
-package com.pqd.adapters.web.security;
+package com.pqd.adapters.web.security.config;
 
+import com.pqd.adapters.web.security.jwt.JwtAuthenticationEntryPoint;
+import com.pqd.adapters.web.security.filter.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

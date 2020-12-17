@@ -1,4 +1,4 @@
-package com.pqd.adapters.web.security;
+package com.pqd.adapters.web.security.jwt;
 
 import java.io.IOException;
 import java.io.Serializable;
