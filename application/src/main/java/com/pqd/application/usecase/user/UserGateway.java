@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface UserGateway {
 
     Optional<User> findByUsername(String username);
+
+    void save(User user);
 }

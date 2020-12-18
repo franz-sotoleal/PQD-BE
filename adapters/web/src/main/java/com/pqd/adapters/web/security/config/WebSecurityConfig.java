@@ -1,7 +1,7 @@
 package com.pqd.adapters.web.security.config;
 
-import com.pqd.adapters.web.security.jwt.JwtAuthenticationEntryPoint;
 import com.pqd.adapters.web.security.filter.JwtRequestFilter;
+import com.pqd.adapters.web.security.jwt.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // disable csrf
         httpSecurity.csrf().disable()
                     // dont authenticate this particular request
-                    .authorizeRequests().antMatchers("/api/authentication/login").permitAll().
+                    .authorizeRequests().antMatchers("/api/authentication/login", "/api/authentication/register").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to store user's state.

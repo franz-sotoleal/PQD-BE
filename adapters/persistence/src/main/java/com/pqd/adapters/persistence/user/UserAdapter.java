@@ -22,6 +22,17 @@ public class UserAdapter implements UserGateway {
         return userRepository.findByUsername(username).map(toUser());
     }
 
+    @Override
+    public void save(User user) {
+        userRepository.save(UserEntity.builder()
+                                      .firstName(user.getFirstName())
+                                      .lastName(user.getLastName())
+                                      .username(user.getUsername())
+                                      .email(user.getEmail())
+                                      .password(user.getPassword())
+                                      .build());
+    }
+
     private Function<UserEntity, User> toUser() {
         return user -> User.builder()
                            .userId(UserId.of(user.getId()))

@@ -1,11 +1,10 @@
 package com.pqd.adapters.web.authentication;
 
-import java.util.Objects;
-
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.adapters.web.security.jwt.JwtResponse;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
+import com.pqd.application.usecase.user.RegisterUser;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,15 +30,38 @@ public class AuthenticationController {
     @Autowired
     private JwtUserDetailsService jwtInMemoryUserDetailsService;
 
+    @Autowired
+    RegisterUser registerUser;
+
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
+
     @PostMapping("/login")
-    public ResponseEntity<?> generateAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
+    public ResponseEntity<?> loginAndGenerateAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
             throws Exception {
+        return generateAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+    }
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody RegisterUserInput input) {
+        RegisterUser.Request encryptedRequest = RegisterUser.Request.builder()
+                                                         .firstName(input.getFirstName())
+                                                         .lastName(input.getLastName())
+                                                         .email(input.getEmail())
+                                                         .username(input.getUsername())
+                                                         .password(bcryptEncoder
+                                                                           .encode(input.getPassword())) // Important password encryption
+                                                         .build();
+        registerUser.execute(encryptedRequest);
+        // TODO exception handler
 
-        final UserDetails userDetails = jwtInMemoryUserDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+        return ResponseEntity.ok().build();
+    }
 
+    private ResponseEntity<?> generateAuthenticationToken(String username, String password) throws Exception {
+        authenticate(username, password);
+
+        final UserDetails userDetails = jwtInMemoryUserDetailsService.loadUserByUsername(username);
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token));
