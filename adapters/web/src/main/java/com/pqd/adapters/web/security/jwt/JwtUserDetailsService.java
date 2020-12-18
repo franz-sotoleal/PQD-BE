@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
+    // AuthenticationManager calls this method
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //TODO get username and password hash from db through core layer
