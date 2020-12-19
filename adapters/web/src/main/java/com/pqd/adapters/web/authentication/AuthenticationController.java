@@ -6,11 +6,11 @@ import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
 import com.pqd.application.usecase.user.RegisterUser;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,46 +19,43 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/authentication")
 @CrossOrigin
+@RequiredArgsConstructor
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private JwtUserDetailsService jwtInMemoryUserDetailsService;
+    private final JwtUserDetailsService jwtInMemoryUserDetailsService;
 
-    @Autowired
-    RegisterUser registerUser;
+    private final RegisterUser registerUser;
 
-    @Autowired
-    private PasswordEncoder bcryptEncoder;
+    private final PasswordEncoder bcryptEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginAndGenerateAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
-            throws Exception {
+    public ResponseEntity<JwtResponse> loginAndGenerateAuthenticationToken(
+            @RequestBody JwtRequest authenticationRequest) {
         return generateAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
     }
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterUserInput input) {
         if (input.getPassword().length() < 4) { throw new RegisterUser.InvalidFieldException("Password too short"); }
-        RegisterUser.Request encryptedRequest = RegisterUser.Request.builder()
-                                                         .firstName(input.getFirstName())
-                                                         .lastName(input.getLastName())
-                                                         .email(input.getEmail())
-                                                         .username(input.getUsername())
-                                                         .password(bcryptEncoder
-                                                                           .encode(input.getPassword())) // Important password encryption
-                                                         .build();
+        RegisterUser.Request encryptedRequest =
+                RegisterUser.Request.builder()
+                                    .firstName(input.getFirstName())
+                                    .lastName(input.getLastName())
+                                    .email(input.getEmail())
+                                    .username(input.getUsername())
+                                    .password(
+                                            bcryptEncoder.encode(input.getPassword())) // Important password encryption
+                                    .build();
         registerUser.execute(encryptedRequest);
 
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<?> generateAuthenticationToken(String username, String password) throws Exception {
+    private ResponseEntity<JwtResponse> generateAuthenticationToken(String username, String password) {
         authenticate(username, password);
 
         final UserDetails userDetails = jwtInMemoryUserDetailsService.loadUserByUsername(username);
@@ -67,19 +64,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    private void authenticate(@NonNull String username, @NonNull String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
+    private void authenticate(@NonNull String username, @NonNull String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 
     @ExceptionHandler({RegisterUser.InvalidFieldException.class})
     public ResponseEntity<?> handleInvalidFieldException(Exception e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public ResponseEntity<?> handleBadCredentialsException(Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("INVALID_CREDENTIALS");
     }
 
 }
