@@ -23,6 +23,11 @@ public class UserAdapter implements UserGateway {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email).map(toUser());
+    }
+
+    @Override
     public void save(User user) {
         userRepository.save(UserEntity.builder()
                                       .firstName(user.getFirstName())

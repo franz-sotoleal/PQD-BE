@@ -7,6 +7,7 @@ import lombok.Value;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Component
@@ -16,22 +17,33 @@ public class RegisterUser {
     private final UserGateway userGateway;
 
     public void execute(Request request) {
+        validateCompulsoryFields(request.getUsername(), request.getEmail());
+        userGateway.findByEmail(request.getEmail()).ifPresent(r -> {throw new InvalidFieldException("Email already in use");});
+        userGateway.findByUsername(request.getUsername()).ifPresent(r -> {throw new InvalidFieldException("Username already in use");});
+
         User user = User.builder()
-                         .username(request.getUsername())
-                         .firstName(request.getFirstName())
-                         .lastName(request.getLastName())
-                         .email(request.getEmail())
-                         .password(request.getPassword())
-                         .build();
+                        .username(request.getUsername())
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .email(request.getEmail())
+                        .password(request.getPassword())
+                        .build();
 
-        // TODO check if username or email doesnt exist already and throw corresponding exception
-        // TODO check if username, email or password are not empty
+        userGateway.save(user);
+    }
 
-        try {
-            userGateway.save(user);
-        } catch (Exception e) {
-            throw new UserSavingException();
+    private void validateCompulsoryFields(String username, String email) {
+        if (username.length() < 4) {
+            throw new InvalidFieldException("Username too short");
+        } else if (!isValidEmail(email)) {
+            throw new InvalidFieldException("Email invalid");
         }
+    }
+
+    private boolean isValidEmail(String email) {
+        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(email).matches();
     }
 
     @Value
@@ -44,7 +56,9 @@ public class RegisterUser {
         String email;
     }
 
-    public static class UserSavingException extends RuntimeException {
-
+    public static class InvalidFieldException extends RuntimeException {
+        public InvalidFieldException(String message) {
+            super(message);
+        }
     }
 }

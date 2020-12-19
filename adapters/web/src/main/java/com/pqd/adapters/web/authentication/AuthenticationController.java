@@ -44,6 +44,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterUserInput input) {
+        if (input.getPassword().length() < 4) { throw new RegisterUser.InvalidFieldException("Password too short"); }
         RegisterUser.Request encryptedRequest = RegisterUser.Request.builder()
                                                          .firstName(input.getFirstName())
                                                          .lastName(input.getLastName())
@@ -53,7 +54,6 @@ public class AuthenticationController {
                                                                            .encode(input.getPassword())) // Important password encryption
                                                          .build();
         registerUser.execute(encryptedRequest);
-        // TODO exception handler
 
         return ResponseEntity.ok().build();
     }
@@ -76,4 +76,10 @@ public class AuthenticationController {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
+
+    @ExceptionHandler({RegisterUser.InvalidFieldException.class})
+    public ResponseEntity<?> handleInvalidFieldException(Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
 }
