@@ -1,11 +1,11 @@
 package com.pqd.application.usecase.dummy;
 
+import com.pqd.application.usecase.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+@UseCase
 public class GetDummyResult {
 
     public Response execute() {

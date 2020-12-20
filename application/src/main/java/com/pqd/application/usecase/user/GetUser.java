@@ -1,15 +1,15 @@
 package com.pqd.application.usecase.user;
 
 import com.pqd.application.domain.user.User;
+import com.pqd.application.usecase.UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
-@Component
+@UseCase
 @Transactional
 public class GetUser {
 
