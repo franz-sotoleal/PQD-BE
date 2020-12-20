@@ -13,9 +13,9 @@ Requests through the web adapter are protected by jwt, except login and register
 
 # Project structure
 ```
-adapters/          adapters for implementing outside communication
-application/       core business logic
-configuration/     spring boot module and all configurations, builds docker image
+adapters/          adapters for implementing outside communication (with unit tests)
+application/       core business logic (with unit tests)
+configuration/     spring boot module and all configurations, builds docker image (with integration tests)
 dev-scripts/       common scripts to set up db 
 ```
 
