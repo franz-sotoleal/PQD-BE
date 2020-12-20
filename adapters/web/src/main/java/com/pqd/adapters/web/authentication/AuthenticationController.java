@@ -39,7 +39,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterUserInput input) {
+    public ResponseEntity<Void> register(@RequestBody RegisterUserRequestJson input) {
         if (input.getPassword().length() < 4) { throw new RegisterUser.InvalidFieldException("Password too short"); }
         RegisterUser.Request encryptedRequest =
                 RegisterUser.Request.builder()

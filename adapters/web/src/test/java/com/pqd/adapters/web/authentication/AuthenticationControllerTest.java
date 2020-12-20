@@ -74,9 +74,9 @@ public class AuthenticationControllerTest {
 
     @Test
     void GIVEN_valid_data_WHEN_registering_THEN_password_encrypted_and_user_saved() {
-        RegisterUserInput registerUserInput = TestDataGenerator.generateRegisterUserInput();
+        RegisterUserRequestJson registerUserRequestJson = TestDataGenerator.generateRegisterUserInput();
         when(bcryptEncoder.encode(any())).thenReturn("EncryptedPassword");
-        ResponseEntity<Void> response = controller.register(registerUserInput);
+        ResponseEntity<Void> response = controller.register(registerUserRequestJson);
 
         verify(registerUser).execute(captor.capture());
         assertThat(captor.getValue().getPassword()).isEqualTo("EncryptedPassword");
@@ -85,10 +85,10 @@ public class AuthenticationControllerTest {
 
     @Test
     void GIVEN_short_password_WHEN_registering_THEN_exception_thrown() {
-        RegisterUserInput registerUserInput = TestDataGenerator.generateRegisterUserInputWithShortPassword();
+        RegisterUserRequestJson registerUserRequestJson = TestDataGenerator.generateRegisterUserInputWithShortPassword();
 
         Exception exception =
-                assertThrows(Exception.class, () -> controller.register(registerUserInput));
+                assertThrows(Exception.class, () -> controller.register(registerUserRequestJson));
         assertThat(exception).hasStackTraceContaining("InvalidFieldException");
         assertThat(exception).hasStackTraceContaining("Password too short");
     }

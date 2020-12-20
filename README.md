@@ -1,11 +1,15 @@
 # Product Quality Dashboard API
 
-To clone project 
+To clone the project: 
 
 ```
 git clone git@github.com:Kert944/PQD-BE.git 
 ```
-
+API Swagger (web adapter)
+```
+http://localhost:8080/swagger-ui/index.html#/
+```
+Requests through the web adapter are protected by jwt, except login and register.
 
 # Project structure
 ```
