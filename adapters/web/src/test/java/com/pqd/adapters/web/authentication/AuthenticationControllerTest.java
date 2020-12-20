@@ -59,7 +59,7 @@ public class AuthenticationControllerTest {
         ResponseEntity<JwtResponse> response = controller.loginAndGenerateAuthenticationToken(jwtRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getJwttoken()).isEqualTo("token");
+        assertThat(Objects.requireNonNull(response.getBody()).getJwt()).isEqualTo("token");
     }
 
     @Test
