@@ -11,3 +11,5 @@ spring:
   jpa:
     properties:
       jdbc.time_zone: Europe/Tallinn
+jwt:
+  secret: developmentsecret
