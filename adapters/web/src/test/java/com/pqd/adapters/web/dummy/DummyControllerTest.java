@@ -1,6 +1,7 @@
 package com.pqd.adapters.web.dummy;
 
 import com.pqd.application.usecase.dummy.GetDummyResult;
+import com.pqd.application.usecase.release.CollectAndSaveAllReleaseData;
 import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +16,14 @@ class DummyControllerTest {
 
     private GetDummyResult getDummyResult;
     private RetrieveSonarqubeData retrieveSonarqubeData;
+    private CollectAndSaveAllReleaseData collectAndSaveAllReleaseData;
     private DummyController controller;
 
     @BeforeEach
     void setup() {
         getDummyResult = mock(GetDummyResult.class);
         retrieveSonarqubeData = mock(RetrieveSonarqubeData.class);
-        controller = new DummyController(getDummyResult, retrieveSonarqubeData);
+        controller = new DummyController(getDummyResult, retrieveSonarqubeData, collectAndSaveAllReleaseData);
     }
 
     @Test
