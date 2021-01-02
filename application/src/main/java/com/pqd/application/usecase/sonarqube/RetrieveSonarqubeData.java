@@ -2,6 +2,7 @@ package com.pqd.application.usecase.sonarqube;
 
 import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
 import com.pqd.application.usecase.UseCase;
+import com.pqd.application.usecase.release.SaveReleaseInfo;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -14,7 +15,9 @@ import javax.transaction.Transactional;
 public class RetrieveSonarqubeData {
 
     private final SonarqubeGateway sonarqubeGateway;
+
     private final SaveSonarqubeData saveSonarqubeData;
+    private final SaveReleaseInfo saveReleaseInfo;
 
     public Response execute(Request request) {
 
@@ -23,9 +26,11 @@ public class RetrieveSonarqubeData {
                                                                                              request.getToken());
 
         //TODO remove saving from here
-        saveSonarqubeData.execute(SaveSonarqubeData.Request.of(sonarqubeReleaseInfo));
+        SonarqubeReleaseInfo savedSonarqubeReleaseInfo =
+                saveSonarqubeData.execute(SaveSonarqubeData.Request.of(sonarqubeReleaseInfo)).getSonarqubeReleaseInfo();
+        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(savedSonarqubeReleaseInfo));
 
-        return Response.of(sonarqubeReleaseInfo);
+        return Response.of(savedSonarqubeReleaseInfo);
     }
 
     @Value(staticConstructor = "of")
