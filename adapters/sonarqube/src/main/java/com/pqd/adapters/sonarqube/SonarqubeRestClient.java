@@ -1,6 +1,6 @@
 package com.pqd.adapters.sonarqube;
 
-import com.pqd.application.domain.sonarqube.SecurityRating;
+import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
 import com.pqd.application.usecase.sonarqube.SonarqubeGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.http.*;
@@ -17,10 +17,10 @@ public class SonarqubeRestClient implements SonarqubeGateway {
     private final RestTemplate sonarqubeApiRestTemplate;
 
     @Override
-    public SecurityRating getSecurityRating(String baseUrl, String componentName, String token) {
-        String tokenBase = "9257cc3a6b0610da1357f73e03524b090658553d" + ":";
+    public SonarqubeReleaseInfo getSonarqubeReleaseInfo(String baseUrl, String componentName, String token) {
+        String tokenBase = token + ":";
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(tokenBase.getBytes()));
-        String uri = "http://localhost:9000/api/measures/component?component=ESI-builtit&metricKeys=security_rating";
+        String uri = baseUrl + "/api/measures/component?component=" + componentName + "&metricKeys=security_rating,vulnerabilities,reliability_rating,bugs,sqale_rating,sqale_index,code_smells";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -30,9 +30,14 @@ public class SonarqubeRestClient implements SonarqubeGateway {
         ResponseEntity<SonarqubeMeasureResponse> response =
                 sonarqubeApiRestTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
 
-        return SecurityRating.builder()
-                     .value(Objects.requireNonNull(response.getBody()).getMetricValue("security_rating"))
-                     .build();
+        return SonarqubeReleaseInfo.builder()
+                             .securityRating(Objects.requireNonNull(response.getBody()).getMetricValue("security_rating"))
+                             .reliabilityRating(Objects.requireNonNull(response.getBody()).getMetricValue("reliability_rating"))
+                             .maintainabilityRating(Objects.requireNonNull(response.getBody()).getMetricValue("sqale_rating"))
+                             .maintainabilityDebt(Objects.requireNonNull(response.getBody()).getMetricValue("sqale_index"))
+                             .maintainabilitySmells(Objects.requireNonNull(response.getBody()).getMetricValue("code_smells"))
+                             .securityVulnerabilities(Objects.requireNonNull(response.getBody()).getMetricValue("vulnerabilities"))
+                             .reliabilityBugs(Objects.requireNonNull(response.getBody()).getMetricValue("bugs"))
+                             .build();
     }
-
 }

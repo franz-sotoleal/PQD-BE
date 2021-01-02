@@ -3,6 +3,7 @@ package com.pqd.application.usecase.user;
 import com.pqd.application.domain.user.User;
 import com.pqd.application.usecase.UseCase;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -48,6 +49,7 @@ public class RegisterUser {
 
     @Value
     @Builder
+    @EqualsAndHashCode(callSuper = false)
     public static class Request {
         String username;
         String password;

@@ -29,7 +29,7 @@ public class DummyController {
 
     @GetMapping("/trigger")
     public String trigger() {
-        retrieveSonarqubeData.execute();
+        retrieveSonarqubeData.execute(RetrieveSonarqubeData.Request.of("http://localhost:9000", "ESI-builtit", "9257cc3a6b0610da1357f73e03524b090658553d"));
 
         return "triggered";
     }
