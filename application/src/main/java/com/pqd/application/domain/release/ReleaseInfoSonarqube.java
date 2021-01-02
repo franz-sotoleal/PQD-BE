@@ -1,11 +1,11 @@
-package com.pqd.application.domain.sonarqube;
+package com.pqd.application.domain.release;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class SonarqubeReleaseInfo {
+public class ReleaseInfoSonarqube {
 
     private final Long id;
 

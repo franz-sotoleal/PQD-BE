@@ -1,7 +1,7 @@
 package com.pqd.application.domain.product;
 
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Builder
@@ -14,17 +14,4 @@ public class Product {
 
     SonarqubeInfo sonarqubeInfo;
 
-    @Builder
-    @Getter
-    @EqualsAndHashCode(callSuper = false)
-    public static class SonarqubeInfo {
-
-        Long id;
-
-        String baseUrl;
-
-        String componentName;
-
-        String token;
-    }
 }

@@ -1,7 +1,7 @@
 package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.release.ReleaseInfo;
-import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.UseCase;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,11 @@ public class SaveReleaseInfo {
 
     public Response execute(Request request) {
         Double qualityLevel =
-                calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getSonarqubeReleaseInfo()))
+                calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getReleaseInfoSonarqube()))
                                      .getQualityLevel();
         ReleaseInfo releaseInfo = ReleaseInfo.builder()
                                              .created(LocalDateTime.now())
-                                             .sonarqubeReleaseInfo(request.getSonarqubeReleaseInfo())
+                                             .releaseInfoSonarqube(request.getReleaseInfoSonarqube())
                                              .productId(request.getProductId())
                                              .qualityLevel(qualityLevel)
                                              .build();
@@ -36,7 +36,7 @@ public class SaveReleaseInfo {
     @Value(staticConstructor = "of")
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
-        SonarqubeReleaseInfo sonarqubeReleaseInfo;
+        ReleaseInfoSonarqube releaseInfoSonarqube;
         Long productId;
     }
 

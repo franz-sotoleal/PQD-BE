@@ -2,7 +2,7 @@ package com.pqd.adapters.persistence.release.main;
 
 import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
-import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.release.ReleaseInfoGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
         return ReleaseInfoEntity.builder()
                                 .created(releaseInfo.getCreated())
                                 .productId(releaseInfo.getProductId())
-                                .sonarqubeReleaseInfoEntity(buildReleaseInfoSonarqubeEntity(releaseInfo.getSonarqubeReleaseInfo()))
+                                .sonarqubeReleaseInfoEntity(buildReleaseInfoSonarqubeEntity(releaseInfo.getReleaseInfoSonarqube()))
                                 .qualityLevel(releaseInfo.getQualityLevel())
                                 .build();
     }
@@ -36,13 +36,13 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
                           .id(entity.getId())
                           .qualityLevel(entity.getQualityLevel())
                           .productId(entity.getProductId())
-                          .sonarqubeReleaseInfo(buildSonarqubeReleaseInfo(entity.getSonarqubeReleaseInfoEntity()))
+                          .releaseInfoSonarqube(buildSonarqubeReleaseInfo(entity.getSonarqubeReleaseInfoEntity()))
                           .created(entity.getCreated())
                           .build();
     }
 
-    private SonarqubeReleaseInfo buildSonarqubeReleaseInfo(ReleaseInfoSonarqubeEntity entity) {
-        return SonarqubeReleaseInfo.builder()
+    private ReleaseInfoSonarqube buildSonarqubeReleaseInfo(ReleaseInfoSonarqubeEntity entity) {
+        return ReleaseInfoSonarqube.builder()
                                    .id(entity.getId())
                                    .securityRating(entity.getSecurityRating())
                                    .reliabilityRating(entity.getReliabilityRating())
@@ -54,7 +54,7 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
                                    .build();
     }
 
-    private ReleaseInfoSonarqubeEntity buildReleaseInfoSonarqubeEntity(SonarqubeReleaseInfo releaseInfo) {
+    private ReleaseInfoSonarqubeEntity buildReleaseInfoSonarqubeEntity(ReleaseInfoSonarqube releaseInfo) {
         return ReleaseInfoSonarqubeEntity.builder()
                                          .securityRating(releaseInfo.getSecurityRating())
                                          .maintainabilityRating(releaseInfo.getMaintainabilityRating())

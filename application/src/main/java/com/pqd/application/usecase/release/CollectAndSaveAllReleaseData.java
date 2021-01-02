@@ -2,7 +2,7 @@ package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
-import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.UseCase;
 import com.pqd.application.usecase.product.ProductGateway;
 import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
@@ -30,10 +30,10 @@ public class CollectAndSaveAllReleaseData {
                 RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().getBaseUrl(),
                                                  product.getSonarqubeInfo().getComponentName(),
                                                  product.getSonarqubeInfo().getToken());
-        SonarqubeReleaseInfo sonarqubeReleaseInfo = retrieveSonarqubeData.execute(retrieveSqDataRequest)
+        ReleaseInfoSonarqube releaseInfoSonarqube = retrieveSonarqubeData.execute(retrieveSqDataRequest)
                                                                          .getReleaseInfo();
 
-        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(sonarqubeReleaseInfo, request.getProductId()));
+        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(releaseInfoSonarqube, request.getProductId()));
     }
 
     @Value(staticConstructor = "of")

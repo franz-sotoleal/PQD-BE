@@ -1,6 +1,6 @@
 package com.pqd.application.usecase.release;
 
-import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.UseCase;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ public class CalculateQualityLevel {
     public Response execute(Request request) {
         int totalCharacteristics = 3;
 
-        Double sqSecurityRating = transformSonarqubeRating(request.getSonarqubeReleaseInfo().getSecurityRating());
-        Double sqReliabilityRating = transformSonarqubeRating(request.getSonarqubeReleaseInfo().getReliabilityRating());
-        Double sqMaintainabilityRating = transformSonarqubeRating(request.getSonarqubeReleaseInfo().getMaintainabilityRating());
+        Double sqSecurityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getSecurityRating());
+        Double sqReliabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getReliabilityRating());
+        Double sqMaintainabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getMaintainabilityRating());
 
         Double qualityLevel = (sqSecurityRating / totalCharacteristics)
                               + (sqReliabilityRating / totalCharacteristics)
@@ -27,7 +27,7 @@ public class CalculateQualityLevel {
     @Value(staticConstructor = "of")
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
-        SonarqubeReleaseInfo sonarqubeReleaseInfo;
+        ReleaseInfoSonarqube releaseInfoSonarqube;
 
     }
 
