@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.release.main;
 
+import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class ReleaseInfoEntity {
     @Column(name = "quality_level")
     private Double qualityLevel;
 
-    @Column(name = "release_info_sq_id")
-    private Long releaseInfoSonarqubeId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "release_info_sq_id", referencedColumnName = "id")
+    private ReleaseInfoSonarqubeEntity sonarqubeReleaseInfoEntity;
 }

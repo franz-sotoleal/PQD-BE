@@ -24,8 +24,8 @@ public class SaveReleaseInfo {
                                      .getQualityLevel();
         ReleaseInfo releaseInfo = ReleaseInfo.builder()
                                              .created(LocalDateTime.now())
-                                             .releaseInfoSonarqubeId(request.getSonarqubeReleaseInfo().getId())
-                                             .productId(1L) //TODO productId must come somewhere
+                                             .sonarqubeReleaseInfo(request.getSonarqubeReleaseInfo())
+                                             .productId(request.getProductId())
                                              .qualityLevel(qualityLevel)
                                              .build();
 
@@ -37,7 +37,7 @@ public class SaveReleaseInfo {
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
         SonarqubeReleaseInfo sonarqubeReleaseInfo;
-
+        Long productId;
     }
 
     @Value(staticConstructor = "of")

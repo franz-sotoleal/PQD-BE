@@ -1,6 +1,8 @@
 package com.pqd.adapters.persistence.release.main;
 
+import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
 import com.pqd.application.usecase.release.ReleaseInfoGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,7 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
         return ReleaseInfoEntity.builder()
                                 .created(releaseInfo.getCreated())
                                 .productId(releaseInfo.getProductId())
-                                .releaseInfoSonarqubeId(releaseInfo.getReleaseInfoSonarqubeId())
+                                .sonarqubeReleaseInfoEntity(buildReleaseInfoSonarqubeEntity(releaseInfo.getSonarqubeReleaseInfo()))
                                 .qualityLevel(releaseInfo.getQualityLevel())
                                 .build();
     }
@@ -34,8 +36,33 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
                           .id(entity.getId())
                           .qualityLevel(entity.getQualityLevel())
                           .productId(entity.getProductId())
-                          .releaseInfoSonarqubeId(entity.getReleaseInfoSonarqubeId())
+                          .sonarqubeReleaseInfo(buildSonarqubeReleaseInfo(entity.getSonarqubeReleaseInfoEntity()))
                           .created(entity.getCreated())
                           .build();
+    }
+
+    private SonarqubeReleaseInfo buildSonarqubeReleaseInfo(ReleaseInfoSonarqubeEntity entity) {
+        return SonarqubeReleaseInfo.builder()
+                                   .id(entity.getId())
+                                   .securityRating(entity.getSecurityRating())
+                                   .reliabilityRating(entity.getReliabilityRating())
+                                   .maintainabilityRating(entity.getMaintainabilityRating())
+                                   .securityVulnerabilities(entity.getSecurityVulnerabilities())
+                                   .reliabilityBugs(entity.getReliabilityBugs())
+                                   .maintainabilitySmells(entity.getMaintainabilitySmells())
+                                   .maintainabilityDebt(entity.getMaintainabilityDebt())
+                                   .build();
+    }
+
+    private ReleaseInfoSonarqubeEntity buildReleaseInfoSonarqubeEntity(SonarqubeReleaseInfo releaseInfo) {
+        return ReleaseInfoSonarqubeEntity.builder()
+                                         .securityRating(releaseInfo.getSecurityRating())
+                                         .maintainabilityRating(releaseInfo.getMaintainabilityRating())
+                                         .reliabilityRating(releaseInfo.getReliabilityRating())
+                                         .securityVulnerabilities(releaseInfo.getSecurityVulnerabilities())
+                                         .maintainabilityDebt(releaseInfo.getMaintainabilityDebt())
+                                         .maintainabilitySmells(releaseInfo.getMaintainabilitySmells())
+                                         .reliabilityBugs(releaseInfo.getReliabilityBugs())
+                                         .build();
     }
 }

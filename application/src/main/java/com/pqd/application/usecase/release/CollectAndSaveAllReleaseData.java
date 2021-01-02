@@ -6,7 +6,6 @@ import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
 import com.pqd.application.usecase.UseCase;
 import com.pqd.application.usecase.product.ProductGateway;
 import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
-import com.pqd.application.usecase.sonarqube.SaveSonarqubeData;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -23,8 +22,6 @@ public class CollectAndSaveAllReleaseData {
 
     private final RetrieveSonarqubeData retrieveSonarqubeData;
 
-    private final SaveSonarqubeData saveSonarqubeData;
-
     private final SaveReleaseInfo saveReleaseInfo;
 
     public void execute(Request request) {
@@ -36,11 +33,7 @@ public class CollectAndSaveAllReleaseData {
         SonarqubeReleaseInfo sonarqubeReleaseInfo = retrieveSonarqubeData.execute(retrieveSqDataRequest)
                                                                          .getReleaseInfo();
 
-        SonarqubeReleaseInfo savedSonarqubeReleaseInfo =
-                saveSonarqubeData.execute(SaveSonarqubeData.Request.of(sonarqubeReleaseInfo))
-                                 .getSonarqubeReleaseInfo();
-
-        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(savedSonarqubeReleaseInfo));
+        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(sonarqubeReleaseInfo, request.getProductId()));
     }
 
     @Value(staticConstructor = "of")

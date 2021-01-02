@@ -1,5 +1,6 @@
 package com.pqd.application.domain.release;
 
+import com.pqd.application.domain.sonarqube.SonarqubeReleaseInfo;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,5 +18,5 @@ public class ReleaseInfo {
 
     private final Double qualityLevel;
 
-    private final Long releaseInfoSonarqubeId;
+    private final SonarqubeReleaseInfo sonarqubeReleaseInfo;
 }
