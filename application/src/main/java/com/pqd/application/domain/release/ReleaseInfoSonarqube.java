@@ -1,10 +1,12 @@
 package com.pqd.application.domain.release;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Builder
 @Getter
+@EqualsAndHashCode(callSuper = false)
 public class ReleaseInfoSonarqube {
 
     private final Long id;

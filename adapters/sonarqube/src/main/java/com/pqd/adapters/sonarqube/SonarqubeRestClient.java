@@ -5,6 +5,7 @@ import com.pqd.application.usecase.sonarqube.SonarqubeGateway;
 import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
@@ -27,8 +28,14 @@ public class SonarqubeRestClient implements SonarqubeGateway {
         headers.set(HttpHeaders.AUTHORIZATION, basicAuth);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<SonarqubeMeasureResponse> response =
-                sonarqubeApiRestTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
+        ResponseEntity<SonarqubeMeasureResponse> response;
+
+        try {
+            response =
+                    sonarqubeApiRestTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
+        } catch (HttpClientErrorException exception) {
+            throw new SonarqubeRestClientException(String.format("%s", exception.getMessage()));
+        }
 
         return ReleaseInfoSonarqube.builder()
                                    .securityRating(Objects.requireNonNull(response.getBody()).getMetricValue("security_rating"))
@@ -40,4 +47,11 @@ public class SonarqubeRestClient implements SonarqubeGateway {
                                    .reliabilityBugs(Objects.requireNonNull(response.getBody()).getMetricValue("bugs"))
                                    .build();
     }
+
+    public static class SonarqubeRestClientException extends RuntimeException {
+        public SonarqubeRestClientException(String message) {
+            super(message);
+        }
+    }
+
 }
