@@ -4,5 +4,6 @@ include(
         "configuration",
         "application",
         "adapters:web",
-        "adapters:persistence"
+        "adapters:persistence",
+        "adapters:sonarqube"
 )
