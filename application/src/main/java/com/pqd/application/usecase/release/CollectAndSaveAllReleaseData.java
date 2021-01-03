@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import javax.transaction.Transactional;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @UseCase
@@ -25,7 +24,8 @@ public class CollectAndSaveAllReleaseData {
     private final SaveReleaseInfo saveReleaseInfo;
 
     public void execute(Request request) {
-        Product product = productGateway.findById(request.getProductId()).orElseThrow(NoSuchElementException::new);
+        Product product = productGateway.findById(request.getProductId())
+                                        .orElseThrow(() -> new RuntimeException(String.format("Product with id %s not found", request.getProductId())));
         RetrieveSonarqubeData.Request retrieveSqDataRequest =
                 RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().getBaseUrl(),
                                                  product.getSonarqubeInfo().getComponentName(),
