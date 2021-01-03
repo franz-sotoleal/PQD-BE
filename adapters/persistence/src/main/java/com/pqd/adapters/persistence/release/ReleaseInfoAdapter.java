@@ -1,4 +1,4 @@
-package com.pqd.adapters.persistence.release.main;
+package com.pqd.adapters.persistence.release;
 
 import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
