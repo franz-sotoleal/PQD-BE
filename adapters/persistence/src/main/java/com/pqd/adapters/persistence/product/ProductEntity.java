@@ -25,6 +25,9 @@ public class ProductEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "token")
+    private String token;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sq_info_id", referencedColumnName = "id")
     private SonarqubeInfoEntity sonarqubeInfoEntity;
