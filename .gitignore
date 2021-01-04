@@ -5,3 +5,4 @@
 /application/build/
 /adapters/persistence/build/
 /adapters/sonarqube/build/
+/adapters/messaging/build/

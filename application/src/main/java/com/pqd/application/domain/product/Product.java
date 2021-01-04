@@ -14,6 +14,8 @@ public class Product {
 
     String name;
 
+    String token;
+
     SonarqubeInfo sonarqubeInfo;
 
 }

@@ -26,6 +26,7 @@ CREATE TABLE public.product
 (
     id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('product_seq'),
     name            TEXT                    NOT NULL,
+    token           TEXT,
     sq_info_id      BIGINT                              REFERENCES public.sq_info(id)
     -- add other tool references here with another changelist by modifying this table
 );

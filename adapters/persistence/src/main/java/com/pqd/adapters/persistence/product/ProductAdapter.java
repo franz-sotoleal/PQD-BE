@@ -31,6 +31,7 @@ public class ProductAdapter implements ProductGateway {
                                            .id(entity.getSonarqubeInfoEntity().getId())
                                            .build())
                       .name(entity.getName())
+                      .token(entity.getToken())
                       .id(entity.getId())
                       .build();
     }
