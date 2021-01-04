@@ -107,5 +107,4 @@ public class MessagingControllerTest {
         assertThat(response.getBody()).isEqualTo("Invalid token");
     }
 
-
 }

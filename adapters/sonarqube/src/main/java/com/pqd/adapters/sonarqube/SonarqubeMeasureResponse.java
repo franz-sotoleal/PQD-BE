@@ -16,7 +16,7 @@ public class SonarqubeMeasureResponse {
     @Data
     @RequiredArgsConstructor
     @AllArgsConstructor
-    static class Component {
+    public static class Component {
 
         String id;
         String key;
@@ -28,7 +28,7 @@ public class SonarqubeMeasureResponse {
         @Data
         @RequiredArgsConstructor
         @AllArgsConstructor
-        static class Measure {
+        public static class Measure {
             String metric;
             double value;
             boolean bestValue;
