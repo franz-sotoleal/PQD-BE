@@ -1,8 +1,6 @@
 package com.pqd.adapters.web.dummy;
 
 import com.pqd.application.usecase.dummy.GetDummyResult;
-import com.pqd.application.usecase.release.CollectAndSaveAllReleaseData;
-import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,15 +13,12 @@ import static org.mockito.Mockito.when;
 class DummyControllerTest {
 
     private GetDummyResult getDummyResult;
-    private RetrieveSonarqubeData retrieveSonarqubeData;
-    private CollectAndSaveAllReleaseData collectAndSaveAllReleaseData;
     private DummyController controller;
 
     @BeforeEach
     void setup() {
         getDummyResult = mock(GetDummyResult.class);
-        retrieveSonarqubeData = mock(RetrieveSonarqubeData.class);
-        controller = new DummyController(getDummyResult, retrieveSonarqubeData, collectAndSaveAllReleaseData);
+        controller = new DummyController(getDummyResult);
     }
 
     @Test
