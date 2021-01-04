@@ -5,5 +5,6 @@ include(
         "application",
         "adapters:web",
         "adapters:persistence",
-        "adapters:sonarqube"
+        "adapters:sonarqube",
+        "adapters:messaging"
 )
