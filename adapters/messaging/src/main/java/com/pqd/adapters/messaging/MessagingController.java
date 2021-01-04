@@ -4,7 +4,7 @@ import com.pqd.adapters.messaging.async.AsyncService;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.usecase.product.GetProduct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +18,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MessagingController {
 
-    @Autowired
-    private AsyncService asyncService;
+    private final AsyncService asyncService;
 
-    @Autowired
-    private GetProduct getProduct;
+    private final GetProduct getProduct;
 
     /**
      * Runs asynchronously. Response 200 means the controller got the request and started async thread
@@ -32,7 +30,7 @@ public class MessagingController {
      */
     @PostMapping("/trigger")
     public ResponseEntity<String> triggerReleaseInfoCollection(@RequestHeader Map<String, String> headers, @RequestParam Long productId) {
-        if (!isValidToken(productId, headers.get("authorization"))) {
+        if (!isValidToken(productId, getAuthorizationHeader(headers))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
 
@@ -48,6 +46,25 @@ public class MessagingController {
         return decodedString.equals(product.getToken() + ":");
     }
 
+    private String getAuthorizationHeader(Map<String, String> headers) {
+        String startingUppercase = headers.get(HttpHeaders.AUTHORIZATION);
+        String lowercase = headers.get(HttpHeaders.AUTHORIZATION.toLowerCase());
+        String uppercase = headers.get(HttpHeaders.AUTHORIZATION.toUpperCase());
 
+        if (startingUppercase != null) {
+            return startingUppercase;
+        } else if (lowercase != null) {
+            return lowercase;
+        } else if (uppercase != null) {
+            return uppercase;
+        } else {
+            throw new RuntimeException("Exception with authorization header");
+        }
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<?> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
 
 }
