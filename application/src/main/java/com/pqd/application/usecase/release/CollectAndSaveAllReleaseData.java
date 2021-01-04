@@ -4,7 +4,7 @@ import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.UseCase;
-import com.pqd.application.usecase.product.ProductGateway;
+import com.pqd.application.usecase.product.GetProduct;
 import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +17,14 @@ import javax.transaction.Transactional;
 @Transactional
 public class CollectAndSaveAllReleaseData {
 
-    private final ProductGateway productGateway;
-
     private final RetrieveSonarqubeData retrieveSonarqubeData;
 
     private final SaveReleaseInfo saveReleaseInfo;
 
+    private final GetProduct getProduct;
+
     public void execute(Request request) {
-        Product product = productGateway.findById(request.getProductId())
-                                        .orElseThrow(() -> new RuntimeException(String.format("Product with id %s not found", request.getProductId())));
+        Product product = getProduct.execute(GetProduct.Request.of(request.getProductId())).getProduct();
         RetrieveSonarqubeData.Request retrieveSqDataRequest =
                 RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().getBaseUrl(),
                                                  product.getSonarqubeInfo().getComponentName(),
