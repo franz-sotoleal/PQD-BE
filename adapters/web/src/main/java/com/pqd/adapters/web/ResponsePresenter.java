@@ -7,6 +7,6 @@ public interface ResponsePresenter {
 
     void present(AbstractResponse response);
 
-    ResponseEntity getViewModel();
+    ResponseEntity<?> getViewModel();
 
 }

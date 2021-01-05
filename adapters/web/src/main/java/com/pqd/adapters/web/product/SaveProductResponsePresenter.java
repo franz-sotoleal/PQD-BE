@@ -34,4 +34,5 @@ public class SaveProductResponsePresenter implements ResponsePresenter {
         Assert.notNull(result, () -> "Result must be presented");
         return ResponseEntity.ok(result);
     }
+
 }
