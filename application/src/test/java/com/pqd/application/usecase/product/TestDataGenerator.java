@@ -17,4 +17,8 @@ public class TestDataGenerator {
                                                   .build())
                       .build();
     }
+
+    public static String generateToken() {
+        return "am6002capucyii2pjg0dp68q8a7d3j3evy1usiad";
+    }
 }
