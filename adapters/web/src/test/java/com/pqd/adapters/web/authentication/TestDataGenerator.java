@@ -1,6 +1,5 @@
-package com.pqd.adapters.web;
+package com.pqd.adapters.web.authentication;
 
-import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.application.domain.user.User;
 import com.pqd.application.domain.user.UserId;

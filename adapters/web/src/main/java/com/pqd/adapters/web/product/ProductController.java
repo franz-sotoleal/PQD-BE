@@ -35,6 +35,7 @@ public class ProductController {
         return presenter.getViewModel();
     }
 
+    // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
         if (requestJson.getUserId() == null
             || requestJson.getSonarqubeInfo() == null

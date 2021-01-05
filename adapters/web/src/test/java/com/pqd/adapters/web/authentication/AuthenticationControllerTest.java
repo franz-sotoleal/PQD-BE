@@ -1,6 +1,5 @@
 package com.pqd.adapters.web.authentication;
 
-import com.pqd.adapters.web.TestDataGenerator;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
