@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.product;
 
+import com.pqd.adapters.persistence.product.sonarqube.SonarqubeInfoEntity;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.product.ProductGateway;
@@ -21,6 +22,12 @@ public class ProductAdapter implements ProductGateway {
         return repository.findById(id).map(this::buildProduct);
     }
 
+    @Override
+    public Product save(Product product) {
+        ProductEntity savedProductEntity = repository.save(buildProductEntity(product));
+        return buildProduct(savedProductEntity);
+    }
+
     private Product buildProduct(ProductEntity entity) {
         return Product.builder()
                       .sonarqubeInfo(
@@ -34,6 +41,18 @@ public class ProductAdapter implements ProductGateway {
                       .token(entity.getToken())
                       .id(entity.getId())
                       .build();
+    }
+
+    private ProductEntity buildProductEntity(Product product) {
+        return ProductEntity.builder()
+                            .name(product.getName())
+                            .token(product.getToken())
+                            .sonarqubeInfoEntity(SonarqubeInfoEntity.builder()
+                                                                    .token(product.getSonarqubeInfo().getToken())
+                                                                    .baseUrl(product.getSonarqubeInfo().getBaseUrl())
+                                                                    .componentName(product.getSonarqubeInfo().getComponentName())
+                                                                    .build())
+                            .build();
     }
 
 }

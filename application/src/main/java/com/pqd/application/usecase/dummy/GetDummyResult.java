@@ -1,6 +1,8 @@
 package com.pqd.application.usecase.dummy;
 
+import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -13,7 +15,8 @@ public class GetDummyResult {
     }
 
     @Value(staticConstructor = "of")
-    public static class Response {
+    @EqualsAndHashCode(callSuper = false)
+    public static class Response extends AbstractResponse {
         String message;
     }
 

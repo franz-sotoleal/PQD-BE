@@ -15,5 +15,5 @@ public class SonarqubeInfo {
 
     String componentName;
 
-    String token;
+    String token; // token for authorization on sonarqube api side
 }
