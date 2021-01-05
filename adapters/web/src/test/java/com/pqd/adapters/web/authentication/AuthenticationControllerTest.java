@@ -2,9 +2,10 @@ package com.pqd.adapters.web.authentication;
 
 import com.pqd.adapters.web.TestDataGenerator;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
-import com.pqd.adapters.web.security.jwt.JwtResponse;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
+import com.pqd.application.domain.user.User;
+import com.pqd.application.usecase.user.GetUser;
 import com.pqd.application.usecase.user.RegisterUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ public class AuthenticationControllerTest {
 
     private AuthenticationController controller;
     private RegisterUser registerUser;
+    private GetUser getUser;
 
     private AuthenticationManager authenticationManager;
     private JwtTokenUtil jwtTokenUtil;
@@ -40,6 +42,7 @@ public class AuthenticationControllerTest {
     void setup() {
         JwtUserDetailsService jwtInMemoryUserDetailsService = mock(JwtUserDetailsService.class);
         registerUser = mock(RegisterUser.class);
+        getUser = mock(GetUser.class);
         authenticationManager = mock(AuthenticationManager.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
         bcryptEncoder = mock(PasswordEncoder.class);
@@ -47,19 +50,26 @@ public class AuthenticationControllerTest {
                                                   jwtTokenUtil,
                                                   jwtInMemoryUserDetailsService,
                                                   registerUser,
+                                                  getUser,
                                                   bcryptEncoder);
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void GIVEN_valid_credentials_WHEN_login_THEN_jwt_token_returned() {
+    void GIVEN_valid_credentials_WHEN_login_THEN_user_with_jwt_returned() {
         JwtRequest jwtRequest = TestDataGenerator.generateJwtRequest();
+        User user = TestDataGenerator.generateUser();
         when(jwtTokenUtil.generateToken(any())).thenReturn("token");
+        when(getUser.execute(any())).thenReturn(GetUser.Response.of(user));
 
-        ResponseEntity<JwtResponse> response = controller.loginAndGenerateAuthenticationToken(jwtRequest);
+        ResponseEntity<LoginResponseJson> response = controller.loginAndGenerateAuthenticationToken(jwtRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(response.getBody()).getJwt()).isEqualTo("token");
+        assertThat(Objects.requireNonNull(response.getBody()).getUsername()).isEqualTo(user.getUsername());
+        assertThat(Objects.requireNonNull(response.getBody()).getEmail()).isEqualTo(user.getEmail());
+        assertThat(Objects.requireNonNull(response.getBody()).getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(Objects.requireNonNull(response.getBody()).getLastName()).isEqualTo(user.getLastName());
     }
 
     @Test

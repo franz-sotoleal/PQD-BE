@@ -1,9 +1,10 @@
 package com.pqd.adapters.web.authentication;
 
 import com.pqd.adapters.web.security.jwt.JwtRequest;
-import com.pqd.adapters.web.security.jwt.JwtResponse;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
+import com.pqd.application.domain.user.User;
+import com.pqd.application.usecase.user.GetUser;
 import com.pqd.application.usecase.user.RegisterUser;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,12 @@ public class AuthenticationController {
 
     private final RegisterUser registerUser;
 
+    private final GetUser getUser;
+
     private final PasswordEncoder bcryptEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> loginAndGenerateAuthenticationToken(
+    public ResponseEntity<LoginResponseJson> loginAndGenerateAuthenticationToken(
             @RequestBody JwtRequest authenticationRequest) {
         return generateAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
     }
@@ -55,13 +58,22 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<JwtResponse> generateAuthenticationToken(String username, String password) {
+    private ResponseEntity<LoginResponseJson> generateAuthenticationToken(String username, String password) {
         authenticate(username, password);
 
         final UserDetails userDetails = jwtInMemoryUserDetailsService.loadUserByUsername(username);
         final String token = jwtTokenUtil.generateToken(userDetails);
+        User user = getUser.execute(GetUser.Request.of(username)).getUser();
+        LoginResponseJson loginResponseJson = LoginResponseJson.builder()
+                                                               .firstName(user.getFirstName())
+                                                               .lastName(user.getLastName())
+                                                               .userId(user.getUserId().getId())
+                                                               .username(user.getUsername())
+                                                               .email(user.getEmail())
+                                                               .jwt(token)
+                                                               .build();
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(loginResponseJson);
     }
 
     private void authenticate(@NonNull String username, @NonNull String password) {

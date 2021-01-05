@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SaveProductRequestJson {
 
+    //TODO userId
+
     @JsonProperty("name")
     String name;
 
