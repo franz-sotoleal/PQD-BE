@@ -1,6 +1,8 @@
 package com.pqd.integration;
 
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
+import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -107,5 +109,28 @@ public class TestDataGenerator {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("AuTHORizaTION", basicAuth);
         return headers;
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson() {
+        return SaveProductRequestJson.builder()
+                                     .name("test12")
+                                     .userId(123L)
+                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withNoUserId() {
+        return SaveProductRequestJson.builder()
+                                     .name("test12")
+                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .build();
+    }
+
+    private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .baseUrl("base-url")
+                                       .componentName("comp-name")
+                                       .token("tokenabc123")
+                                       .build();
     }
 }
