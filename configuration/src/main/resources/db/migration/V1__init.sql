@@ -3,6 +3,7 @@ CREATE SEQUENCE product_seq INCREMENT 50;
 CREATE SEQUENCE sq_info_seq INCREMENT 50;
 CREATE SEQUENCE release_info_sq_seq INCREMENT 50;
 CREATE SEQUENCE release_info_seq INCREMENT 50;
+CREATE SEQUENCE user_product_claim_seq INCREMENT 50;
 
 CREATE TABLE public.user
 (
@@ -31,8 +32,9 @@ CREATE TABLE public.product
     -- add other tool references here with another changelist by modifying this table
 );
 
-CREATE TABLE public.user_product_claims
+CREATE TABLE public.user_product_claim
 (
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('user_product_claim_seq'),
     user_id         BIGINT                  NOT NULL    REFERENCES public.user(id),
     product_id      BIGINT                  NOT NULL    REFERENCES public.product(id),
     claim_level     TEXT
