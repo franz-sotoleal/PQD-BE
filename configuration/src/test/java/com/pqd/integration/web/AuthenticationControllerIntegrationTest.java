@@ -13,6 +13,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.transaction.Transactional;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,12 +28,17 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
 
     @Test
     @Transactional
-    void GIVEN_correct_credentials_WHEN_login_THEN_jwt_returned() throws Exception {
+    void GIVEN_correct_credentials_WHEN_login_THEN_user_info_with_jwt_returned() throws Exception {
         JwtRequest jwtRequest = TestDataGenerator.generateJwtRequestWithValidCredentials();
         mvc.perform(post("/api/authentication/login")
                             .content(objectMapper.writeValueAsString(jwtRequest))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
+           .andExpect(jsonPath("$.username", is("user")))
+           .andExpect(jsonPath("$.userId", is(1)))
+           .andExpect(jsonPath("$.firstName", is("john")))
+           .andExpect(jsonPath("$.lastName", is("doe")))
+           .andExpect(jsonPath("$.email", is("john.doe@mail.com")))
            .andExpect(jsonPath("$.jwt", isA(String.class)));
     }
 
