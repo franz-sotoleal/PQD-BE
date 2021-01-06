@@ -26,7 +26,7 @@ public class ReleaseInfoAdapterTest {
     }
 
     @Test
-    void GIVEN_user_WHEN_saving_user_entity_THEN_user_entity_passed_and_saved() {
+    void GIVEN_release_info_WHEN_saving_entity_THEN_entity_passed_and_saved() {
         ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo();
         ReleaseInfoEntity releaseInfoEntity = TestDataGenerator.generateReleaseInfoEntity();
         when(repository.save(any())).thenReturn(releaseInfoEntity);
