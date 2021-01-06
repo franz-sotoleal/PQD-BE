@@ -126,6 +126,13 @@ public class TestDataGenerator {
                                      .build();
     }
 
+    public static String getExpiredToken() {
+        return "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwicHJvZHVjdCI6W3sicHJvZHVj" +
+               "dElkIjoxLCJjbGFpbUxldmVsIjp7InZhbHVlIjoiYWRtaW4ifX1dLCJleHAiOjE2MDk5" +
+               "NzM2ODEsImlhdCI6MTYwOTk1NTY4MX0.FiMys8RCjnGEPrWrXN1NRR5ia1QMHFq9ceax4" +
+               "ckY4KLywzOqOEWX9AJ-0KzFdF3Xyx1p9B-3jNzYlnLRr7wQPA";
+    }
+
     private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson() {
         return SonarqubeInfoRequestJson.builder()
                                        .baseUrl("base-url")

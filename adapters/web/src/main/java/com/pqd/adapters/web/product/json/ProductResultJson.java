@@ -4,10 +4,12 @@ import com.pqd.application.domain.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class ProductResultJson {
 
     Long id;

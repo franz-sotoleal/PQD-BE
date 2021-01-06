@@ -18,6 +18,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     testImplementation("org.springframework.cloud:spring-cloud-starter:2.2.2.RELEASE")
+    testImplementation("javax.servlet:javax.servlet-api:3.1.0")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql:1.15.1")
     testImplementation("org.testcontainers:junit-jupiter:1.15.1")

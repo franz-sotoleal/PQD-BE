@@ -74,7 +74,7 @@ public class ProductController {
     }
 
     @ExceptionHandler({HttpClientErrorException.class})
-    public ResponseEntity<?> handleBadCredentialsException(Exception e) {
+    public ResponseEntity<?> handleBadRequestException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
