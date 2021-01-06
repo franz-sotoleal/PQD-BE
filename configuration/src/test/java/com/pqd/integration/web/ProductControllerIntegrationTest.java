@@ -40,8 +40,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
            .andExpect(jsonPath("$.id", isA(Number.class)))
            .andExpect(jsonPath("$.name", is(requestJson.getName())))
            .andExpect(jsonPath("$.sonarqubeInfo.baseUrl", is(requestJson.getSonarqubeInfo().getBaseUrl())))
-           .andExpect(jsonPath("$.sonarqubeInfo.componentName", is(requestJson.getSonarqubeInfo().getComponentName())))
-           .andExpect(jsonPath("$.sonarqubeInfo.token", is(requestJson.getSonarqubeInfo().getToken())));
+           .andExpect(jsonPath("$.sonarqubeInfo.componentName", is(requestJson.getSonarqubeInfo().getComponentName())));
     }
 
     @Test

@@ -1,8 +1,10 @@
 package com.pqd.adapters.web.product;
 
+import com.pqd.adapters.web.product.json.ProductResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
-import com.pqd.adapters.web.product.json.SaveProductResultJson;
+import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,10 @@ public class ProductControllerTest {
 
     private ProductController controller;
 
+    private GetProductList getProductList;
+
+    private JwtTokenUtil jwtTokenUtil;
+
     @Captor
     private ArgumentCaptor<SaveProduct.Request> saveProductRequestCaptor;
 
@@ -35,7 +41,9 @@ public class ProductControllerTest {
     void setup() {
         saveProduct = mock(SaveProduct.class);
         saveClaim = mock(SaveClaim.class);
-        controller = new ProductController(saveProduct, saveClaim);
+        getProductList = mock(GetProductList.class);
+        jwtTokenUtil = mock(JwtTokenUtil.class);
+        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -47,7 +55,7 @@ public class ProductControllerTest {
         when(saveProduct.execute(any())).thenReturn(saveProductResponse);
         when(saveClaim.execute(any())).thenReturn(saveClaimResponse);
 
-        ResponseEntity<SaveProductResultJson> responseEntity = controller.saveProduct(requestJson);
+        ResponseEntity<ProductResultJson> responseEntity = controller.saveProduct(requestJson);
 
         verify(saveProduct).execute(saveProductRequestCaptor.capture());
         verify(saveClaim).execute(saveClaimRequestCaptor.capture());
@@ -66,8 +74,6 @@ public class ProductControllerTest {
                 .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getComponentName());
         assertThat(responseEntity.getBody().getSonarqubeInfo().getBaseUrl())
                 .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getBaseUrl());
-        assertThat(responseEntity.getBody().getSonarqubeInfo().getToken())
-                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getToken());
     }
 
     @Test

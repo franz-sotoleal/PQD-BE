@@ -13,5 +13,5 @@ public class SonarqubeInfoResultJson {
 
     String componentName;
 
-    String token; // token for authorization on sonarqube api side
+    // String token; // token for authorization on sonarqube api side
 }
