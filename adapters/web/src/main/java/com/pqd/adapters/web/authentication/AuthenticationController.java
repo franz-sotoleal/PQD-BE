@@ -4,6 +4,7 @@ import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
 import com.pqd.application.domain.user.User;
+import com.pqd.application.usecase.claim.GetUserProductClaims;
 import com.pqd.application.usecase.user.GetUser;
 import com.pqd.application.usecase.user.RegisterUser;
 import lombok.NonNull;
@@ -16,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/authentication")
@@ -33,12 +37,18 @@ public class AuthenticationController {
 
     private final GetUser getUser;
 
+    private final GetUserProductClaims getUserProductClaims;
+
     private final PasswordEncoder bcryptEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseJson> loginAndGenerateAuthenticationToken(
             @RequestBody JwtRequest authenticationRequest) {
-        return generateAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        String username = authenticationRequest.getUsername();
+        String password = authenticationRequest.getPassword();
+
+        authenticate(username, password);
+        return ResponseEntity.ok(getLoginResponse(authenticationRequest.getUsername()));
     }
 
     @PostMapping("/register")
@@ -58,22 +68,19 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<LoginResponseJson> generateAuthenticationToken(String username, String password) {
-        authenticate(username, password);
+    private LoginResponseJson getLoginResponse(String username) {
+        List<UserProductClaimResponseJson> claimsResponse =
+                getUserProductClaims.execute(GetUserProductClaims.Request.of(username))
+                                    .getUserProductClaims()
+                                    .stream()
+                                    .map(UserProductClaimResponseJson::buildResponseJson)
+                                    .collect(Collectors.toList());
 
         final UserDetails userDetails = jwtInMemoryUserDetailsService.loadUserByUsername(username);
-        final String token = jwtTokenUtil.generateToken(userDetails);
+        final String token = jwtTokenUtil.generateToken(userDetails, claimsResponse);
         User user = getUser.execute(GetUser.Request.of(username)).getUser();
-        LoginResponseJson loginResponseJson = LoginResponseJson.builder()
-                                                               .firstName(user.getFirstName())
-                                                               .lastName(user.getLastName())
-                                                               .userId(user.getUserId().getId())
-                                                               .username(user.getUsername())
-                                                               .email(user.getEmail())
-                                                               .jwt(token)
-                                                               .build();
 
-        return ResponseEntity.ok(loginResponseJson);
+        return LoginResponseJson.buildResopnseJson(user, token);
     }
 
     private void authenticate(@NonNull String username, @NonNull String password) {

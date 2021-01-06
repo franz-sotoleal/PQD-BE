@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -19,6 +21,12 @@ public class UserProductClaimAdapter implements UserProductClaimGateway {
     public UserProductClaim save(UserProductClaim userProductClaim) {
         UserProductClaimEntity savedClaimEntity = repository.save(buildUserProductClaimEntity(userProductClaim));
         return buildUserProductClaim(savedClaimEntity);
+    }
+
+    @Override
+    public List<UserProductClaim> getUserProductClaimsByUsername(String username) {
+        List<UserProductClaimEntity> entities = repository.getUserProductClaimsByUsername(username);
+        return entities.stream().map(this::buildUserProductClaim).collect(Collectors.toList());
     }
 
     private UserProductClaimEntity buildUserProductClaimEntity(UserProductClaim userProductClaim) {

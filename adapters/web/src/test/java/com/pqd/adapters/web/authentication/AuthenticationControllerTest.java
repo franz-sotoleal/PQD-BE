@@ -4,6 +4,7 @@ import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
 import com.pqd.application.domain.user.User;
+import com.pqd.application.usecase.claim.GetUserProductClaims;
 import com.pqd.application.usecase.user.GetUser;
 import com.pqd.application.usecase.user.RegisterUser;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +31,7 @@ public class AuthenticationControllerTest {
     private AuthenticationController controller;
     private RegisterUser registerUser;
     private GetUser getUser;
+    private GetUserProductClaims getUserProductClaims;
 
     private AuthenticationManager authenticationManager;
     private JwtTokenUtil jwtTokenUtil;
@@ -42,6 +45,7 @@ public class AuthenticationControllerTest {
         JwtUserDetailsService jwtInMemoryUserDetailsService = mock(JwtUserDetailsService.class);
         registerUser = mock(RegisterUser.class);
         getUser = mock(GetUser.class);
+        getUserProductClaims = mock(GetUserProductClaims.class);
         authenticationManager = mock(AuthenticationManager.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
         bcryptEncoder = mock(PasswordEncoder.class);
@@ -50,6 +54,7 @@ public class AuthenticationControllerTest {
                                                   jwtInMemoryUserDetailsService,
                                                   registerUser,
                                                   getUser,
+                                                  getUserProductClaims,
                                                   bcryptEncoder);
         MockitoAnnotations.initMocks(this);
     }
@@ -58,7 +63,8 @@ public class AuthenticationControllerTest {
     void GIVEN_valid_credentials_WHEN_login_THEN_user_with_jwt_returned() {
         JwtRequest jwtRequest = TestDataGenerator.generateJwtRequest();
         User user = TestDataGenerator.generateUser();
-        when(jwtTokenUtil.generateToken(any())).thenReturn("token");
+        when(jwtTokenUtil.generateToken(any(), any())).thenReturn("token");
+        when(getUserProductClaims.execute(any())).thenReturn(GetUserProductClaims.Response.of(new ArrayList<>()));
         when(getUser.execute(any())).thenReturn(GetUser.Response.of(user));
 
         ResponseEntity<LoginResponseJson> response = controller.loginAndGenerateAuthenticationToken(jwtRequest);
