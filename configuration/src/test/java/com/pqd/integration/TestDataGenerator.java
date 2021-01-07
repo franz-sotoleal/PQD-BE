@@ -158,10 +158,40 @@ public class TestDataGenerator {
                "ckY4KLywzOqOEWX9AJ-0KzFdF3Xyx1p9B-3jNzYlnLRr7wQPA";
     }
 
-    private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson() {
+    public static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson() {
         return SonarqubeInfoRequestJson.builder()
                                        .baseUrl("base-url")
                                        .componentName("comp-name")
+                                       .token("tokenabc123")
+                                       .build();
+    }
+
+    public static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_missingBaseUrl() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .componentName("comp-name")
+                                       .token("tokenabc123")
+                                       .build();
+    }
+
+    public static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_emptyBaseUrl() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .baseUrl("")
+                                       .componentName("comp-name")
+                                       .token("tokenabc123")
+                                       .build();
+    }
+
+    public static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_missingComponentName() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .baseUrl("base-url")
+                                       .token("tokenabc123")
+                                       .build();
+    }
+
+    public static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_emptyComponentName() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .componentName("")
+                                       .baseUrl("base-url")
                                        .token("tokenabc123")
                                        .build();
     }

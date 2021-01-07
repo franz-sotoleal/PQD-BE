@@ -4,6 +4,7 @@ import com.pqd.adapters.web.authentication.LoginResponseJson;
 import com.pqd.adapters.web.product.json.ProductResultJson;
 import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.integration.TestContainerBase;
 import com.pqd.integration.TestDataGenerator;
@@ -179,6 +180,87 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
 
         assertThat(mvcResult.getResponse().getContentAsString())
                 .contains("The product does not exist or you don't have access rights");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_syntactically_correct_request_WHEN_testing_sonarqube_connection_THEN_sonarqube_connection_result_returned()
+            throws Exception {
+        SonarqubeInfoRequestJson requestJson = TestDataGenerator.generateSonarqubeInfoRequestJson();
+
+        mvc.perform(post("/api/product/test/sonarqube/connection")
+                            .content(mapper.writeValueAsString(requestJson))
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.connectionOk", is(false)))
+           .andExpect(jsonPath("$.message", is("URI is not absolute")));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_baseurl_WHEN_testing_sonarqube_connection_THEN_400_returned()
+            throws Exception {
+        SonarqubeInfoRequestJson requestJson = TestDataGenerator.generateSonarqubeInfoRequestJson_missingBaseUrl();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_empty_baseurl_WHEN_testing_sonarqube_connection_THEN_400_returned()
+            throws Exception {
+        SonarqubeInfoRequestJson requestJson = TestDataGenerator.generateSonarqubeInfoRequestJson_emptyBaseUrl();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_component_name_WHEN_testing_sonarqube_connection_THEN_400_returned()
+            throws Exception {
+        SonarqubeInfoRequestJson requestJson =
+                TestDataGenerator.generateSonarqubeInfoRequestJson_missingComponentName();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_empty_component_name_WHEN_testing_sonarqube_connection_THEN_400_returned()
+            throws Exception {
+        SonarqubeInfoRequestJson requestJson =
+                TestDataGenerator.generateSonarqubeInfoRequestJson_emptyComponentName();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
     }
 
     private LoginResponseJson performLoginRequest() throws Exception {
