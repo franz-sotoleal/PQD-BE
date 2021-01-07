@@ -1,14 +1,12 @@
 package com.pqd.adapters.web.product.json;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class SonarqubeInfoResultJson {
 
     String baseUrl;

@@ -1,15 +1,13 @@
 package com.pqd.adapters.web.product.json;
 
 import com.pqd.application.domain.product.Product;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class ProductResultJson {
 
     Long id;

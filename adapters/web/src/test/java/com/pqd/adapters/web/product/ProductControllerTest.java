@@ -3,6 +3,8 @@ package com.pqd.adapters.web.product;
 import com.pqd.adapters.web.product.json.ProductResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
+import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
+import com.pqd.application.domain.product.Product;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -13,6 +15,9 @@ import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,6 +50,36 @@ public class ProductControllerTest {
         jwtTokenUtil = mock(JwtTokenUtil.class);
         controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil);
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    void GIVEN_user_has_claims_WHEN_getting_products_THEN_product_list_returned() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        List<Product> productList = TestDataGenerator.generateProductList();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+        when(getProductList.execute(any())).thenReturn(GetProductList.Response.of(productList));
+
+        ResponseEntity<List<ProductResultJson>> actual =
+                controller.getUserProductList("Bearer token.blabla.bla");
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isInstanceOf(ArrayList.class);
+        assertThat(actual.getBody().size()).isEqualTo(2);
+        assertThat(actual.getBody().get(0)).isEqualTo(ProductResultJson.buildResultJson(productList.get(0)));
+        assertThat(actual.getBody().get(1)).isEqualTo(ProductResultJson.buildResultJson(productList.get(1)));
+    }
+
+    @Test
+    void GIVEN_user_has_no_claims_WHEN_getting_products_THEN_empty_list_returned() {
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(List.of());
+        when(getProductList.execute(any())).thenReturn(GetProductList.Response.of(List.of()));
+
+        ResponseEntity<List<ProductResultJson>> actual =
+                controller.getUserProductList("Bearer token.blabla.bla");
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isInstanceOf(ArrayList.class);
+        assertThat(actual.getBody().size()).isEqualTo(0);
     }
 
     @Test

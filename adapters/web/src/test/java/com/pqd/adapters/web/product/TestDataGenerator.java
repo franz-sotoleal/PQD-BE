@@ -2,6 +2,7 @@ package com.pqd.adapters.web.product;
 
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.domain.claim.UserProductClaim;
 import com.pqd.application.domain.product.Product;
@@ -9,7 +10,34 @@ import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.SaveProduct;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class TestDataGenerator {
+
+    public static List<JwtUserProductClaim> generateProductClaimsFromToken() {
+        return List.of(1L, 2L)
+                   .stream()
+                   .map(id -> JwtUserProductClaim.builder()
+                                                 .productId(id)
+                                                 .claimLevel(
+                                                         ClaimLevel
+                                                                 .builder()
+                                                                 .value(ClaimLevel.ADMIN)
+                                                                 .build())
+                                                 .build()).collect(Collectors.toList());
+    }
+
+    public static List<Product> generateProductList() {
+        return List.of(1L, 2L)
+                   .stream()
+                   .map(id -> Product.builder()
+                                     .id(id)
+                                     .token("product-token" + id)
+                                     .name("product-name" + id)
+                                     .sonarqubeInfo(generateSonarqubeInfo())
+                                     .build()).collect(Collectors.toList());
+    }
 
     public static SaveProductRequestJson generateSaveProductRequestJson() {
         return SaveProductRequestJson.builder()
