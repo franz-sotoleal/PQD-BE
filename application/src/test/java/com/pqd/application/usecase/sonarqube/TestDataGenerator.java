@@ -1,6 +1,7 @@
 package com.pqd.application.usecase.sonarqube;
 
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 
 public class TestDataGenerator {
 
@@ -15,5 +16,12 @@ public class TestDataGenerator {
                                    .securityRating(3.0)
                                    .securityVulnerabilities(8.0)
                                    .build();
+    }
+
+    public static SonarqubeConnectionResult generateSonarqubeConnectionResult() {
+        return SonarqubeConnectionResult.builder()
+                                        .connectionOk(true)
+                                        .message("One test is enough")
+                                        .build();
     }
 }

@@ -1,16 +1,16 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.ProductResultJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.*;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;
+import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,6 +41,8 @@ public class ProductControllerTest {
 
     private GetProductReleaseInfo getProductReleaseInfo;
 
+    private TestSonarqubeConnection testSonarqubeConnection;
+
     @Captor
     private ArgumentCaptor<SaveProduct.Request> saveProductRequestCaptor;
 
@@ -54,8 +56,72 @@ public class ProductControllerTest {
         getProductList = mock(GetProductList.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
-        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo);
+        testSonarqubeConnection = mock(TestSonarqubeConnection.class);
+        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo,
+                                           testSonarqubeConnection);
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    void GIVEN_all_correct_WHEN_testing_sonarqube_connection_THEN_connection_result_returned() {
+        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
+        when(testSonarqubeConnection.execute(any())).thenReturn(TestSonarqubeConnection.Response.of(connectionResult));
+
+        var actual = controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
+                                                                                .baseUrl("a")
+                                                                                .componentName("a")
+                                                                                .token("a")
+                                                                                .build());
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isInstanceOf(SonarqubeConnectionResultJson.class);
+        assertThat(actual.getBody().isConnectionOk()).isEqualTo(true);
+        assertThat(actual.getBody().getMessage()).isEqualTo("ok");
+    }
+
+    @Test
+    void GIVEN_missing_baseurl_WHEN_testing_sonarqube_connection_THEN_exception_thrown() {
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
+                                                                                              .componentName("a")
+                                                                                              .token("a")
+                                                                                              .build()));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_empty_baseurl_WHEN_testing_sonarqube_connection_THEN_exception_thrown() {
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
+                                                                                              .baseUrl("")
+                                                                                              .componentName("a")
+                                                                                              .token("a")
+                                                                                              .build()));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_missing_component_name_WHEN_testing_sonarqube_connection_THEN_exception_thrown() {
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
+                                                                                              .baseUrl("a")
+                                                                                              .token("a")
+                                                                                              .build()));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_empty_component_name_WHEN_testing_sonarqube_connection_THEN_exception_thrown() {
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
+                                                                                              .baseUrl("a")
+                                                                                              .componentName("")
+                                                                                              .token("a")
+                                                                                              .build()));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
     @Test
@@ -143,11 +209,15 @@ public class ProductControllerTest {
         verify(saveProduct).execute(saveProductRequestCaptor.capture());
         verify(saveClaim).execute(saveClaimRequestCaptor.capture());
         assertThat(saveProductRequestCaptor.getValue().getName()).isEqualTo(requestJson.getName());
-        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo()).isEqualTo(requestJson.getSonarqubeInfo().toSonarqubeInfo());
+        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo())
+                .isEqualTo(requestJson.getSonarqubeInfo().toSonarqubeInfo());
 
-        assertThat(saveClaimRequestCaptor.getValue().getProductId()).isEqualTo(saveClaimResponse.getUserProductClaim().getProductId());
-        assertThat(saveClaimRequestCaptor.getValue().getUserId()).isEqualTo(saveClaimResponse.getUserProductClaim().getUserId());
-        assertThat(saveClaimRequestCaptor.getValue().getClaimLevel()).isEqualTo(saveClaimResponse.getUserProductClaim().getClaimLevel());
+        assertThat(saveClaimRequestCaptor.getValue().getProductId())
+                .isEqualTo(saveClaimResponse.getUserProductClaim().getProductId());
+        assertThat(saveClaimRequestCaptor.getValue().getUserId())
+                .isEqualTo(saveClaimResponse.getUserProductClaim().getUserId());
+        assertThat(saveClaimRequestCaptor.getValue().getClaimLevel())
+                .isEqualTo(saveClaimResponse.getUserProductClaim().getClaimLevel());
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody().getToken()).isEqualTo(saveProductResponse.getProduct().getToken());
@@ -168,7 +238,8 @@ public class ProductControllerTest {
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
-    @Test // While Sonarqube is only supported product then it is required if saving product
+    @Test
+        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_no_sq_info_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withNoSqInfo();
 
@@ -177,36 +248,44 @@ public class ProductControllerTest {
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
-    @Test // While Sonarqube is only supported product then it is required if saving product
+    @Test
+        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_1_WHEN_saving_product_THEN_exception_thrown() {
-        SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo();
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo();
 
         Exception exception =
                 assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
-    @Test // While Sonarqube is only supported product then it is required if saving product
+    @Test
+        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_2_WHEN_saving_product_THEN_exception_thrown() {
-        SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo2();
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo2();
 
         Exception exception =
                 assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
-    @Test // While Sonarqube is only supported product then it is required if saving product
+    @Test
+        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_3_WHEN_saving_product_THEN_exception_thrown() {
-        SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo3();
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo3();
 
         Exception exception =
                 assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
-    @Test // While Sonarqube is only supported product then it is required if saving product
+    @Test
+        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_4_WHEN_saving_product_THEN_exception_thrown() {
-        SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo4();
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo4();
 
         Exception exception =
                 assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));

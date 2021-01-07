@@ -1,8 +1,6 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.ProductResultJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.*;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
@@ -10,6 +8,7 @@ import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;
+import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +36,8 @@ public class ProductController {
 
     private final GetProductReleaseInfo getProductReleaseInfo;
 
+    private final TestSonarqubeConnection testSonarqubeConnection;
+
     @PostMapping("/save")
     public ResponseEntity<ProductResultJson> saveProduct(@RequestBody @NonNull SaveProductRequestJson requestJson) {
         checkRequiredFieldPresence(requestJson);
@@ -50,8 +51,23 @@ public class ProductController {
         return presenter.getViewModel();
     }
 
+    @PostMapping("/test/sonarqube/connection")
+    public ResponseEntity<SonarqubeConnectionResultJson> testSonarqubeConnection(
+            @RequestBody @NonNull SonarqubeInfoRequestJson request) {
+        checkRequiredFieldPresence(request);
+        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),
+                                                                                          request.getComponentName(),
+                                                                                          request.getToken()));
+
+        var presenter = new ConnectionTestPresenter();
+        presenter.present(response);
+
+        return presenter.getViewModel();
+    }
+
     @GetMapping("/get/all")
-    public ResponseEntity<List<ProductResultJson>> getUserProductList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+    public ResponseEntity<List<ProductResultJson>> getUserProductList(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         List<Long> productIds = getClaimedProductIds(authorizationHeader);
 
         GetProductList.Response response = getProductList.execute(GetProductList.Request.of(productIds));
@@ -92,13 +108,23 @@ public class ProductController {
     // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
         if (requestJson.getUserId() == null
-            || requestJson.getSonarqubeInfo() == null
-            || requestJson.getSonarqubeInfo().getBaseUrl() == null
-            || requestJson.getSonarqubeInfo().getComponentName() == null
-            || requestJson.getSonarqubeInfo().getBaseUrl().length() == 0
-            || requestJson.getSonarqubeInfo().getComponentName().length() == 0) {
+            || !areSonarqubeFieldsPresent(requestJson.getSonarqubeInfo())) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
+    }
+
+    private void checkRequiredFieldPresence(SonarqubeInfoRequestJson requestJson) {
+        if (!areSonarqubeFieldsPresent(requestJson)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
+    private boolean areSonarqubeFieldsPresent(SonarqubeInfoRequestJson requestJson) {
+        return requestJson != null
+               && requestJson.getBaseUrl() != null
+               && requestJson.getComponentName() != null
+               && requestJson.getBaseUrl().length() != 0
+               && requestJson.getComponentName().length() != 0;
     }
 
     @ExceptionHandler({HttpClientErrorException.class})
