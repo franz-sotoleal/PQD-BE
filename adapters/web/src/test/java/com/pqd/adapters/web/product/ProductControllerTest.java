@@ -8,6 +8,7 @@ import com.pqd.application.domain.product.Product;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
+import com.pqd.application.usecase.release.GetProductReleaseInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +37,8 @@ public class ProductControllerTest {
 
     private JwtTokenUtil jwtTokenUtil;
 
+    private GetProductReleaseInfo getProductReleaseInfo;
+
     @Captor
     private ArgumentCaptor<SaveProduct.Request> saveProductRequestCaptor;
 
@@ -48,7 +51,8 @@ public class ProductControllerTest {
         saveClaim = mock(SaveClaim.class);
         getProductList = mock(GetProductList.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
-        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil);
+        getProductReleaseInfo = mock(GetProductReleaseInfo.class);
+        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo);
         MockitoAnnotations.initMocks(this);
     }
 
