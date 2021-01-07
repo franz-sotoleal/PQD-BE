@@ -101,12 +101,17 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         List<ProductResultJson> productResultJsons =
                 mapper.readValue(productListMvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
 
-        assertThat(productResultJsons.size()).isEqualTo(1);
+        assertThat(productResultJsons.size()).isEqualTo(2);
         assertThat(productResultJsons.get(0).getId()).isEqualTo(1L);
         assertThat(productResultJsons.get(0).getName()).isEqualTo("Demo Product");
         assertThat(productResultJsons.get(0).getToken()).isEqualTo("8257cc3a6b0610da1357f73e03524b090658553a");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
+        assertThat(productResultJsons.get(1).getId()).isEqualTo(51L);
+        assertThat(productResultJsons.get(1).getName()).isEqualTo("Demo Product 2");
+        assertThat(productResultJsons.get(1).getToken()).isEqualTo("7257cc3a6b0610da1357f73e03524b090658553b");
+        assertThat(productResultJsons.get(1).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
+        assertThat(productResultJsons.get(1).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
     }
 
     @Test
