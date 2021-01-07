@@ -1,6 +1,7 @@
 package com.pqd.integration;
 
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
+import com.pqd.adapters.web.product.json.ReleaseInfoSonarqubeResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
@@ -10,6 +11,30 @@ import org.springframework.http.MediaType;
 import java.util.Base64;
 
 public class TestDataGenerator {
+    public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_201() {
+        return ReleaseInfoSonarqubeResultJson.builder()
+                                             .securityRating(1.0)
+                                             .reliabilityRating(2.0)
+                                             .maintainabilityRating(1.0)
+                                             .securityVulnerabilities(0.0)
+                                             .reliabilityBugs(5.0)
+                                             .maintainabilityDebt(326.0)
+                                             .maintainabilitySmells(65.0)
+                                             .build();
+    }
+
+    public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_1() {
+        return ReleaseInfoSonarqubeResultJson.builder()
+                                             .securityRating(1.0)
+                                             .reliabilityRating(3.0)
+                                             .maintainabilityRating(2.0)
+                                             .securityVulnerabilities(0.0)
+                                             .reliabilityBugs(5.0)
+                                             .maintainabilityDebt(326.0)
+                                             .maintainabilitySmells(65.0)
+                                             .build();
+    }
+
     public static JwtRequest generateJwtRequestWithValidCredentials() {
         JwtRequest jwtRequest = new JwtRequest();
         jwtRequest.setPassword("password");

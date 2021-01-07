@@ -2,6 +2,7 @@ package com.pqd.integration.web;
 
 import com.pqd.adapters.web.authentication.LoginResponseJson;
 import com.pqd.adapters.web.product.json.ProductResultJson;
+import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.integration.TestContainerBase;
@@ -78,16 +79,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     @Transactional
     void GIVEN_user_has_product_claims_WHEN_login_and_requesting_all_products_THEN_status_ok_and_user_products_returned()
             throws Exception {
-        JwtRequest jwtRequest = TestDataGenerator.generateJwtRequestWithValidCredentials();
-
-        MvcResult loginMvcResult = mvc.perform(post("/api/authentication/login")
-                                                       .content(mapper.writeValueAsString(jwtRequest))
-                                                       .contentType(MediaType.APPLICATION_JSON))
-                                      .andExpect(status().isOk())
-                                      .andReturn();
-
-        LoginResponseJson loginResponseJson =
-                mapper.readValue(loginMvcResult.getResponse().getContentAsString(), LoginResponseJson.class);
+        LoginResponseJson loginResponseJson = performLoginRequest();
 
         MvcResult productListMvcResult =
                 mvc.perform(get("/api/product/get/all")
@@ -133,6 +125,72 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                                                                         .header(HttpHeaders.AUTHORIZATION,
                                                                                 "Bearer " +
                                                                                 expiredToken.replaceFirst("W", "b"))));
-        assertThat(exception).hasStackTraceContaining("SignatureException: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted");
+        assertThat(exception).hasStackTraceContaining("SignatureException: JWT signature does not match locally " +
+                                                      "computed signature. JWT validity cannot be asserted and" +
+                                                      " should not be trusted");
     }
+
+    @Test
+    @Transactional
+    void GIVEN_user_has_product_claims_WHEN_login_and_requesting_release_info_THEN_status_ok_and_release_info_list_returned()
+            throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+
+        MvcResult releaseInfoListMvcResult =
+                mvc.perform(get("/api/product/1/releaseInfo")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header(HttpHeaders.AUTHORIZATION,
+                                            "Bearer " + loginResponseJson.getJwt()))
+                   .andExpect(status().isOk())
+                   .andReturn();
+
+        List<ReleaseInfoResultJson> releaseInfoList =
+                mapper.readValue(releaseInfoListMvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        assertThat(releaseInfoList.size()).isEqualTo(5);
+        assertThat(releaseInfoList.get(0).getId()).isEqualTo(201L);
+        assertThat(releaseInfoList.get(0).getProductId()).isEqualTo(1L);
+        assertThat(releaseInfoList.get(0).getQualityLevel()).isEqualTo(0.8);
+        assertThat(releaseInfoList.get(0).getReleaseInfoSonarqube())
+                .isEqualTo(TestDataGenerator.generateReleaseInfoSonarqubeResultJson_201());
+        assertThat(releaseInfoList.get(1).getId()).isEqualTo(151L);
+        assertThat(releaseInfoList.get(1).getProductId()).isEqualTo(1L);
+        assertThat(releaseInfoList.get(1).getQualityLevel()).isEqualTo(0.4);
+        assertThat(releaseInfoList.get(4).getId()).isEqualTo(1L);
+        assertThat(releaseInfoList.get(4).getProductId()).isEqualTo(1L);
+        assertThat(releaseInfoList.get(4).getQualityLevel()).isEqualTo(0.75);
+        assertThat(releaseInfoList.get(4).getReleaseInfoSonarqube())
+                .isEqualTo(TestDataGenerator.generateReleaseInfoSonarqubeResultJson_1());
+    }
+
+    @Test
+    @Transactional
+    void GIVEN_user_has_no_product_claims_WHEN_login_and_requesting_release_info_THEN_400_returned()
+            throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+
+        MvcResult mvcResult =
+                mvc.perform(get("/api/product/101/releaseInfo")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header(HttpHeaders.AUTHORIZATION,
+                                            "Bearer " + loginResponseJson.getJwt()))
+                   .andExpect(status().is4xxClientError())
+                   .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("The product does not exist or you don't have access rights");
+    }
+
+    private LoginResponseJson performLoginRequest() throws Exception {
+        JwtRequest jwtRequest = TestDataGenerator.generateJwtRequestWithValidCredentials();
+
+        MvcResult loginMvcResult = mvc.perform(post("/api/authentication/login")
+                                                       .content(mapper.writeValueAsString(jwtRequest))
+                                                       .contentType(MediaType.APPLICATION_JSON))
+                                      .andExpect(status().isOk())
+                                      .andReturn();
+
+        return mapper.readValue(loginMvcResult.getResponse().getContentAsString(), LoginResponseJson.class);
+    }
+
 }

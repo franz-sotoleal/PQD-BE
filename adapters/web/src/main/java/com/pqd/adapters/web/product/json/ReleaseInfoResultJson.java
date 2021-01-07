@@ -3,8 +3,6 @@ package com.pqd.adapters.web.product.json;
 import com.pqd.application.domain.release.ReleaseInfo;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,7 +14,7 @@ public class ReleaseInfoResultJson {
 
     Long productId;
 
-    LocalDateTime created;
+    String created;
 
     Double qualityLevel;
 
@@ -26,7 +24,7 @@ public class ReleaseInfoResultJson {
         return ReleaseInfoResultJson.builder()
                                     .id(releaseInfo.getId())
                                     .productId(releaseInfo.getProductId())
-                                    .created(releaseInfo.getCreated())
+                                    .created(releaseInfo.getCreated().toString())
                                     .qualityLevel(releaseInfo.getQualityLevel())
                                     .releaseInfoSonarqube(
                                             ReleaseInfoSonarqubeResultJson
