@@ -7,6 +7,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -36,5 +38,30 @@ public class ReleaseInfoAdapterTest {
         verify(repository).save(captor.capture());
         assertThat(captor.getValue()).isEqualTo(releaseInfoEntity);
         assertThat(actual).isEqualTo(releaseInfo);
+    }
+
+    @Test
+    void GIVEN_release_info_exist_WHEN_finding_all_release_info_by_id_THEN_release_info_list_returned() {
+        ReleaseInfoEntity releaseInfoEntity = TestDataGenerator.generateReleaseInfoEntity();
+        ReleaseInfoEntity releaseInfoEntity2 = TestDataGenerator.generateReleaseInfoEntity2();
+        ReleaseInfo expected = TestDataGenerator.generateReleaseInfo();
+        ReleaseInfo expected2 = TestDataGenerator.generateReleaseInfo2();
+        when(repository.findAllByProductIdOrderByIdDesc(any()))
+                .thenReturn(List.of(releaseInfoEntity, releaseInfoEntity2));
+
+        List<ReleaseInfo> actual = adapter.findAllByProductId(1L);
+
+        assertThat(actual.size()).isEqualTo(2);
+        assertThat(actual.get(0)).isEqualTo(expected);
+        assertThat(actual.get(1)).isEqualTo(expected2);
+    }
+
+    @Test
+    void GIVEN_release_info_doesnt_exist_WHEN_finding_all_release_info_by_id_THEN_empty_list_returned() {
+        when(repository.findAllByProductIdOrderByIdDesc(any())).thenReturn(List.of());
+
+        List<ReleaseInfo> actual = adapter.findAllByProductId(1L);
+
+        assertThat(actual.size()).isEqualTo(0);
     }
 }

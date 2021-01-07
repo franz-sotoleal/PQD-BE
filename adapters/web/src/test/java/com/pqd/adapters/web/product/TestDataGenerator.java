@@ -6,14 +6,51 @@ import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.domain.claim.UserProductClaim;
 import com.pqd.application.domain.product.Product;
+import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.SaveProduct;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TestDataGenerator {
+
+    public static ReleaseInfo generateReleaseInfo() {
+        return ReleaseInfo.builder()
+                          .releaseInfoSonarqube(generateReleaseInfoSonarqube())
+                          .productId(1L)
+                          .qualityLevel(0.83)
+                          .created(LocalDateTime.of(LocalDate.of(2021, 1, 3),
+                                                    LocalTime.of(18, 30, 23)))
+                          .build();
+    }
+
+    private static ReleaseInfoSonarqube generateReleaseInfoSonarqube() {
+        return ReleaseInfoSonarqube.builder()
+                                   .securityRating(1.0)
+                                   .securityVulnerabilities(2.0)
+                                   .reliabilityRating(3.0)
+                                   .reliabilityBugs(4.0)
+                                   .maintainabilityRating(5.0)
+                                   .maintainabilityDebt(6.0)
+                                   .maintainabilitySmells(7.0)
+                                   .build();
+    }
+
+    public static ReleaseInfo generateReleaseInfo2() {
+        return ReleaseInfo.builder()
+                          .releaseInfoSonarqube(generateReleaseInfoSonarqube())
+                          .productId(1L)
+                          .qualityLevel(0.5)
+                          .created(LocalDateTime.of(LocalDate.of(2021, 1, 7),
+                                                    LocalTime.of(16, 30, 23)))
+                          .build();
+    }
 
     public static List<JwtUserProductClaim> generateProductClaimsFromToken() {
         return List.of(1L, 2L)

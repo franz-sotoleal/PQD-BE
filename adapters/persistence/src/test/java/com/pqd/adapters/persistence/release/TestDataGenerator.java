@@ -30,6 +30,26 @@ public class TestDataGenerator {
                           .build();
     }
 
+    public static ReleaseInfoEntity generateReleaseInfoEntity2() {
+        return ReleaseInfoEntity.builder()
+                                .sonarqubeReleaseInfoEntity(generateReleaseInfoSonarqubeEntity())
+                                .productId(1L)
+                                .qualityLevel(0.5)
+                                .created(LocalDateTime.of(LocalDate.of(2021, 1, 7),
+                                                          LocalTime.of(16, 30, 23)))
+                                .build();
+    }
+
+    public static ReleaseInfo generateReleaseInfo2() {
+        return ReleaseInfo.builder()
+                          .releaseInfoSonarqube(generateReleaseInfoSonarqube())
+                          .productId(1L)
+                          .qualityLevel(0.5)
+                          .created(LocalDateTime.of(LocalDate.of(2021, 1, 7),
+                                                    LocalTime.of(16, 30, 23)))
+                          .build();
+    }
+
     private static ReleaseInfoSonarqube generateReleaseInfoSonarqube() {
         return ReleaseInfoSonarqube.builder()
                                    .securityRating(1.0)

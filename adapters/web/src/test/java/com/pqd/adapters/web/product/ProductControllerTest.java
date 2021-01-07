@@ -1,10 +1,12 @@
 package com.pqd.adapters.web.product;
 
 import com.pqd.adapters.web.product.json.ProductResultJson;
+import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.product.Product;
+import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -54,6 +56,48 @@ public class ProductControllerTest {
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
         controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo);
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    void GIVEN_all_correct_WHEN_getting_product_release_info_THEN_product_release_info_list_returned() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo();
+        ReleaseInfo releaseInfo2 = TestDataGenerator.generateReleaseInfo2();
+        when(getProductReleaseInfo.execute(any()))
+                .thenReturn(GetProductReleaseInfo.Response.of(List.of(releaseInfo, releaseInfo2)));
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        ResponseEntity<List<ReleaseInfoResultJson>> response =
+                controller.getProductReleaseInfo("Bearer token123.bla.bla", 1L);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(2);
+        assertThat(response.getBody().get(0)).isEqualTo(ReleaseInfoResultJson.buildResultJson(releaseInfo));
+        assertThat(response.getBody().get(1)).isEqualTo(ReleaseInfoResultJson.buildResultJson(releaseInfo2));
+    }
+
+    @Test
+    void GIVEN_all_correct_but_no_release_info_WHEN_getting_product_release_info_THEN_empty_list_returned() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(getProductReleaseInfo.execute(any())).thenReturn(GetProductReleaseInfo.Response.of(List.of()));
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        ResponseEntity<List<ReleaseInfoResultJson>> response =
+                controller.getProductReleaseInfo("Bearer token123.bla.bla", 2L);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(0);
+    }
+
+    @Test
+    void GIVEN_product_id_not_inside_jwt_claims_WHEN_getting_product_release_info_THEN_exception_thrown() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class, () -> controller.getProductReleaseInfo("Bearer token123.bla.bla", 9876L));
+
+        assertThat(exception).hasStackTraceContaining("The product does not exist or you don't have access rights");
     }
 
     @Test
