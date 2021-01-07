@@ -21,6 +21,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -148,7 +149,9 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         List<ReleaseInfoResultJson> releaseInfoList =
                 mapper.readValue(releaseInfoListMvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
 
-        assertThat(releaseInfoList.size()).isEqualTo(5);
+        assertThat(releaseInfoList.stream()
+                                  .map(ReleaseInfoResultJson::getProductId).collect(Collectors.toSet())
+                                  .size()).isEqualTo(1);
         assertThat(releaseInfoList.get(0).getId()).isEqualTo(201L);
         assertThat(releaseInfoList.get(0).getProductId()).isEqualTo(1L);
         assertThat(releaseInfoList.get(0).getQualityLevel()).isEqualTo(0.8);
