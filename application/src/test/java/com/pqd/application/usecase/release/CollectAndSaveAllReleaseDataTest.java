@@ -38,7 +38,7 @@ public class CollectAndSaveAllReleaseDataTest {
     void GIVEN_correct_request_WHEN_collect_and_save_all_release_data_executed_THEN_related_use_cases_executed() {
         CollectAndSaveAllReleaseData.Request request = TestDataGenerator.generateCollectAndSaveAllReleaseDataRequest();
         Product product = TestDataGenerator.generateProduct();
-        ReleaseInfoSonarqube releaseInfoSonarqube = TestDataGenerator.getReleaseInfoSonarqube();
+        ReleaseInfoSonarqube releaseInfoSonarqube = TestDataGenerator.generateReleaseInfoSonarqube();
 
         when(getProduct.execute(any())).thenReturn(GetProduct.Response.of(product));
         when(retrieveSonarqubeData
@@ -47,7 +47,7 @@ public class CollectAndSaveAllReleaseDataTest {
                                                                product.getSonarqubeInfo().getToken())))
                 .thenReturn(RetrieveSonarqubeData.Response.of(releaseInfoSonarqube));
         when(saveReleaseInfo.execute(any())).thenReturn(
-                SaveReleaseInfo.Response.of(TestDataGenerator.getReleaseInfo()));
+                SaveReleaseInfo.Response.of(TestDataGenerator.generateReleaseInfo()));
 
         collectAndSaveAllReleaseData.execute(request);
 

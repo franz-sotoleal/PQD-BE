@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface ProductGateway {
 
     Optional<Product> findById(Long id);
+
+    Product save(Product product);
 }

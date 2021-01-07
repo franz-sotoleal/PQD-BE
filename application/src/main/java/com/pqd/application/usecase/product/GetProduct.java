@@ -1,7 +1,9 @@
 package com.pqd.application.usecase.product;
 
 import com.pqd.application.domain.product.Product;
+import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -22,8 +24,10 @@ public class GetProduct {
         return Response.of(product);
     }
 
+
     @Value(staticConstructor = "of")
-    public static class Response {
+    @EqualsAndHashCode(callSuper = false)
+    public static class Response extends AbstractResponse {
         Product product;
     }
 

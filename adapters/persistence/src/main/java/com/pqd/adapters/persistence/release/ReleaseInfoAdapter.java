@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -20,6 +22,12 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
     public ReleaseInfo save(ReleaseInfo releaseInfo) {
         ReleaseInfoEntity savedReleaseInfo = repository.save(buildReleaseInfoEnity(releaseInfo));
         return buildReleaseInfo(savedReleaseInfo);
+    }
+
+    @Override
+    public List<ReleaseInfo> findAllByProductId(Long productId) {
+        List<ReleaseInfoEntity> entities = repository.findAllByProductIdOrderByIdDesc(productId);
+        return entities.stream().map(this::buildReleaseInfo).collect(Collectors.toList());
     }
 
     private ReleaseInfoEntity buildReleaseInfoEnity(ReleaseInfo releaseInfo) {

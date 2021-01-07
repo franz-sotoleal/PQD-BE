@@ -12,15 +12,15 @@ import java.time.LocalTime;
 public class TestDataGenerator {
 
     public static SaveReleaseInfo.Request generateSaveReleaseInfoRequest() {
-        return SaveReleaseInfo.Request.of(getReleaseInfoSonarqube(), 1L);
+        return SaveReleaseInfo.Request.of(generateReleaseInfoSonarqube(), 1L);
     }
 
     public static SaveReleaseInfo.Response generateSaveReleaseInfoResponse() {
-        return SaveReleaseInfo.Response.of(getReleaseInfo());
+        return SaveReleaseInfo.Response.of(generateReleaseInfo());
     }
 
     public static CalculateQualityLevel.Request generateCalculateQualityLevelRequest() {
-        return CalculateQualityLevel.Request.of(getReleaseInfoSonarqube());
+        return CalculateQualityLevel.Request.of(generateReleaseInfoSonarqube());
     }
 
     public static CalculateQualityLevel.Response generateCalculateQualityLevelResponse() {
@@ -32,7 +32,7 @@ public class TestDataGenerator {
     }
 
     public static CollectAndSaveAllReleaseData.Response generateCollectAndSaveAllReleaseDataResponse() {
-        return CollectAndSaveAllReleaseData.Response.of(getReleaseInfo());
+        return CollectAndSaveAllReleaseData.Response.of(generateReleaseInfo());
     }
 
     public static Product generateProduct() {
@@ -48,7 +48,7 @@ public class TestDataGenerator {
                       .build();
     }
 
-    public static ReleaseInfoSonarqube getReleaseInfoSonarqube() {
+    public static ReleaseInfoSonarqube generateReleaseInfoSonarqube() {
         return ReleaseInfoSonarqube.builder()
                                    .securityRating(1.0)
                                    .securityVulnerabilities(2.0)
@@ -60,13 +60,23 @@ public class TestDataGenerator {
                                    .build();
     }
 
-    public static ReleaseInfo getReleaseInfo() {
+    public static ReleaseInfo generateReleaseInfo() {
         return ReleaseInfo.builder()
-                          .releaseInfoSonarqube(getReleaseInfoSonarqube())
+                          .releaseInfoSonarqube(generateReleaseInfoSonarqube())
                           .productId(1L)
                           .qualityLevel(0.83)
                           .created(LocalDateTime.of(LocalDate.of(2021, 1, 3),
                                                     LocalTime.of(18, 30, 23)))
+                          .build();
+    }
+
+    public static ReleaseInfo generateReleaseInfo2() {
+        return ReleaseInfo.builder()
+                          .releaseInfoSonarqube(generateReleaseInfoSonarqube())
+                          .productId(1L)
+                          .qualityLevel(0.50)
+                          .created(LocalDateTime.of(LocalDate.of(2021, 1, 7),
+                                                    LocalTime.of(16, 30, 23)))
                           .build();
     }
 

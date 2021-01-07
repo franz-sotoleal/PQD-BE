@@ -14,7 +14,7 @@ public class Product {
 
     String name;
 
-    String token;
+    String token; // token for authorization on requests to messaging adapter
 
     SonarqubeInfo sonarqubeInfo;
 

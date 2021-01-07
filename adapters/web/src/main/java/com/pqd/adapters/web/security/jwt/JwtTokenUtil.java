@@ -1,18 +1,18 @@
 package com.pqd.adapters.web.security.jwt;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
+import com.pqd.adapters.web.authentication.UserProductClaimResponseJson;
+import com.pqd.application.domain.claim.ClaimLevel;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.Serializable;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -21,7 +21,7 @@ public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
 
-    public static final long JWT_TOKEN_VALIDITY = 5*60*60;
+    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -36,6 +36,32 @@ public class JwtTokenUtil implements Serializable {
 
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
+    }
+
+    public List<JwtUserProductClaim> getProductClaimsFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+
+        @SuppressWarnings (value="unchecked")
+        ArrayList<Object> productClaims = claims.get("product", ArrayList.class);
+        return productClaims
+                .stream()
+                .map(obj -> {
+                    if (obj instanceof LinkedHashMap) {
+
+                        @SuppressWarnings (value="unchecked")
+                        LinkedHashMap<String, Object> linkedHashMap = (LinkedHashMap<String, Object>) obj;
+
+                        @SuppressWarnings (value="unchecked")
+                        String claimLevel = ((LinkedHashMap<String, String>) linkedHashMap.get("claimLevel")).get("value");
+                        return JwtUserProductClaim.builder()
+                                                  .productId(Long.valueOf((Integer) linkedHashMap.get("productId")))
+                                                  .claimLevel(ClaimLevel.builder()
+                                                                        .value(claimLevel)
+                                                                        .build())
+                                                  .build();
+                    }
+                    return null;
+                }).collect(Collectors.toList());
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
@@ -57,15 +83,17 @@ public class JwtTokenUtil implements Serializable {
         return false;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, List<UserProductClaimResponseJson> productClaims) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("product", productClaims);
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                   .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY*1000)).signWith(SignatureAlgorithm.HS512, secret).compact();
+                   .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                   .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
     public Boolean canTokenBeRefreshed(String token) {
@@ -76,4 +104,5 @@ public class JwtTokenUtil implements Serializable {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }

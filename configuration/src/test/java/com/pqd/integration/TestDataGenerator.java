@@ -1,6 +1,9 @@
 package com.pqd.integration;
 
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
+import com.pqd.adapters.web.product.json.ReleaseInfoSonarqubeResultJson;
+import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,6 +11,30 @@ import org.springframework.http.MediaType;
 import java.util.Base64;
 
 public class TestDataGenerator {
+    public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_201() {
+        return ReleaseInfoSonarqubeResultJson.builder()
+                                             .securityRating(1.0)
+                                             .reliabilityRating(2.0)
+                                             .maintainabilityRating(1.0)
+                                             .securityVulnerabilities(0.0)
+                                             .reliabilityBugs(5.0)
+                                             .maintainabilityDebt(326.0)
+                                             .maintainabilitySmells(65.0)
+                                             .build();
+    }
+
+    public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_1() {
+        return ReleaseInfoSonarqubeResultJson.builder()
+                                             .securityRating(1.0)
+                                             .reliabilityRating(3.0)
+                                             .maintainabilityRating(2.0)
+                                             .securityVulnerabilities(0.0)
+                                             .reliabilityBugs(5.0)
+                                             .maintainabilityDebt(326.0)
+                                             .maintainabilitySmells(65.0)
+                                             .build();
+    }
+
     public static JwtRequest generateJwtRequestWithValidCredentials() {
         JwtRequest jwtRequest = new JwtRequest();
         jwtRequest.setPassword("password");
@@ -107,5 +134,35 @@ public class TestDataGenerator {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("AuTHORizaTION", basicAuth);
         return headers;
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson() {
+        return SaveProductRequestJson.builder()
+                                     .name("test12")
+                                     .userId(123L)
+                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withNoUserId() {
+        return SaveProductRequestJson.builder()
+                                     .name("test12")
+                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .build();
+    }
+
+    public static String getExpiredToken() {
+        return "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwicHJvZHVjdCI6W3sicHJvZHVj" +
+               "dElkIjoxLCJjbGFpbUxldmVsIjp7InZhbHVlIjoiYWRtaW4ifX1dLCJleHAiOjE2MDk5" +
+               "NzM2ODEsImlhdCI6MTYwOTk1NTY4MX0.FiMys8RCjnGEPrWrXN1NRR5ia1QMHFq9ceax4" +
+               "ckY4KLywzOqOEWX9AJ-0KzFdF3Xyx1p9B-3jNzYlnLRr7wQPA";
+    }
+
+    private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson() {
+        return SonarqubeInfoRequestJson.builder()
+                                       .baseUrl("base-url")
+                                       .componentName("comp-name")
+                                       .token("tokenabc123")
+                                       .build();
     }
 }
