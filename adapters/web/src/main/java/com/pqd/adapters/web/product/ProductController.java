@@ -5,6 +5,7 @@ import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
 import com.pqd.application.usecase.product.UpdateProduct;
@@ -30,6 +31,8 @@ public class ProductController {
     private final SaveProduct saveProduct;
 
     private final UpdateProduct updateProduct;
+
+    private final DeleteProduct deleteProduct;
 
     private final SaveClaim saveClaim;
 
@@ -59,8 +62,7 @@ public class ProductController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @RequestBody @NonNull UpdateProductRequestJson requestJson,
             @PathVariable(value = "productId") Long productId) {
-        List<Long> productIds = getClaimedProductIds(authorizationHeader);
-        checkClaimForAskedProduct(productId, productIds);
+        checkAuthority(authorizationHeader, productId);
         checkRequiredFieldPresence(requestJson);
 
         var response = updateProduct.execute(requestJson.toUpdateProductRequest(productId));
@@ -69,6 +71,17 @@ public class ProductController {
         presenter.present(SaveProduct.Response.of(response.getProduct()));
 
         return presenter.getViewModel();
+    }
+
+    @DeleteMapping("/{productId}/delete")
+    public ResponseEntity<String> deleteProduct(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            @PathVariable(value = "productId") Long productId) {
+        checkAuthority(authorizationHeader, productId);
+
+        deleteProduct.execute(DeleteProduct.Request.of(productId));
+
+        return ResponseEntity.ok(String.format("Product with id %s deleted", productId));
     }
 
     @PostMapping("/test/sonarqube/connection")
@@ -102,8 +115,7 @@ public class ProductController {
     public ResponseEntity<List<ReleaseInfoResultJson>> getProductReleaseInfo(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable(value = "productId") Long productId) {
-        List<Long> productIds = getClaimedProductIds(authorizationHeader);
-        checkClaimForAskedProduct(productId, productIds);
+        checkAuthority(authorizationHeader, productId);
 
         var response = getProductReleaseInfo.execute(GetProductReleaseInfo.Request.of(productId));
 
@@ -111,6 +123,13 @@ public class ProductController {
         presenter.present(response);
 
         return presenter.getViewModel();
+    }
+
+    private void checkAuthority(@RequestHeader(HttpHeaders.AUTHORIZATION)
+                                        String authorizationHeader,
+                                @PathVariable("productId") Long productId) {
+        List<Long> productIds = getClaimedProductIds(authorizationHeader);
+        checkClaimForAskedProduct(productId, productIds);
     }
 
     private List<Long> getClaimedProductIds(String authorizationHeader) {

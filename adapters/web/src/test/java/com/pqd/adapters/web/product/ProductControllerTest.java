@@ -7,6 +7,7 @@ import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
 import com.pqd.application.usecase.product.UpdateProduct;
@@ -34,6 +35,8 @@ public class ProductControllerTest {
 
     private UpdateProduct updateProduct;
 
+    private DeleteProduct deleteProduct;
+
     private SaveClaim saveClaim;
 
     private ProductController controller;
@@ -56,14 +59,41 @@ public class ProductControllerTest {
     void setup() {
         saveProduct = mock(SaveProduct.class);
         updateProduct = mock(UpdateProduct.class);
+        deleteProduct = mock(DeleteProduct.class);
         saveClaim = mock(SaveClaim.class);
         getProductList = mock(GetProductList.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
         testSonarqubeConnection = mock(TestSonarqubeConnection.class);
-        controller = new ProductController(saveProduct, updateProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo,
+        controller = new ProductController(saveProduct,
+                                           updateProduct,
+                                           deleteProduct,
+                                           saveClaim,
+                                           getProductList,
+                                           jwtTokenUtil,
+                                           getProductReleaseInfo,
                                            testSonarqubeConnection);
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    void GIVEN_valid_data_WHEN_deleting_product_THEN_product_deleted() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        ResponseEntity<String> actual = controller.deleteProduct("Bearer token", 1L);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void GIVEN_product_id_not_inside_jwt_claims_WHEN_deleting_product_THEN_exception_thrown() {
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception = assertThrows(Exception.class, () -> controller.deleteProduct("Bearer token", 1234L));
+
+        assertThat(exception).hasStackTraceContaining("The product does not exist or you don't have access rights");
     }
 
     @Test

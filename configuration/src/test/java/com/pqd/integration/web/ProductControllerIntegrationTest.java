@@ -1,8 +1,11 @@
 package com.pqd.integration.web;
 
+import com.pqd.adapters.persistence.claim.UserProductClaimEntity;
 import com.pqd.adapters.persistence.claim.UserProductClaimRepository;
 import com.pqd.adapters.persistence.product.ProductEntity;
 import com.pqd.adapters.persistence.product.ProductRepository;
+import com.pqd.adapters.persistence.release.ReleaseInfoEntity;
+import com.pqd.adapters.persistence.release.ReleaseInfoRepository;
 import com.pqd.adapters.web.authentication.LoginResponseJson;
 import com.pqd.adapters.web.product.json.*;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
@@ -43,7 +46,59 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     ProductRepository productRepository;
 
     @Autowired
+    ReleaseInfoRepository releaseInfoRepository;
+
+    @Autowired
     UserProductClaimRepository userProductClaimRepository;
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_correct_input_WHEN_deleting_product_THEN_status_ok_and_all_related_data_deleted() throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+
+        MvcResult mvcResult = mvc.perform(delete("/api/product/1/delete")
+                                                  .contentType(MediaType.APPLICATION_JSON)
+                                                  .header(HttpHeaders.AUTHORIZATION,
+                                                          "Bearer " + loginResponseJson.getJwt()))
+                                 .andExpect(status().isOk())
+                                 .andReturn();
+
+        ProductEntity productEntityFromDb = productRepository.findById(1L).orElse(null);
+        List<ReleaseInfoEntity> releaseInfoEntityList = releaseInfoRepository.findAllByProductIdOrderByIdDesc(1L);
+        List<UserProductClaimEntity> claimEntities = userProductClaimRepository.findAllByProductId(1L);
+
+        assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo("Product with id 1 deleted");
+        assertThat(productEntityFromDb).isNull();
+        assertThat(releaseInfoEntityList.size()).isEqualTo(0);
+        assertThat(claimEntities.size()).isEqualTo(0);
+    }
+
+    @Test
+    @Transactional
+    void GIVEN_user_has_no_product_claims_WHEN_login_and_deleting_product_THEN_400_returned()
+            throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+
+        MvcResult mvcResult = mvc.perform(delete("/api/product/101/delete")
+                                                  .contentType(MediaType.APPLICATION_JSON)
+                                                  .header(HttpHeaders.AUTHORIZATION,
+                                                          "Bearer " + loginResponseJson.getJwt()))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("The product does not exist or you don't have access rights");
+    }
+
+    @Test
+    @Transactional
+    void GIVEN_no_jwt_WHEN_login_and_deleting_product_THEN_unauthorized_returned()
+            throws Exception {
+        mvc.perform(delete("/api/product/101/delete")
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @Transactional
@@ -156,7 +211,6 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         assertThat(mvcResult.getResponse().getContentAsString())
                 .contains("The product does not exist or you don't have access rights");
     }
-
 
     @Test
     @Transactional

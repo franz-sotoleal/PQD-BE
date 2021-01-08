@@ -11,4 +11,6 @@ public interface UserProductClaimRepository extends JpaRepository<UserProductCla
 
     @Query(value = "SELECT * FROM public.user_product_claim WHERE user_id IN (SELECT id FROM public.user WHERE username = ?1) ORDER BY product_id ASC", nativeQuery = true)
     List<UserProductClaimEntity> getUserProductClaimsByUsername(String username);
+
+    List<UserProductClaimEntity> findAllByProductId(Long productId);
 }

@@ -1,5 +1,7 @@
 package com.pqd.adapters.persistence.product;
 
+import com.pqd.adapters.persistence.claim.UserProductClaimAdapter;
+import com.pqd.adapters.persistence.release.ReleaseInfoAdapter;
 import com.pqd.application.domain.product.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,8 @@ public class ProductAdapterTest {
 
     private ProductRepository repository;
     private ProductAdapter adapter;
+    private ReleaseInfoAdapter releaseInfoAdapter;
+    private UserProductClaimAdapter userProductClaimAdapter;
 
     @Captor
     private ArgumentCaptor<ProductEntity> captor;
@@ -26,7 +30,8 @@ public class ProductAdapterTest {
     @BeforeEach
     void setup() {
         repository = mock(ProductRepository.class);
-        adapter = new ProductAdapter(repository);
+        releaseInfoAdapter = mock(ReleaseInfoAdapter.class);
+        adapter = new ProductAdapter(repository, releaseInfoAdapter, userProductClaimAdapter);
         MockitoAnnotations.initMocks(this);
     }
 

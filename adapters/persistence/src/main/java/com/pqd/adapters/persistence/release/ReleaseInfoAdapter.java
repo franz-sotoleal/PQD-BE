@@ -30,6 +30,11 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
         return entities.stream().map(this::buildReleaseInfo).collect(Collectors.toList());
     }
 
+     public void deleteAllByProductId(Long productId) {
+        List<ReleaseInfoEntity> releaseInfoEntities = repository.findAllByProductIdOrderByIdDesc(productId);
+        repository.deleteAll(releaseInfoEntities);
+    }
+
     private ReleaseInfoEntity buildReleaseInfoEnity(ReleaseInfo releaseInfo) {
         return ReleaseInfoEntity.builder()
                                 .created(releaseInfo.getCreated())
