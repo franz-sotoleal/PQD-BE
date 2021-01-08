@@ -10,6 +10,7 @@ public class TestDataGenerator {
         return ProductEntity.builder()
                             .id(123L)
                             .name("test-product")
+                            .token("new-token")
                             .sonarqubeInfoEntity(generateSonarqubeInfoEntity())
                             .build();
     }
