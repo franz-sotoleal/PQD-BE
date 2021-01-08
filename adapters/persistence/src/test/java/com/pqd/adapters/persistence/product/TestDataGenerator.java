@@ -10,6 +10,7 @@ public class TestDataGenerator {
         return ProductEntity.builder()
                             .id(123L)
                             .name("test-product")
+                            .token("new-token")
                             .sonarqubeInfoEntity(generateSonarqubeInfoEntity())
                             .build();
     }
@@ -18,8 +19,29 @@ public class TestDataGenerator {
         return Product.builder()
                       .id(123L)
                       .name("test-product")
+                      .token("new-token")
                       .sonarqubeInfo(generateSonarqubeInfo())
                       .build();
+
+    }
+
+    public static Product generateUpdatableProduct() {
+        return Product.builder()
+                      .id(123L)
+                      .name("test-product-changed")
+                      .token("old-token")
+                      .sonarqubeInfo(generateUpdatableSonarqubeInfo())
+                      .build();
+
+    }
+
+    public static ProductEntity generateUpdatableProductEntity() {
+        return ProductEntity.builder()
+                             .id(123L)
+                             .name("test-product")
+                             .token("new-token")
+                             .sonarqubeInfoEntity(generateSonarqubeInfoEntity())
+                             .build();
 
     }
 
@@ -40,4 +62,23 @@ public class TestDataGenerator {
                             .id(1234L)
                             .build();
     }
+
+    private static SonarqubeInfo generateUpdatableSonarqubeInfo() {
+        return SonarqubeInfo.builder()
+                            .baseUrl("baseurl-updated")
+                            .componentName("component-name-updated")
+                            .token("token-updated")
+                            .id(1234L)
+                            .build();
+    }
+
+    private static SonarqubeInfoEntity generateUpdatableSonarqubeInfoEntity() {
+        return SonarqubeInfoEntity.builder()
+                                  .baseUrl("baseurl")
+                                  .componentName("component-name")
+                                  .token("token")
+                                  .id(1234L)
+                                  .build();
+    }
+
 }

@@ -29,6 +29,11 @@ public class UserProductClaimAdapter implements UserProductClaimGateway {
         return entities.stream().map(this::buildUserProductClaim).collect(Collectors.toList());
     }
 
+    public void deleteAllByProductId(Long productId) {
+        List<UserProductClaimEntity> entities = repository.findAllByProductId(productId);
+        repository.deleteAll(entities);
+    }
+
     private UserProductClaimEntity buildUserProductClaimEntity(UserProductClaim userProductClaim) {
         return UserProductClaimEntity.builder()
                                      .productId(userProductClaim.getProductId())

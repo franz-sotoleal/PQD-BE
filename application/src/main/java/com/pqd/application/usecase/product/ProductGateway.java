@@ -9,4 +9,8 @@ public interface ProductGateway {
     Optional<Product> findById(Long id);
 
     Product save(Product product);
+
+    Product update(Product product);
+
+    void delete(Long productId);
 }

@@ -2,12 +2,14 @@ package com.pqd.adapters.web.product;
 
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.UpdateProductRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.domain.claim.UserProductClaim;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -19,6 +21,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TestDataGenerator {
+
+    public static SonarqubeConnectionResult generateSonarqubeConnectionResult() {
+        return SonarqubeConnectionResult.builder()
+                                        .message("ok")
+                                        .connectionOk(true)
+                                        .build();
+    }
 
     public static ReleaseInfo generateReleaseInfo() {
         return ReleaseInfo.builder()
@@ -76,6 +85,96 @@ public class TestDataGenerator {
                                      .build()).collect(Collectors.toList());
     }
 
+    public static UpdateProductRequestJson generateUpdateProductRequestJson() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Before update")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_missingBaseurl() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Before update")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_missingName() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_emptyName() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .name("")
+                                                        .id(1L)
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_emptyBaseurl() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Before update")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid2())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_missingComponentName() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Before update")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid3())
+                                                        .build())
+                                       .build();
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_emptyComponentName() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(true)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Before update")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson_invalid4())
+                                                        .build())
+                                       .build();
+    }
+
     public static SaveProductRequestJson generateSaveProductRequestJson() {
         return SaveProductRequestJson.builder()
                                      .name("test12")
@@ -85,12 +184,16 @@ public class TestDataGenerator {
     }
 
     public static SaveProduct.Response generateSaveProductResponse() {
-        return SaveProduct.Response.of(Product.builder()
-                                              .id(12367L)
-                                              .token("product-token")
-                                              .name("product-name")
-                                              .sonarqubeInfo(generateSonarqubeInfo())
-                                              .build());
+        return SaveProduct.Response.of(generateProduct());
+    }
+
+    public static Product generateProduct() {
+        return Product.builder()
+                      .id(12367L)
+                      .token("product-token")
+                      .name("product-name")
+                      .sonarqubeInfo(generateSonarqubeInfo())
+                      .build();
     }
 
     private static SonarqubeInfo generateSonarqubeInfo() {

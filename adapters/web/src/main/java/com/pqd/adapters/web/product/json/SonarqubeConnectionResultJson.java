@@ -7,11 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class SonarqubeInfoResultJson {
+public class SonarqubeConnectionResultJson {
 
-    String baseUrl;
+    boolean connectionOk;
 
-    String componentName;
-
-    String token; // token for authorization on sonarqube api side
+    String message;
 }

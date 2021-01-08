@@ -1,15 +1,16 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.ProductResultJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.*;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
+import com.pqd.application.usecase.product.UpdateProduct;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;
+import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,10 @@ public class ProductController {
 
     private final SaveProduct saveProduct;
 
+    private final UpdateProduct updateProduct;
+
+    private final DeleteProduct deleteProduct;
+
     private final SaveClaim saveClaim;
 
     private final GetProductList getProductList;
@@ -36,6 +41,8 @@ public class ProductController {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final GetProductReleaseInfo getProductReleaseInfo;
+
+    private final TestSonarqubeConnection testSonarqubeConnection;
 
     @PostMapping("/save")
     public ResponseEntity<ProductResultJson> saveProduct(@RequestBody @NonNull SaveProductRequestJson requestJson) {
@@ -50,8 +57,50 @@ public class ProductController {
         return presenter.getViewModel();
     }
 
+    @PutMapping("/{productId}/update")
+    public ResponseEntity<ProductResultJson> updateProduct(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            @RequestBody @NonNull UpdateProductRequestJson requestJson,
+            @PathVariable(value = "productId") Long productId) {
+        checkAuthority(authorizationHeader, productId);
+        checkRequiredFieldPresence(requestJson);
+
+        var response = updateProduct.execute(requestJson.toUpdateProductRequest(productId));
+
+        ProductPresenter presenter = new ProductPresenter();
+        presenter.present(SaveProduct.Response.of(response.getProduct()));
+
+        return presenter.getViewModel();
+    }
+
+    @DeleteMapping("/{productId}/delete")
+    public ResponseEntity<String> deleteProduct(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            @PathVariable(value = "productId") Long productId) {
+        checkAuthority(authorizationHeader, productId);
+
+        deleteProduct.execute(DeleteProduct.Request.of(productId));
+
+        return ResponseEntity.ok(String.format("Product with id %s deleted", productId));
+    }
+
+    @PostMapping("/test/sonarqube/connection")
+    public ResponseEntity<SonarqubeConnectionResultJson> testSonarqubeConnection(
+            @RequestBody @NonNull SonarqubeInfoRequestJson request) {
+        checkRequiredFieldPresence(request);
+        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),
+                                                                                          request.getComponentName(),
+                                                                                          request.getToken()));
+
+        var presenter = new ConnectionTestPresenter();
+        presenter.present(response);
+
+        return presenter.getViewModel();
+    }
+
     @GetMapping("/get/all")
-    public ResponseEntity<List<ProductResultJson>> getUserProductList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+    public ResponseEntity<List<ProductResultJson>> getUserProductList(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         List<Long> productIds = getClaimedProductIds(authorizationHeader);
 
         GetProductList.Response response = getProductList.execute(GetProductList.Request.of(productIds));
@@ -66,8 +115,7 @@ public class ProductController {
     public ResponseEntity<List<ReleaseInfoResultJson>> getProductReleaseInfo(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @PathVariable(value = "productId") Long productId) {
-        List<Long> productIds = getClaimedProductIds(authorizationHeader);
-        checkClaimForAskedProduct(productId, productIds);
+        checkAuthority(authorizationHeader, productId);
 
         var response = getProductReleaseInfo.execute(GetProductReleaseInfo.Request.of(productId));
 
@@ -75,6 +123,13 @@ public class ProductController {
         presenter.present(response);
 
         return presenter.getViewModel();
+    }
+
+    private void checkAuthority(@RequestHeader(HttpHeaders.AUTHORIZATION)
+                                        String authorizationHeader,
+                                @PathVariable("productId") Long productId) {
+        List<Long> productIds = getClaimedProductIds(authorizationHeader);
+        checkClaimForAskedProduct(productId, productIds);
     }
 
     private List<Long> getClaimedProductIds(String authorizationHeader) {
@@ -92,13 +147,32 @@ public class ProductController {
     // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
         if (requestJson.getUserId() == null
-            || requestJson.getSonarqubeInfo() == null
-            || requestJson.getSonarqubeInfo().getBaseUrl() == null
-            || requestJson.getSonarqubeInfo().getComponentName() == null
-            || requestJson.getSonarqubeInfo().getBaseUrl().length() == 0
-            || requestJson.getSonarqubeInfo().getComponentName().length() == 0) {
+            || !areSonarqubeFieldsPresent(requestJson.getSonarqubeInfo())) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
+    }
+
+    private void checkRequiredFieldPresence(UpdateProductRequestJson requestJson) {
+        if (requestJson.getProduct() == null
+            || requestJson.getProduct().getName() == null
+            || requestJson.getProduct().getName().length() == 0
+            || !areSonarqubeFieldsPresent(requestJson.getProduct().getSonarqubeInfo())) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
+    private void checkRequiredFieldPresence(SonarqubeInfoRequestJson requestJson) {
+        if (!areSonarqubeFieldsPresent(requestJson)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
+    private boolean areSonarqubeFieldsPresent(SonarqubeInfoRequestJson requestJson) {
+        return requestJson != null
+               && requestJson.getBaseUrl() != null
+               && requestJson.getComponentName() != null
+               && requestJson.getBaseUrl().length() != 0
+               && requestJson.getComponentName().length() != 0;
     }
 
     @ExceptionHandler({HttpClientErrorException.class})
