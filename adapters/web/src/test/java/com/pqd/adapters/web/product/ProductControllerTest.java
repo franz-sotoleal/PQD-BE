@@ -9,6 +9,7 @@ import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
+import com.pqd.application.usecase.product.UpdateProduct;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;
 import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,8 @@ public class ProductControllerTest {
 
     private SaveProduct saveProduct;
 
+    private UpdateProduct updateProduct;
+
     private SaveClaim saveClaim;
 
     private ProductController controller;
@@ -52,12 +55,13 @@ public class ProductControllerTest {
     @BeforeEach
     void setup() {
         saveProduct = mock(SaveProduct.class);
+        updateProduct = mock(UpdateProduct.class);
         saveClaim = mock(SaveClaim.class);
         getProductList = mock(GetProductList.class);
         jwtTokenUtil = mock(JwtTokenUtil.class);
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
         testSonarqubeConnection = mock(TestSonarqubeConnection.class);
-        controller = new ProductController(saveProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo,
+        controller = new ProductController(saveProduct, updateProduct, saveClaim, getProductList, jwtTokenUtil, getProductReleaseInfo,
                                            testSonarqubeConnection);
         MockitoAnnotations.initMocks(this);
     }

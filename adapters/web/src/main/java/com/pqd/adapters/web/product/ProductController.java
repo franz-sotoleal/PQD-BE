@@ -7,6 +7,7 @@ import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
+import com.pqd.application.usecase.product.UpdateProduct;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;
 import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import lombok.NonNull;
@@ -28,6 +29,8 @@ public class ProductController {
 
     private final SaveProduct saveProduct;
 
+    private final UpdateProduct updateProduct;
+
     private final SaveClaim saveClaim;
 
     private final GetProductList getProductList;
@@ -47,6 +50,17 @@ public class ProductController {
 
         ProductPresenter presenter = new ProductPresenter();
         presenter.present(savedProduct);
+
+        return presenter.getViewModel();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ProductResultJson> updateProduct(@RequestBody @NonNull UpdateProductRequestJson requestJson) {
+        checkRequiredFieldPresence(requestJson);
+        var response = updateProduct.execute(requestJson.toUpdateProductRequest());
+
+        ProductPresenter presenter = new ProductPresenter();
+        presenter.present(SaveProduct.Response.of(response.getProduct()));
 
         return presenter.getViewModel();
     }
@@ -109,6 +123,15 @@ public class ProductController {
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
         if (requestJson.getUserId() == null
             || !areSonarqubeFieldsPresent(requestJson.getSonarqubeInfo())) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
+    private void checkRequiredFieldPresence(UpdateProductRequestJson requestJson) {
+        if (requestJson.getProduct() == null
+            || requestJson.getProduct().getName() == null
+            || requestJson.getProduct().getName().length() == 0
+            || !areSonarqubeFieldsPresent(requestJson.getProduct().getSonarqubeInfo())) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }
