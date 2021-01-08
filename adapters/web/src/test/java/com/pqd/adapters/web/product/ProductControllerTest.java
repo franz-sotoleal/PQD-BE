@@ -67,6 +67,110 @@ public class ProductControllerTest {
     }
 
     @Test
+    void GIVEN_valid_data_WHEN_updating_product_THEN_product_updated() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson();
+        Product product = TestDataGenerator.generateProduct();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+        when(updateProduct.execute(any())).thenReturn(UpdateProduct.Response.of(product));
+
+        ResponseEntity<ProductResultJson> actual =
+                controller.updateProduct("Bearer token", updateProductRequestJson, 1L);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody().getId()).isEqualTo(product.getId());
+        assertThat(actual.getBody().getToken()).isEqualTo(product.getToken());
+        assertThat(actual.getBody().getName()).isEqualTo(product.getName());
+        assertThat(actual.getBody().getSonarqubeInfo().getComponentName()).isEqualTo(product.getSonarqubeInfo().getComponentName());
+        assertThat(actual.getBody().getSonarqubeInfo().getBaseUrl()).isEqualTo(product.getSonarqubeInfo().getBaseUrl());
+        assertThat(actual.getBody().getSonarqubeInfo().getToken()).isEqualTo(product.getSonarqubeInfo().getToken());
+    }
+
+    @Test
+    void GIVEN_product_id_not_inside_jwt_claims_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class, () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1234L));
+
+        assertThat(exception).hasStackTraceContaining("The product does not exist or you don't have access rights");
+    }
+
+    @Test // While Sonarqube is only supported product then it is required if saving product
+    void GIVEN_missing_baseurl_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_missingBaseurl();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test // While Sonarqube is only supported product then it is required if saving product
+    void GIVEN_empty_baseurl_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_emptyBaseurl();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test // While Sonarqube is only supported product then it is required if saving product
+    void GIVEN_missing_component_name_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_missingComponentName();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test // While Sonarqube is only supported product then it is required if saving product
+    void GIVEN_empty_component_name_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_emptyComponentName();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_missing_name_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_missingName();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_empty_name_WHEN_updating_product_THEN_exception_thrown() {
+        UpdateProductRequestJson updateProductRequestJson = TestDataGenerator.generateUpdateProductRequestJson_emptyName();
+        List<JwtUserProductClaim> productClaims = TestDataGenerator.generateProductClaimsFromToken();
+        when(jwtTokenUtil.getProductClaimsFromToken(any())).thenReturn(productClaims);
+
+        Exception exception =
+                assertThrows(Exception.class,
+                             () -> controller.updateProduct("Bearer token", updateProductRequestJson, 1L));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
     void GIVEN_all_correct_WHEN_testing_sonarqube_connection_THEN_connection_result_returned() {
         SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
         when(testSonarqubeConnection.execute(any())).thenReturn(TestSonarqubeConnection.Response.of(connectionResult));

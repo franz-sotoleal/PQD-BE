@@ -20,8 +20,8 @@ public class UpdateProductRequestJson {
     @JsonProperty("product")
     UpdatableProduct product;
 
-    public UpdateProduct.Request toUpdateProductRequest() {
-        return UpdateProduct.Request.of(generateNewToken, product.toProduct());
+    public UpdateProduct.Request toUpdateProductRequest(Long productId) {
+        return UpdateProduct.Request.of(generateNewToken, productId, product.toProduct());
     }
 
     @Data

@@ -16,14 +16,14 @@ public class UpdateProduct {
     private final GenerateToken generateToken;
 
     public Response execute(Request request) {
-        String token = request.getProduct().getToken();
+        String token = productGateway.findById(request.getProductId()).orElse(Product.builder().build()).getToken();
         if (request.isGenerateNewToken()) {
             token = generateToken.execute().getToken();
         }
 
         Product product = Product.builder()
+                                 .id(request.getProductId())
                                  .name(request.getProduct().getName())
-                                 .id(request.getProduct().getId())
                                  .token(token)
                                  .sonarqubeInfo(request.getProduct().getSonarqubeInfo())
                                  .build();
@@ -40,6 +40,8 @@ public class UpdateProduct {
     @Value(staticConstructor = "of")
     public static class Request {
         boolean generateNewToken;
+
+        Long productId;
 
         Product product;
     }

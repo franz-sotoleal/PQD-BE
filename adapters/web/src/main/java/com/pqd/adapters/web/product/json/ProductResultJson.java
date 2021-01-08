@@ -27,6 +27,7 @@ public class ProductResultJson {
                                                        .builder()
                                                        .baseUrl(product.getSonarqubeInfo().getBaseUrl())
                                                        .componentName(product.getSonarqubeInfo().getComponentName())
+                                                       .token(product.getSonarqubeInfo().getToken())
                                                        .build())
                                 .build();
     }

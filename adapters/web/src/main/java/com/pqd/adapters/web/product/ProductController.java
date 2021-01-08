@@ -54,10 +54,16 @@ public class ProductController {
         return presenter.getViewModel();
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ProductResultJson> updateProduct(@RequestBody @NonNull UpdateProductRequestJson requestJson) {
+    @PutMapping("/{productId}/update")
+    public ResponseEntity<ProductResultJson> updateProduct(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+            @RequestBody @NonNull UpdateProductRequestJson requestJson,
+            @PathVariable(value = "productId") Long productId) {
+        List<Long> productIds = getClaimedProductIds(authorizationHeader);
+        checkClaimForAskedProduct(productId, productIds);
         checkRequiredFieldPresence(requestJson);
-        var response = updateProduct.execute(requestJson.toUpdateProductRequest());
+
+        var response = updateProduct.execute(requestJson.toUpdateProductRequest(productId));
 
         ProductPresenter presenter = new ProductPresenter();
         presenter.present(SaveProduct.Response.of(response.getProduct()));
