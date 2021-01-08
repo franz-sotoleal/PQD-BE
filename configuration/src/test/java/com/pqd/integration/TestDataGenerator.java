@@ -4,6 +4,7 @@ import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
 import com.pqd.adapters.web.product.json.ReleaseInfoSonarqubeResultJson;
 import com.pqd.adapters.web.product.json.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.UpdateProductRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -134,6 +135,19 @@ public class TestDataGenerator {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("AuTHORizaTION", basicAuth);
         return headers;
+    }
+
+    public static UpdateProductRequestJson generateUpdateProductRequestJson_withOldToken() {
+        return UpdateProductRequestJson.builder()
+                                       .generateNewToken(false)
+                                       .product(UpdateProductRequestJson.UpdatableProduct
+                                                        .builder()
+                                                        .id(1L)
+                                                        .name("Demo Product - updated")
+                                                        .sonarqubeInfo(
+                                                                generateSonarqubeInfoRequestJson())
+                                                        .build())
+                                       .build();
     }
 
     public static SaveProductRequestJson generateSaveProductRequestJson() {

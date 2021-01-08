@@ -1,10 +1,10 @@
 package com.pqd.integration.web;
 
+import com.pqd.adapters.persistence.claim.UserProductClaimRepository;
+import com.pqd.adapters.persistence.product.ProductEntity;
+import com.pqd.adapters.persistence.product.ProductRepository;
 import com.pqd.adapters.web.authentication.LoginResponseJson;
-import com.pqd.adapters.web.product.json.ProductResultJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
-import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.*;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.integration.TestContainerBase;
 import com.pqd.integration.TestDataGenerator;
@@ -27,8 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,20 +39,42 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
 
     ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    UserProductClaimRepository userProductClaimRepository;
+
     @Test
     @Transactional
     @WithMockUser
     void GIVEN_correct_input_WHEN_saving_product_THEN_status_ok_and_product_returned() throws Exception {
         SaveProductRequestJson requestJson = TestDataGenerator.generateSaveProductRequestJson();
-        mvc.perform(post("/api/product/save")
-                            .content(mapper.writeValueAsString(requestJson))
-                            .contentType(MediaType.APPLICATION_JSON))
-           .andExpect(status().isOk())
-           .andExpect(jsonPath("$.token", isA(String.class)))
-           .andExpect(jsonPath("$.id", isA(Number.class)))
-           .andExpect(jsonPath("$.name", is(requestJson.getName())))
-           .andExpect(jsonPath("$.sonarqubeInfo.baseUrl", is(requestJson.getSonarqubeInfo().getBaseUrl())))
-           .andExpect(jsonPath("$.sonarqubeInfo.componentName", is(requestJson.getSonarqubeInfo().getComponentName())));
+        MvcResult mvcResult = mvc.perform(post("/api/product/save")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.token", isA(String.class)))
+                                 .andExpect(jsonPath("$.id", isA(Number.class)))
+                                 .andExpect(jsonPath("$.name", is(requestJson.getName())))
+                                 .andExpect(jsonPath("$.sonarqubeInfo.baseUrl",
+                                                     is(requestJson.getSonarqubeInfo().getBaseUrl())))
+                                 .andExpect(jsonPath("$.sonarqubeInfo.componentName",
+                                                     is(requestJson.getSonarqubeInfo().getComponentName())))
+                                 .andReturn();
+
+        ProductResultJson productResultJson =
+                mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        ProductEntity entityFromDb = productRepository.findById(productResultJson.getId()).orElse(ProductEntity.builder().build());
+
+        assertThat(entityFromDb.getName()).isEqualTo(requestJson.getName());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getToken())
+                .isEqualTo(requestJson.getSonarqubeInfo().getToken());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
+                .isEqualTo(requestJson.getSonarqubeInfo().getComponentName());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.getSonarqubeInfo().getBaseUrl());
     }
 
     @Test
@@ -76,6 +97,66 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError());
     }
+
+    @Test
+    @Transactional
+    void GIVEN_user_has_product_claims_WHEN_login_and_updating_product_THEN_status_ok_and_updated_product_returned()
+            throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+
+        UpdateProductRequestJson requestJson = TestDataGenerator.generateUpdateProductRequestJson_withOldToken();
+        MvcResult productListMvcResult =
+                mvc.perform(put("/api/product/1/update")
+                                    .content(mapper.writeValueAsString(requestJson))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header(HttpHeaders.AUTHORIZATION,
+                                            "Bearer " + loginResponseJson.getJwt()))
+                   .andExpect(status().isOk())
+                   .andReturn();
+        ProductEntity entityFromDb = productRepository.findById(1L).orElse(ProductEntity.builder().build());
+        ProductResultJson productResultJsons =
+                mapper.readValue(productListMvcResult.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        assertThat(productResultJsons.getId()).isEqualTo(1L);
+        assertThat(productResultJsons.getName()).isEqualTo("Demo Product - updated");
+        assertThat(productResultJsons.getToken()).isEqualTo("8257cc3a6b0610da1357f73e03524b090658553a");
+        assertThat(productResultJsons.getSonarqubeInfo().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getBaseUrl());
+        assertThat(productResultJsons.getSonarqubeInfo().getComponentName())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
+        assertThat(productResultJsons.getSonarqubeInfo().getToken())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getToken());
+
+        assertThat(entityFromDb.getName()).isEqualTo(requestJson.getProduct().getName());
+        assertThat(entityFromDb.getToken()).isEqualTo(productResultJsons.getToken());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getToken())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getToken());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getBaseUrl());
+        assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
+                .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
+    }
+
+    @Test
+    @Transactional
+    void GIVEN_user_has_no_product_claims_WHEN_login_and_updating_product_THEN_400_returned()
+            throws Exception {
+        LoginResponseJson loginResponseJson = performLoginRequest();
+        UpdateProductRequestJson requestJson = TestDataGenerator.generateUpdateProductRequestJson_withOldToken();
+
+        MvcResult mvcResult =
+                mvc.perform(put("/api/product/101/update")
+                                    .content(mapper.writeValueAsString(requestJson))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .header(HttpHeaders.AUTHORIZATION,
+                                            "Bearer " + loginResponseJson.getJwt()))
+                   .andExpect(status().is4xxClientError())
+                   .andReturn();
+
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("The product does not exist or you don't have access rights");
+    }
+
 
     @Test
     @Transactional
