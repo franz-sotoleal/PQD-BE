@@ -128,7 +128,7 @@ http://localhost:8080/api/messaging/trigger?productId=<product_id>
 * The endpoint triggers asynchronous data collection, meaning that you get status 200 if the request passes the 
   controller - it doesn't indicate that the collection was successful (this runs on a different thread)
 
-#Adding support for a another tool
+# Adding support for a another tool
 * Add DB support for the new tool 
     * create table public.<tool_name>\_info with necessary columns
     * add reference public.<tool_name>\_info(id) to table public.product
