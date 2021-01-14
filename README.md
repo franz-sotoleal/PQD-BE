@@ -18,8 +18,8 @@ This backend system is the core of the PQD. It stores the data and contains the 
 at the frontend part is just a visualization layer that contains minimal amount of business logic.
 
 ## Technical description
-The project is written using hexagonal architecture (aka ports and adapters pattern). The components are separated
-by gradle modules.
+The project is written using characteristics of hexagonal architecture (aka ports and adapters pattern) and domain 
+driven design. The components are separated by gradle modules.
 
 At the center lies the core business logic, that doesn't know anything about the other modules.
 It doesn't care where the data is coming or where it is going. The core business logic is implemented by use
@@ -43,7 +43,8 @@ keeping the user password safe. This token doesn't expire, but can be replaced.
 
 Keep in mind not to change the layer dependencies between each other, while developing new functionality. Adapters
 cannot access or implement each other. They can only access the core layer. Keep writing unit tests to each adapter
-and to the core module. Integration tests are written in the configuration module using MockMvc and Testcontainers.
+and to the core module. Integration tests are written in the configuration module using MockMvc and Testcontainers. 
+You can find the description, of how to add a support for an additional tool, below.
 
 ### Directory structure:
 ```
@@ -56,14 +57,6 @@ application/       core business logic (with unit tests)
 configuration/     spring boot module and all configurations, builds docker image (with integration tests)
 dev-scripts/       script to set up db 
 ```
-
-### Database changelog
-Flyway is used for database changelog. Migration files are located at:
-`configuration/src/main/resources/db/migration`
-
-_Not so relevant, if not deployed to production_: New change sets must be in order and prefixed with
-```V<timestamp>__changename.sql```
-Change sets that should run on every migration should be prefixed with ```R__changename.sql```
 
 
 # Running Locally
@@ -104,7 +97,14 @@ git clone git@github.com:Kert944/PQD-BE.git
             * Use component name (project key) _ESI-builtit_ so that you can trigger release info collection with the 
               test user 
               that is already inserted into the DB
-              
+
+### Database changelog
+Flyway is used for database changelog. Migration files are located at:
+`configuration/src/main/resources/db/migration`
+
+_Not so relevant, if not deployed to production_: New change sets must be in order and prefixed with
+```V<timestamp>__changename.sql```
+Change sets that should run on every migration should be prefixed with ```R__changename.sql```   
 
 # Using the API
 API Swagger (majority of requests need authorization with Bearer token, jwt)
@@ -127,3 +127,32 @@ http://localhost:8080/api/messaging/trigger?productId=<product_id>
             * example: "Basic ODI1N2N..."
 * The endpoint triggers asynchronous data collection, meaning that you get status 200 if the request passes the 
   controller - it doesn't indicate that the collection was successful (this runs on a different thread)
+
+#Adding support for a another tool
+* Add DB support for the new tool 
+    * create table public.<tool_name>\_info with necessary columns
+    * add reference public.<tool_name>\_info(id) to table public.product
+    * create table public.release_info_<tool_name> with necessary columns
+    * add reference public.release_info_<tool_name>(id) to table public.release_info
+    * _optional_: add sample data to the db
+    
+* Add another adapter module for connecting with the tool
+    * alternatively, add a module to connect to the building environment or pipeline if the data could be read from 
+      there
+      
+* Implement _Retrieve<new\_tool>Data_ use case, so that when executing the use case, data from the new product is 
+  retrieved
+    * you can take _RetrieveSonarqubeData_ use case as an example
+
+* Add support for the new tool in the domain objects, product use cases and release use cases
+
+* Add the _Retrieve<new\_tool>Data_ to the _CollectAndSaveAllReleaseData_ so that on a trigger, from a messaging 
+  adapter, data from all the supported tools are collected
+    * At this point think on the case if the user does not have one of the tools connected to his/her product
+        * should perform a check if the given product has support for the tool (don't want to start data collection 
+          if there is no tool to collect from)
+          
+* Improve _SaveReleaseInfo_ and _CalculateQualityLevel_
+    * think about what to do when the product doesn't have the support for all the tools
+    
+* Implement and improve other relevant parts and do not forget testing
