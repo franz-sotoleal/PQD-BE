@@ -11,7 +11,6 @@ import lombok.Value;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @UseCase
@@ -23,10 +22,10 @@ public class RetrieveReleaseInfoJira {
     public Response execute(Request request) {
         List<JiraSprint> activeSprints = jiraGateway.getActiveSprints(request.getJiraInfo());
 
-        // TODO link issues under sprint
-        List<List<JiraIssue>> collect = activeSprints.stream().map(sprint -> {
-            return jiraGateway.getSprintIssues(request.getJiraInfo(), sprint.getSprintId());
-        }).collect(Collectors.toList());
+        activeSprints.forEach(sprint -> {
+            List<JiraIssue> sprintIssues = jiraGateway.getSprintIssues(request.getJiraInfo(), sprint.getSprintId());
+            sprint.setIssues(sprintIssues);
+        });
 
         return Response.of(activeSprints);
     }

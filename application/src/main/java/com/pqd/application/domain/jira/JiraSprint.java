@@ -1,17 +1,18 @@
 package com.pqd.application.domain.jira;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Builder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class JiraSprint {
 
@@ -30,6 +31,8 @@ public class JiraSprint {
     private final String goal;
 
     private final String browserUrl;
+
+    List<JiraIssue> issues;
 
     public static String createBrowserUrl(String baseUrl, Long sprintId) {
         String browserUrl = baseUrl + "/issues/?";
