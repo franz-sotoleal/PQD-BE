@@ -1,4 +1,4 @@
-package com.pqd.adapters.jira;
+package com.pqd.adapters.jira.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
