@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SonarqubeConnectionResult {
+public class SonarqubeConnectionResult { // TODO make common
 
     boolean connectionOk;
 

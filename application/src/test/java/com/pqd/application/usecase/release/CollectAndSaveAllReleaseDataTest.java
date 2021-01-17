@@ -2,6 +2,7 @@ package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.usecase.jira.RetrieveReleaseInfoJira;
 import com.pqd.application.usecase.product.GetProduct;
 import com.pqd.application.usecase.sonarqube.RetrieveSonarqubeData;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ public class CollectAndSaveAllReleaseDataTest {
     private GetProduct getProduct;
     private CollectAndSaveAllReleaseData collectAndSaveAllReleaseData;
     private RetrieveSonarqubeData retrieveSonarqubeData;
+    private RetrieveReleaseInfoJira retrieveReleaseInfoJira;
 
     @Captor
     private ArgumentCaptor<SaveReleaseInfo.Request> captor;
@@ -29,8 +31,9 @@ public class CollectAndSaveAllReleaseDataTest {
         getProduct = mock(GetProduct.class);
         saveReleaseInfo = mock(SaveReleaseInfo.class);
         retrieveSonarqubeData = mock(RetrieveSonarqubeData.class);
+        retrieveReleaseInfoJira = mock(RetrieveReleaseInfoJira.class);
         collectAndSaveAllReleaseData =
-                new CollectAndSaveAllReleaseData(retrieveSonarqubeData, saveReleaseInfo, getProduct);
+                new CollectAndSaveAllReleaseData(retrieveSonarqubeData, saveReleaseInfo, getProduct, retrieveReleaseInfoJira);
         MockitoAnnotations.initMocks(this);
     }
 

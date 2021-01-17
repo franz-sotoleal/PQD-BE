@@ -18,4 +18,12 @@ public class Product {
 
     SonarqubeInfo sonarqubeInfo;
 
+    public boolean hasValidSonarqubeInfo() {
+        return sonarqubeInfo != null
+               && sonarqubeInfo.getBaseUrl() != null
+               && sonarqubeInfo.getComponentName() != null
+               && sonarqubeInfo.getBaseUrl().length() > 0
+               && sonarqubeInfo.getComponentName().length() > 0;
+    }
+
 }

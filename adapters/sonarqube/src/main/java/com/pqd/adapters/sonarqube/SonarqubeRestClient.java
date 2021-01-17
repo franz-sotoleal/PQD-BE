@@ -18,7 +18,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class SonarqubeRestClient implements SonarqubeGateway {
 
-    private final RestTemplate sonarqubeApiRestTemplate;
+    private final RestTemplate restTemplate;
 
     @Override
     public ReleaseInfoSonarqube getSonarqubeReleaseInfo(String baseUrl, String componentName, String token) {
@@ -70,7 +70,7 @@ public class SonarqubeRestClient implements SonarqubeGateway {
         ResponseEntity<SonarqubeMeasureResponse> response;
 
         try {
-            response = sonarqubeApiRestTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
+            response = restTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
         } catch (ResourceAccessException e) {
             throw new SonarqubeConnectionRefusedException(String.format("Connection refused for baseurl %s", baseUrl));
         } catch (HttpClientErrorException exception) {

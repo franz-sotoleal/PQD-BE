@@ -5,6 +5,7 @@ include(
         "application",
         "adapters:web",
         "adapters:persistence",
+        "adapters:messaging",
         "adapters:sonarqube",
-        "adapters:messaging"
+        "adapters:jira"
 )
