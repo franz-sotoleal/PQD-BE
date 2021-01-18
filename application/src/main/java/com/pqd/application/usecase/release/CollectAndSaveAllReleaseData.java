@@ -44,6 +44,7 @@ public class CollectAndSaveAllReleaseData {
                                                         .getReleaseInfo();
         }
 
+
         List<JiraSprint> activeSprints =
                 retrieveReleaseInfoJira.execute(RetrieveReleaseInfoJira.Request.of(JiraInfo.builder()
                                                                                            .baseUrl(

@@ -9,8 +9,6 @@ import lombok.Getter;
 @EqualsAndHashCode(callSuper = false)
 public class JiraIssueType {
 
-    private final Long id;
-
     private final Long issueId;
 
     private final String description;
