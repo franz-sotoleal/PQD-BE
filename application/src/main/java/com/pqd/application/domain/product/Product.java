@@ -1,5 +1,6 @@
 package com.pqd.application.domain.product;
 
+import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,8 @@ public class Product {
     String token; // token for authorization on requests to messaging adapter
 
     SonarqubeInfo sonarqubeInfo;
+
+    JiraInfo jiraInfo;
 
     public boolean hasValidSonarqubeInfo() {
         return sonarqubeInfo != null

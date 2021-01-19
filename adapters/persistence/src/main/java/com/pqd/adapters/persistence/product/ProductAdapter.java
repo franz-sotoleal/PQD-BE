@@ -1,8 +1,10 @@
 package com.pqd.adapters.persistence.product;
 
 import com.pqd.adapters.persistence.claim.UserProductClaimAdapter;
+import com.pqd.adapters.persistence.product.jira.JiraInfoEntity;
 import com.pqd.adapters.persistence.product.sonarqube.SonarqubeInfoEntity;
 import com.pqd.adapters.persistence.release.ReleaseInfoAdapter;
+import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.product.ProductGateway;
@@ -73,6 +75,13 @@ public class ProductAdapter implements ProductGateway {
                                            .token(entity.getSonarqubeInfoEntity().getToken())
                                            .id(entity.getSonarqubeInfoEntity().getId())
                                            .build())
+                      .jiraInfo(JiraInfo.builder()
+                                        .userEmail(entity.getJiraInfoEntity().getUserEmail())
+                                        .boardId(entity.getJiraInfoEntity().getBoardId())
+                                        .id(entity.getJiraInfoEntity().getId())
+                                        .token(entity.getJiraInfoEntity().getToken())
+                                        .baseUrl(entity.getJiraInfoEntity().getBaseUrl())
+                                        .build())
                       .name(entity.getName())
                       .token(entity.getToken())
                       .id(entity.getId())
@@ -89,6 +98,12 @@ public class ProductAdapter implements ProductGateway {
                                                                     .componentName(product.getSonarqubeInfo()
                                                                                           .getComponentName())
                                                                     .build())
+                            .jiraInfoEntity(JiraInfoEntity.builder()
+                                                          .baseUrl(product.getJiraInfo().getBaseUrl())
+                                                          .boardId(product.getJiraInfo().getBoardId())
+                                                          .userEmail(product.getJiraInfo().getUserEmail())
+                                                          .token(product.getJiraInfo().getToken())
+                                                          .build())
                             .build();
     }
 

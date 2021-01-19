@@ -18,6 +18,8 @@ public class ProductResultJson {
 
     SonarqubeInfoResultJson sonarqubeInfo;
 
+    JiraInfoResultJson jiraInfo;
+
     public static ProductResultJson buildResultJson(Product product) {
         return ProductResultJson.builder()
                                 .id(product.getId())
@@ -29,6 +31,12 @@ public class ProductResultJson {
                                                        .componentName(product.getSonarqubeInfo().getComponentName())
                                                        .token(product.getSonarqubeInfo().getToken())
                                                        .build())
+                                .jiraInfo(JiraInfoResultJson.builder()
+                                                            .baseUrl(product.getJiraInfo().getBaseUrl())
+                                                            .boardId(product.getJiraInfo().getBoardId())
+                                                            .userEmail(product.getJiraInfo().getUserEmail())
+                                                            .token(product.getJiraInfo().getToken())
+                                                            .build())
                                 .build();
     }
 }
