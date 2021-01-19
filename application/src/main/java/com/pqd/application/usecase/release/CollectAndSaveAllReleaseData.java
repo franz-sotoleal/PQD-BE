@@ -44,7 +44,7 @@ public class CollectAndSaveAllReleaseData {
                                                         .getReleaseInfo();
         }
 
-
+        // TODO salvesta baasi: schema uuendatud ja nüüd vaja persistence adapteri asjad teha, siis core layer ja web adapter
         List<JiraSprint> activeSprints =
                 retrieveReleaseInfoJira.execute(RetrieveReleaseInfoJira.Request.of(JiraInfo.builder()
                                                                                            .baseUrl(

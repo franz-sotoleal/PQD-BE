@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.product;
 
+import com.pqd.adapters.persistence.product.jira.JiraInfoEntity;
 import com.pqd.adapters.persistence.product.sonarqube.SonarqubeInfoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +32,8 @@ public class ProductEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sq_info_id", referencedColumnName = "id")
     private SonarqubeInfoEntity sonarqubeInfoEntity;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "jira_info_id", referencedColumnName = "id")
+    private JiraInfoEntity jiraInfoEntity;
 }

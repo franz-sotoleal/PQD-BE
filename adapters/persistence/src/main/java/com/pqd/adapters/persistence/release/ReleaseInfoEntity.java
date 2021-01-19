@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.release;
 
+import com.pqd.adapters.persistence.release.jira.JiraSprintEntity;
 import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "release_info", schema = "public")
@@ -35,4 +37,9 @@ public class ReleaseInfoEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "release_info_sq_id", referencedColumnName = "id")
     private ReleaseInfoSonarqubeEntity sonarqubeReleaseInfoEntity;
+
+    @OneToMany(mappedBy = "releaseInfo",
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<JiraSprintEntity> jiraSprintEntity;
 }

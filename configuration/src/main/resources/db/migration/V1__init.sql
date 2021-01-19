@@ -65,9 +65,21 @@ CREATE TABLE public.release_info_sq
     maint_smells    BIGINT
 );
 
+CREATE TABLE public.release_info
+(
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_seq'),
+    product_id      BIGINT                  NOT NULL    REFERENCES public.product(id),
+    created         TIMESTAMP   WITHOUT     TIME ZONE   DEFAULT Now(),
+    quality_level   DECIMAL,
+    release_info_sq_id  BIGINT                          REFERENCES public.release_info_sq(id)
+    -- add other tool references here by modifying the table if you add support for another tool (or in case of a list,
+    -- add the release info reference to the other table)
+);
+
 CREATE TABLE public.release_info_jira_sprint
 (
     id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_jira_seq'),
+    release_info_id BIGINT                  NOT NULL    REFERENCES public.release_info(id),
     sprint_id       BIGINT                  NOT NULL,
     board_id        BIGINT                  NOT NULL,
     name            TEXT,
@@ -87,17 +99,6 @@ CREATE TABLE public.jira_issue
     icon_url        TEXT,
     name            TEXT,
     browser_url     TEXT
-);
-
-CREATE TABLE public.release_info
-(
-    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_seq'),
-    product_id      BIGINT                  NOT NULL    REFERENCES public.product(id),
-    created         TIMESTAMP   WITHOUT     TIME ZONE   DEFAULT Now(),
-    quality_level   DECIMAL,
-    release_info_sq_id  BIGINT                          REFERENCES public.release_info_sq(id),
-    release_info_jira_sprint BIGINT                     REFERENCES public.release_info_jira_sprint(id)
-    -- add other tool references here by modifying the table if you add support for another tool
 );
 
 -- To add database support for another tool:
