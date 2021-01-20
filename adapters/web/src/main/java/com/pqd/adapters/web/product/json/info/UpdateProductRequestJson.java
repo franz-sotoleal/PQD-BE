@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -48,7 +50,7 @@ public class UpdateProductRequestJson {
                           .id(id)
                           .name(name)
                           .token(token)
-                          .sonarqubeInfo(sonarqubeInfo.toSonarqubeInfo())
+                          .sonarqubeInfo(Optional.of(sonarqubeInfo.toSonarqubeInfo()))
                           .build();
         }
 

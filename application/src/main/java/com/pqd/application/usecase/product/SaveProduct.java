@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @UseCase
 public class SaveProduct {
@@ -40,8 +42,8 @@ public class SaveProduct {
     public static class Request {
         String name;
 
-        SonarqubeInfo sonarqubeInfo;
+        Optional<SonarqubeInfo> sonarqubeInfo;
 
-        JiraInfo jiraInfo;
+        Optional<JiraInfo> jiraInfo;
     }
 }

@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,13 +26,15 @@ public class SaveProductRequestJson {
     String name;
 
     @JsonProperty("sonarqubeInfo")
-    SonarqubeInfoRequestJson sonarqubeInfo;
+    Optional<SonarqubeInfoRequestJson> sonarqubeInfo;
 
     @JsonProperty("jiraInfo")
-    JiraInfoRequestJson jiraInfo;
+    Optional<JiraInfoRequestJson> jiraInfo = Optional.empty();
 
     public SaveProduct.Request toSaveProductRequest() {
-        return SaveProduct.Request.of(name, sonarqubeInfo.toSonarqubeInfo(), jiraInfo.toJiraInfo());
+        return SaveProduct.Request.of(name,
+                                      sonarqubeInfo.map(SonarqubeInfoRequestJson::toSonarqubeInfo),
+                                      jiraInfo.map(JiraInfoRequestJson::toJiraInfo));
     }
 
     public SaveClaim.Request toSaveClaimRequest(Long productId, ClaimLevel claimLevel) {

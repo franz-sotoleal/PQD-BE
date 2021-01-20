@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Optional;
+
 @Builder
 @Getter
 @Setter
@@ -19,16 +21,16 @@ public class Product {
 
     String token; // token for authorization on requests to messaging adapter
 
-    SonarqubeInfo sonarqubeInfo;
+    Optional<SonarqubeInfo> sonarqubeInfo;
 
-    JiraInfo jiraInfo;
+    Optional<JiraInfo> jiraInfo;
 
     public boolean hasValidSonarqubeInfo() {
-        return sonarqubeInfo != null
-               && sonarqubeInfo.getBaseUrl() != null
-               && sonarqubeInfo.getComponentName() != null
-               && sonarqubeInfo.getBaseUrl().length() > 0
-               && sonarqubeInfo.getComponentName().length() > 0;
+        return sonarqubeInfo.isPresent()
+               && sonarqubeInfo.get().getBaseUrl() != null
+               && sonarqubeInfo.get().getComponentName() != null
+               && sonarqubeInfo.get().getBaseUrl().length() > 0
+               && sonarqubeInfo.get().getComponentName().length() > 0;
     }
 
 }

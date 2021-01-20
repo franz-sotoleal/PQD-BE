@@ -42,9 +42,12 @@ public class ProductAdapter implements ProductGateway {
                                   String.format("ProductEntity with id %s not found", product.getId())));
         productEntity.setName(product.getName());
         productEntity.setToken(product.getToken());
-        productEntity.getSonarqubeInfoEntity().setToken(product.getSonarqubeInfo().getToken());
-        productEntity.getSonarqubeInfoEntity().setBaseUrl(product.getSonarqubeInfo().getBaseUrl());
-        productEntity.getSonarqubeInfoEntity().setComponentName(product.getSonarqubeInfo().getComponentName());
+
+        if (product.getSonarqubeInfo().isPresent()) {
+            productEntity.getSonarqubeInfoEntity().setToken(product.getSonarqubeInfo().get().getToken());
+            productEntity.getSonarqubeInfoEntity().setBaseUrl(product.getSonarqubeInfo().get().getBaseUrl());
+            productEntity.getSonarqubeInfoEntity().setComponentName(product.getSonarqubeInfo().get().getComponentName());
+        }
 
         ProductEntity savedEntity = repository.save(productEntity);
 

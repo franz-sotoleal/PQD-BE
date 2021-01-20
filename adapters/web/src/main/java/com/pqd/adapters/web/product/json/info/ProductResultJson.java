@@ -23,22 +23,30 @@ public class ProductResultJson {
     JiraInfoResultJson jiraInfo;
 
     public static ProductResultJson buildResultJson(Product product) {
-        return ProductResultJson.builder()
-                                .id(product.getId())
-                                .name(product.getName())
-                                .token(product.getToken())
-                                .sonarqubeInfo(SonarqubeInfoResultJson
-                                                       .builder()
-                                                       .baseUrl(product.getSonarqubeInfo().getBaseUrl())
-                                                       .componentName(product.getSonarqubeInfo().getComponentName())
-                                                       .token(product.getSonarqubeInfo().getToken())
-                                                       .build())
-                                .jiraInfo(JiraInfoResultJson.builder()
-                                                            .baseUrl(product.getJiraInfo().getBaseUrl())
-                                                            .boardId(product.getJiraInfo().getBoardId())
-                                                            .userEmail(product.getJiraInfo().getUserEmail())
-                                                            .token(product.getJiraInfo().getToken())
-                                                            .build())
-                                .build();
+        ProductResultJson resultJson = ProductResultJson.builder()
+                                                        .id(product.getId())
+                                                        .name(product.getName())
+                                                        .token(product.getToken())
+                                                        .build();
+
+        if (product.getSonarqubeInfo().isPresent()) {
+            resultJson.setSonarqubeInfo(
+                    SonarqubeInfoResultJson
+                            .builder()
+                            .baseUrl(product.getSonarqubeInfo().get().getBaseUrl())
+                            .componentName(product.getSonarqubeInfo().get().getComponentName())
+                            .token(product.getSonarqubeInfo().get().getToken())
+                            .build());
+        }
+        if (product.getJiraInfo().isPresent()) {
+            resultJson.setJiraInfo(
+                    JiraInfoResultJson.builder()
+                                      .baseUrl(product.getJiraInfo().get().getBaseUrl())
+                                      .boardId(product.getJiraInfo().get().getBoardId())
+                                      .userEmail(product.getJiraInfo().get().getUserEmail())
+                                      .token(product.getJiraInfo().get().getToken())
+                                      .build());
+        }
+        return resultJson;
     }
 }
