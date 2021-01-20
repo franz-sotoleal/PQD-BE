@@ -5,9 +5,11 @@ import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class Product {
 

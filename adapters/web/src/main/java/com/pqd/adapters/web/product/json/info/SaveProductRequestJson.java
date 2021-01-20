@@ -1,6 +1,7 @@
 package com.pqd.adapters.web.product.json.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
@@ -25,8 +26,11 @@ public class SaveProductRequestJson {
     @JsonProperty("sonarqubeInfo")
     SonarqubeInfoRequestJson sonarqubeInfo;
 
+    @JsonProperty("jiraInfo")
+    JiraInfoRequestJson jiraInfo;
+
     public SaveProduct.Request toSaveProductRequest() {
-        return SaveProduct.Request.of(name, sonarqubeInfo.toSonarqubeInfo());
+        return SaveProduct.Request.of(name, sonarqubeInfo.toSonarqubeInfo(), jiraInfo.toJiraInfo());
     }
 
     public SaveClaim.Request toSaveClaimRequest(Long productId, ClaimLevel claimLevel) {

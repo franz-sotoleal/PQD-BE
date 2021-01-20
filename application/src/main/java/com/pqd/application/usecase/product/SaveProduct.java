@@ -1,5 +1,6 @@
 package com.pqd.application.usecase.product;
 
+import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.AbstractResponse;
@@ -22,6 +23,7 @@ public class SaveProduct {
                                  .token(token)
                                  .name(request.getName())
                                  .sonarqubeInfo(request.getSonarqubeInfo())
+                                 .jiraInfo(request.getJiraInfo())
                                  .build();
 
         return Response.of(productGateway.save(product));
@@ -39,5 +41,7 @@ public class SaveProduct {
         String name;
 
         SonarqubeInfo sonarqubeInfo;
+
+        JiraInfo jiraInfo;
     }
 }
