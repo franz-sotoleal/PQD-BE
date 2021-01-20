@@ -1,7 +1,7 @@
-package com.pqd.adapters.web.product;
+package com.pqd.adapters.web.product.presenter;
 
 import com.pqd.adapters.web.ResponsePresenter;
-import com.pqd.adapters.web.product.json.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.product.GetProductList;

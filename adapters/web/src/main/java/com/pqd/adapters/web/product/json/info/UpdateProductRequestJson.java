@@ -1,6 +1,7 @@
-package com.pqd.adapters.web.product.json;
+package com.pqd.adapters.web.product.json.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.usecase.product.UpdateProduct;
 import lombok.AllArgsConstructor;

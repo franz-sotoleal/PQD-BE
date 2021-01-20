@@ -1,25 +1,16 @@
 package com.pqd.application.domain.release;
 
+import com.pqd.application.domain.jira.JiraSprint;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class ReleaseInfoJira {
 
-    private final Long id;
-
-    private final String name;
-
-    private final LocalDateTime start;
-
-    private final LocalDateTime end;
-
-    private final Long boardId;
-
-    private final String goal;
+    private final List<JiraSprint> jiraSprints;
 }

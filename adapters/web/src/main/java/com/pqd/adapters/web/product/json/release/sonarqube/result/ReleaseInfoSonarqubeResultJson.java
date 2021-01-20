@@ -1,4 +1,4 @@
-package com.pqd.adapters.web.product.json;
+package com.pqd.adapters.web.product.json.release.sonarqube.result;
 
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import lombok.*;

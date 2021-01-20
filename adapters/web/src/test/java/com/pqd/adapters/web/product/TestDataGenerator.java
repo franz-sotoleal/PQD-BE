@@ -1,8 +1,8 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
-import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
-import com.pqd.adapters.web.product.json.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.domain.claim.UserProductClaim;

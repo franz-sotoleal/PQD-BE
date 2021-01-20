@@ -1,7 +1,7 @@
-package com.pqd.adapters.web.product;
+package com.pqd.adapters.web.product.presenter;
 
 import com.pqd.adapters.web.ResponsePresenter;
-import com.pqd.adapters.web.product.json.ReleaseInfoResultJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.release.GetProductReleaseInfo;

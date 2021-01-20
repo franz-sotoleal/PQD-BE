@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class SonarqubeConnectionResultJson {
+public class ConnectionResultJson {
 
     boolean connectionOk;
 

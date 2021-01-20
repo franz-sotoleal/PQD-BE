@@ -1,5 +1,7 @@
-package com.pqd.adapters.web.product.json;
+package com.pqd.adapters.web.product.json.info;
 
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoResultJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoResultJson;
 import com.pqd.application.domain.product.Product;
 import lombok.*;
 

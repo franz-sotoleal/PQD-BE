@@ -1,6 +1,11 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.*;
+import com.pqd.adapters.web.product.json.ConnectionResultJson;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.product.Product;
@@ -211,7 +216,7 @@ public class ProductControllerTest {
                                                                                 .token("a")
                                                                                 .build());
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(actual.getBody()).isInstanceOf(SonarqubeConnectionResultJson.class);
+        assertThat(actual.getBody()).isInstanceOf(ConnectionResultJson.class);
         assertThat(actual.getBody().isConnectionOk()).isEqualTo(true);
         assertThat(actual.getBody().getMessage()).isEqualTo("ok");
     }

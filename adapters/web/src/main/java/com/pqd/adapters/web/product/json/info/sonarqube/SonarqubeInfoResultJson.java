@@ -1,4 +1,4 @@
-package com.pqd.adapters.web.product.json;
+package com.pqd.adapters.web.product.json.info.sonarqube;
 
 import lombok.*;
 

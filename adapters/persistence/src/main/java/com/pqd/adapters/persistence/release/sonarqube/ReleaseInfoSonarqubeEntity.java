@@ -1,6 +1,7 @@
 package com.pqd.adapters.persistence.release.sonarqube;
 
 
+import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,4 +43,29 @@ public class ReleaseInfoSonarqubeEntity {
 
     @Column(name = "maint_smells")
     private Double maintainabilitySmells;
+
+    public static ReleaseInfoSonarqube buildSonarqubeReleaseInfo(ReleaseInfoSonarqubeEntity entity) {
+        return ReleaseInfoSonarqube.builder()
+                                   .id(entity.getId())
+                                   .securityRating(entity.getSecurityRating())
+                                   .reliabilityRating(entity.getReliabilityRating())
+                                   .maintainabilityRating(entity.getMaintainabilityRating())
+                                   .securityVulnerabilities(entity.getSecurityVulnerabilities())
+                                   .reliabilityBugs(entity.getReliabilityBugs())
+                                   .maintainabilitySmells(entity.getMaintainabilitySmells())
+                                   .maintainabilityDebt(entity.getMaintainabilityDebt())
+                                   .build();
+    }
+
+    public static ReleaseInfoSonarqubeEntity buildReleaseInfoSonarqubeEntity(ReleaseInfoSonarqube releaseInfo) {
+        return builder()
+                                         .securityRating(releaseInfo.getSecurityRating())
+                                         .maintainabilityRating(releaseInfo.getMaintainabilityRating())
+                                         .reliabilityRating(releaseInfo.getReliabilityRating())
+                                         .securityVulnerabilities(releaseInfo.getSecurityVulnerabilities())
+                                         .maintainabilityDebt(releaseInfo.getMaintainabilityDebt())
+                                         .maintainabilitySmells(releaseInfo.getMaintainabilitySmells())
+                                         .reliabilityBugs(releaseInfo.getReliabilityBugs())
+                                         .build();
+    }
 }

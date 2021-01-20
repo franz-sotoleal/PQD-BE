@@ -1,10 +1,10 @@
 package com.pqd.integration;
 
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoSonarqubeResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
-import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
-import com.pqd.adapters.web.product.json.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.sonarqube.result.ReleaseInfoSonarqubeResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

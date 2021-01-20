@@ -83,4 +83,3 @@ INSERT INTO public.jira_issue(jira_sprint_id, issue_id, key, description, icon_u
 
 
 
-

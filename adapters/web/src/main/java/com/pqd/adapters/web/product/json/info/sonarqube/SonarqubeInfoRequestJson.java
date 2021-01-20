@@ -1,4 +1,4 @@
-package com.pqd.adapters.web.product.json;
+package com.pqd.adapters.web.product.json.info.sonarqube;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;

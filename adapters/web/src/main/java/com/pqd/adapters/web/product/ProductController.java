@@ -1,6 +1,15 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.*;
+import com.pqd.adapters.web.product.json.ConnectionResultJson;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
+import com.pqd.adapters.web.product.presenter.ConnectionTestPresenter;
+import com.pqd.adapters.web.product.presenter.ProductListPresenter;
+import com.pqd.adapters.web.product.presenter.ProductPresenter;
+import com.pqd.adapters.web.product.presenter.ReleaseInfoPresenter;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
@@ -85,7 +94,7 @@ public class ProductController {
     }
 
     @PostMapping("/test/sonarqube/connection")
-    public ResponseEntity<SonarqubeConnectionResultJson> testSonarqubeConnection(
+    public ResponseEntity<ConnectionResultJson> testSonarqubeConnection(
             @RequestBody @NonNull SonarqubeInfoRequestJson request) {
         checkRequiredFieldPresence(request);
         var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),

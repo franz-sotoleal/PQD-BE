@@ -21,4 +21,6 @@ public class ReleaseInfo {
     private final Double qualityLevel;
 
     private final ReleaseInfoSonarqube releaseInfoSonarqube;
+
+    private final ReleaseInfoJira releaseInfoJira;
 }
