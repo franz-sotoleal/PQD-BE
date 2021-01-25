@@ -23,7 +23,7 @@ public class JiraIssueEntity {
 
     @ToString.Exclude // Lombok toString() causes circular dependency and stackOverflowError
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="jira_sprint_id", nullable=false)
+    @JoinColumn(name = "jira_sprint_id", nullable = false)
     private JiraSprintEntity sprint;
 
     @Column(name = "issue_id")
@@ -59,5 +59,17 @@ public class JiraIssueEntity {
                                                .build())
                         .browserUrl(entity.getBrowserUrl())
                         .build();
+    }
+
+    public static JiraIssueEntity buildJiraIssue(JiraIssue jiraIssue) {
+        return JiraIssueEntity.builder()
+                              .id(jiraIssue.getId())
+                              .issueId(jiraIssue.getIssueId())
+                              .key(jiraIssue.getKey())
+                              .browserUrl(jiraIssue.getBrowserUrl())
+                              .description(jiraIssue.getFields().getIssueType().getDescription())
+                              .iconUrl(jiraIssue.getFields().getIssueType().getIconUrl())
+                              .name(jiraIssue.getFields().getIssueType().getName())
+                              .build();
     }
 }

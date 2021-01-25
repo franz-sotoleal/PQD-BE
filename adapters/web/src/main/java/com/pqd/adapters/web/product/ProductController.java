@@ -153,6 +153,7 @@ public class ProductController {
         }
     }
 
+
     // TODO tee ümber, et sonarqube ei oleks enam kohustuslik aga kontrolli kohustuslikke fielde ikka kui need olemas on
     // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {

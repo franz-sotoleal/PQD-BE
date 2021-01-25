@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Entity
@@ -51,23 +52,37 @@ public class ReleaseInfoEntity {
                           .id(entity.getId())
                           .qualityLevel(entity.getQualityLevel())
                           .productId(entity.getProductId())
-                          .releaseInfoSonarqube(ReleaseInfoSonarqubeEntity.buildSonarqubeReleaseInfo(entity.getSonarqubeReleaseInfoEntity()))
-                          .releaseInfoJira(ReleaseInfoJira.builder()
-                                                          .jiraSprints(entity.getJiraSprintEntity().stream()
-                                                              .map(JiraSprintEntity::buildJiraSprint)
-                                                              .collect(Collectors.toList()))
-                                                          .build())
+                          .releaseInfoSonarqube(
+                                  Optional.of(ReleaseInfoSonarqubeEntity.buildSonarqubeReleaseInfo(
+                                          entity.getSonarqubeReleaseInfoEntity())))
+                          .releaseInfoJira(Optional.of(ReleaseInfoJira.builder()
+                                                                      .jiraSprints(entity.getJiraSprintEntity().stream()
+                                                                                         .map(JiraSprintEntity::buildJiraSprint)
+                                                                                         .collect(Collectors.toList()))
+                                                                      .build()))
                           .created(entity.getCreated())
                           .build();
     }
 
     public static ReleaseInfoEntity buildReleaseInfoEnity(ReleaseInfo releaseInfo) {
-        return builder()
-                                .created(releaseInfo.getCreated())
-                                .productId(releaseInfo.getProductId())
-                                .sonarqubeReleaseInfoEntity(ReleaseInfoSonarqubeEntity
-                                                                    .buildReleaseInfoSonarqubeEntity(releaseInfo.getReleaseInfoSonarqube()))
-                                .qualityLevel(releaseInfo.getQualityLevel())
-                                .build();
+        ReleaseInfoEntity entity = builder()
+                .created(releaseInfo.getCreated())
+                .productId(releaseInfo.getProductId())
+                .qualityLevel(releaseInfo.getQualityLevel())
+                .build();
+
+        if (releaseInfo.getReleaseInfoSonarqube().isPresent()) {
+            entity.setSonarqubeReleaseInfoEntity(
+                    ReleaseInfoSonarqubeEntity.buildReleaseInfoSonarqubeEntity(releaseInfo
+                                                                                       .getReleaseInfoSonarqube()
+                                                                                       .get()));
+        }
+        if (releaseInfo.getReleaseInfoJira().isPresent()) {
+            entity.setJiraSprintEntity(releaseInfo.getReleaseInfoJira().get().getJiraSprints().stream()
+                                                  .map(JiraSprintEntity::buildJiraSprint)
+                                                  .collect(Collectors.toList()));
+        }
+
+        return entity;
     }
 }

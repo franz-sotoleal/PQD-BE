@@ -4,7 +4,7 @@ CREATE SEQUENCE sq_info_seq INCREMENT 50;
 CREATE SEQUENCE jira_info_seq INCREMENT 50;
 CREATE SEQUENCE jira_issue_seq INCREMENT 50;
 CREATE SEQUENCE release_info_sq_seq INCREMENT 50;
-CREATE SEQUENCE release_info_jira_seq INCREMENT 50;
+CREATE SEQUENCE release_info_jira_sprint_seq INCREMENT 50;
 CREATE SEQUENCE release_info_seq INCREMENT 50;
 CREATE SEQUENCE user_product_claim_seq INCREMENT 50;
 
@@ -78,10 +78,10 @@ CREATE TABLE public.release_info
 
 CREATE TABLE public.release_info_jira_sprint
 (
-    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_jira_seq'),
-    release_info_id BIGINT                  NOT NULL    REFERENCES public.release_info(id),
-    sprint_id       BIGINT                  NOT NULL,
-    board_id        BIGINT                  NOT NULL,
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_jira_sprint_seq'),
+    release_info_id BIGINT                              REFERENCES public.release_info(id),
+    sprint_id       BIGINT,
+    board_id        BIGINT,
     name            TEXT,
     start_time      TIMESTAMP,
     end_time        TIMESTAMP,

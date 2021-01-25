@@ -28,23 +28,30 @@ public class ReleaseInfoResultJson {
     ReleaseInfoJiraResultJson releaseInfoJira;
 
     public static ReleaseInfoResultJson buildResultJson(ReleaseInfo releaseInfo) {
-        return ReleaseInfoResultJson.builder()
-                                    .id(releaseInfo.getId())
-                                    .productId(releaseInfo.getProductId())
-                                    .created(releaseInfo.getCreated().toString())
-                                    .qualityLevel(releaseInfo.getQualityLevel())
-                                    .releaseInfoSonarqube(
-                                            ReleaseInfoSonarqubeResultJson
-                                                    .buildResultJson(releaseInfo.getReleaseInfoSonarqube()))
-                                    .releaseInfoJira(ReleaseInfoJiraResultJson.builder()
-                                                                              .jiraSprints(releaseInfo
-                                                                                                   .getReleaseInfoJira()
-                                                                                                   .getJiraSprints()
-                                                                                                   .stream()
-                                                                                                   .map(JiraSprintResultJson::buildJiraSprint)
-                                                                                                   .collect(Collectors.toList()))
-                                                                              .build())
-                                    .build();
+        ReleaseInfoResultJson resultJson = ReleaseInfoResultJson.builder()
+                                                                .id(releaseInfo.getId())
+                                                                .productId(releaseInfo.getProductId())
+                                                                .created(releaseInfo.getCreated().toString())
+                                                                .qualityLevel(releaseInfo.getQualityLevel())
+                                                                .build();
+
+        if (releaseInfo.getReleaseInfoSonarqube().isPresent()) {
+            resultJson.setReleaseInfoSonarqube(
+                    ReleaseInfoSonarqubeResultJson.buildResultJson(releaseInfo.getReleaseInfoSonarqube().get()));
+        }
+        if (releaseInfo.getReleaseInfoJira().isPresent()) {
+            resultJson.setReleaseInfoJira(
+                    ReleaseInfoJiraResultJson.builder()
+                                             .jiraSprints(releaseInfo
+                                                                  .getReleaseInfoJira()
+                                                                  .get()
+                                                                  .getJiraSprints()
+                                                                  .stream()
+                                                                  .map(JiraSprintResultJson::buildJiraSprint)
+                                                                  .collect(Collectors.toList()))
+                                             .build());
+        }
+        return resultJson;
     }
 
 }

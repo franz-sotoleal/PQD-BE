@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Builder
 @Getter
@@ -20,7 +21,7 @@ public class ReleaseInfo {
 
     private final Double qualityLevel;
 
-    private final ReleaseInfoSonarqube releaseInfoSonarqube;
+    private final Optional<ReleaseInfoSonarqube> releaseInfoSonarqube;
 
-    private final ReleaseInfoJira releaseInfoJira;
+    private final Optional<ReleaseInfoJira> releaseInfoJira;
 }

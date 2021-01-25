@@ -71,4 +71,20 @@ public class JiraSprintEntity {
                               .name(entity.getName())
                               .build();
     }
+
+    public static JiraSprintEntity buildJiraSprint(JiraSprint entity) {
+        return JiraSprintEntity.builder()
+                         .boardId(entity.getBoardId())
+                         .browserUrl(entity.getBrowserUrl())
+                         .endTime(entity.getEnd())
+                         .startTime(entity.getStart())
+                         .goal(entity.getGoal())
+                         .issues(entity.getIssues().stream()
+                                       .map(JiraIssueEntity::buildJiraIssue)
+                                       .collect(Collectors.toList()))
+                         .id(entity.getId())
+                         .sprintId(entity.getSprintId())
+                         .name(entity.getName())
+                         .build();
+    }
 }

@@ -1,6 +1,7 @@
 package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoJira;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
@@ -10,6 +11,7 @@ import lombok.Value;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @UseCase
@@ -25,7 +27,8 @@ public class SaveReleaseInfo {
                                      .getQualityLevel();
         ReleaseInfo releaseInfo = ReleaseInfo.builder()
                                              .created(LocalDateTime.now())
-                                             .releaseInfoSonarqube(request.getReleaseInfoSonarqube())
+                                             .releaseInfoSonarqube(Optional.of(request.getReleaseInfoSonarqube()))
+                                             .releaseInfoJira(Optional.of(request.getReleaseInfoJira()))
                                              .productId(request.getProductId())
                                              .qualityLevel(qualityLevel)
                                              .build();
@@ -38,6 +41,7 @@ public class SaveReleaseInfo {
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
         ReleaseInfoSonarqube releaseInfoSonarqube;
+        ReleaseInfoJira releaseInfoJira;
         Long productId;
     }
 

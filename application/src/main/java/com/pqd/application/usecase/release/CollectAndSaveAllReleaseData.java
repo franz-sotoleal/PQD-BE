@@ -4,6 +4,7 @@ import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.jira.JiraSprint;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoJira;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
@@ -44,7 +45,9 @@ public class CollectAndSaveAllReleaseData {
                                                         .getReleaseInfo();
         }
 
-        // TODO salvesta baasi: schema uuendatud ja nüüd vaja persistence adapteri asjad teha, siis core layer ja web adapter
+        // TODO salvesta baasi: schema uuendatud, persistence tehtud, toote salvestamine tehtud
+        // TODO releaseInfo kohta tee ka Optionaliga SonarqubeReleaseInfo ja JiraReleaseInfo väljad, samamoodi nagu toote salvestamise juures - TEHTUD
+        // TODO update product
         List<JiraSprint> activeSprints =
                 retrieveReleaseInfoJira.execute(RetrieveReleaseInfoJira.Request.of(JiraInfo.builder()
                                                                                            .baseUrl(
@@ -61,7 +64,7 @@ public class CollectAndSaveAllReleaseData {
         System.out.println(activeSprints);
 
 
-        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(releaseInfoSonarqube, request.getProductId()));
+        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(releaseInfoSonarqube, ReleaseInfoJira.builder().jiraSprints(activeSprints).build(), request.getProductId()));
     }
 
     @Value(staticConstructor = "of")

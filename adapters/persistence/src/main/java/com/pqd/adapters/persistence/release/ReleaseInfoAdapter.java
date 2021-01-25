@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.release;
 
+import com.pqd.adapters.persistence.release.jira.JiraSprintEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.usecase.release.ReleaseInfoGateway;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,23 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
 
     @Override
     public ReleaseInfo save(ReleaseInfo releaseInfo) {
-        ReleaseInfoEntity savedReleaseInfo = repository.save(ReleaseInfoEntity.buildReleaseInfoEnity(releaseInfo));
-        return ReleaseInfoEntity.buildReleaseInfo(savedReleaseInfo);
+        ReleaseInfoEntity releaseInfoEntity = ReleaseInfoEntity.buildReleaseInfoEnity(releaseInfo);
+        List<JiraSprintEntity> jiraSprintEntity = releaseInfoEntity.getJiraSprintEntity();
+        releaseInfoEntity.setJiraSprintEntity(null);
+        ReleaseInfoEntity savedReleaseInfo = repository.save(releaseInfoEntity);
+        savedReleaseInfo.setJiraSprintEntity(
+                jiraSprintEntity.stream()
+                                .peek(entity -> {
+                                    entity.setReleaseInfo(savedReleaseInfo);
+                                    entity.setIssues(entity.getIssues().stream()
+                                                           .peek(issue -> issue.setSprint(entity))
+                                                           .collect(Collectors.toList()));
+                                })
+                                .collect(Collectors.toList()));
+
+        // Set DB generated id to release_info_jira sprint
+        ReleaseInfoEntity updatedReleaseInfo = repository.save(savedReleaseInfo);
+        return ReleaseInfoEntity.buildReleaseInfo(updatedReleaseInfo);
     }
 
     @Override
@@ -28,7 +44,7 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
         return entities.stream().map(ReleaseInfoEntity::buildReleaseInfo).collect(Collectors.toList());
     }
 
-     public void deleteAllByProductId(Long productId) {
+    public void deleteAllByProductId(Long productId) {
         List<ReleaseInfoEntity> releaseInfoEntities = repository.findAllByProductIdOrderByIdDesc(productId);
         repository.deleteAll(releaseInfoEntities);
     }
