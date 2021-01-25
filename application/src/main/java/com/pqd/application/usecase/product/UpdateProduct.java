@@ -26,6 +26,7 @@ public class UpdateProduct {
                                  .name(request.getProduct().getName())
                                  .token(token)
                                  .sonarqubeInfo(request.getProduct().getSonarqubeInfo())
+                                 .jiraInfo(request.product.getJiraInfo())
                                  .build();
 
         return Response.of(productGateway.update(product));

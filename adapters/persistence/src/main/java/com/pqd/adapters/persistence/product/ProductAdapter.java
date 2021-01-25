@@ -48,6 +48,12 @@ public class ProductAdapter implements ProductGateway {
             productEntity.getSonarqubeInfoEntity().setBaseUrl(product.getSonarqubeInfo().get().getBaseUrl());
             productEntity.getSonarqubeInfoEntity().setComponentName(product.getSonarqubeInfo().get().getComponentName());
         }
+        if (product.getJiraInfo().isPresent()) {
+            productEntity.getJiraInfoEntity().setBaseUrl(product.getJiraInfo().get().getBaseUrl());
+            productEntity.getJiraInfoEntity().setBoardId(product.getJiraInfo().get().getBoardId());
+            productEntity.getJiraInfoEntity().setUserEmail(product.getJiraInfo().get().getUserEmail());
+            productEntity.getJiraInfoEntity().setToken(product.getJiraInfo().get().getToken());
+        }
 
         ProductEntity savedEntity = repository.save(productEntity);
 

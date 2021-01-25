@@ -4,6 +4,7 @@ import com.pqd.adapters.web.product.json.ConnectionResultJson;
 import com.pqd.adapters.web.product.json.info.ProductResultJson;
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.product.presenter.ConnectionTestPresenter;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -153,21 +155,23 @@ public class ProductController {
         }
     }
 
-
-    // TODO tee ümber, et sonarqube ei oleks enam kohustuslik aga kontrolli kohustuslikke fielde ikka kui need olemas on
-    // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
+        Optional<SonarqubeInfoRequestJson> sonarqubeInfo = requestJson.getSonarqubeInfo();
+        Optional<JiraInfoRequestJson> jiraInfo = requestJson.getJiraInfo();
         if (requestJson.getUserId() == null
-            || !areSonarqubeFieldsPresent(requestJson.getSonarqubeInfo().get())) {
+            || sonarqubeInfo.isPresent() && !areSonarqubeFieldsPresent(sonarqubeInfo.get())
+            || jiraInfo.isPresent() && !areJiraFieldsPresent(jiraInfo.get())
+        ) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }
 
     private void checkRequiredFieldPresence(UpdateProductRequestJson requestJson) {
+        SonarqubeInfoRequestJson sonarqubeInfo = requestJson.getProduct().getSonarqubeInfo();
         if (requestJson.getProduct() == null
             || requestJson.getProduct().getName() == null
             || requestJson.getProduct().getName().length() == 0
-            || !areSonarqubeFieldsPresent(requestJson.getProduct().getSonarqubeInfo())) {
+            || sonarqubeInfo != null && !areSonarqubeFieldsPresent(sonarqubeInfo)) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }
@@ -184,6 +188,15 @@ public class ProductController {
                && requestJson.getComponentName() != null
                && requestJson.getBaseUrl().length() != 0
                && requestJson.getComponentName().length() != 0;
+    }
+
+    private boolean areJiraFieldsPresent(JiraInfoRequestJson requestJson) {
+        return requestJson != null
+               && requestJson.getBaseUrl() != null
+               && requestJson.getBoardId() != null
+               && requestJson.getUserEmail() != null
+               && requestJson.getBaseUrl().length() != 0
+               && requestJson.getUserEmail().length() != 0;
     }
 
     @ExceptionHandler({HttpClientErrorException.class})
