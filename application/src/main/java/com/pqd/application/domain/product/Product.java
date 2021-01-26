@@ -33,4 +33,13 @@ public class Product {
                && sonarqubeInfo.get().getComponentName().length() > 0;
     }
 
+    public boolean hasValidJiraInfo() {
+        return jiraInfo.isPresent()
+               && jiraInfo.get().getBaseUrl() != null
+               && jiraInfo.get().getBoardId() != null
+               && jiraInfo.get().getUserEmail() != null
+               && jiraInfo.get().getBaseUrl().length() > 0
+               && jiraInfo.get().getUserEmail().length() > 0;
+    }
+
 }

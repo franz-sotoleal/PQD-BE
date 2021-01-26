@@ -45,26 +45,23 @@ public class CollectAndSaveAllReleaseData {
                                                         .getReleaseInfo();
         }
 
-        // TODO salvesta baasi: schema uuendatud, persistence tehtud, toote salvestamine tehtud
-        // TODO releaseInfo kohta tee ka Optionaliga SonarqubeReleaseInfo ja JiraReleaseInfo väljad, samamoodi nagu toote salvestamise juures - TEHTUD
-        // TODO update product
-        List<JiraSprint> activeSprints =
-                retrieveReleaseInfoJira.execute(RetrieveReleaseInfoJira.Request.of(JiraInfo.builder()
-                                                                                           .baseUrl(
-                                                                                                   "https://kert944.atlassian.net")
-                                                                                           .boardId(1L)
-                                                                                           .token("dlNrqUp5na04fQyacxcx58EF")
-                                                                                           .userEmail(
-                                                                                                   "prinkkert@gmail.com")
-                                                                                           .build()))
-                                       .getActiveSprints();
+        List<JiraSprint> activeSprints = List.of();
+        if (product.hasValidJiraInfo() && product.getJiraInfo().isPresent()) {
+            activeSprints =
+                    retrieveReleaseInfoJira.execute(
+                            RetrieveReleaseInfoJira
+                                    .Request.of(JiraInfo.builder()
+                                                        .baseUrl(product.getJiraInfo().get().getBaseUrl())
+                                                        .boardId(product.getJiraInfo().get().getBoardId())
+                                                        .token(product.getJiraInfo().get().getToken())
+                                                        .userEmail(product.getJiraInfo().get().getUserEmail())
+                                                        .build()))
+                                           .getActiveSprints();
+        }
 
-
-
-        System.out.println(activeSprints);
-
-
-        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(releaseInfoSonarqube, ReleaseInfoJira.builder().jiraSprints(activeSprints).build(), request.getProductId()));
+        saveReleaseInfo.execute(SaveReleaseInfo.Request.of(releaseInfoSonarqube,
+                                                           ReleaseInfoJira.builder().jiraSprints(activeSprints).build(),
+                                                           request.getProductId()));
     }
 
     @Value(staticConstructor = "of")
