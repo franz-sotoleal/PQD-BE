@@ -1,7 +1,7 @@
 package com.pqd.adapters.sonarqube;
 
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -81,7 +81,7 @@ public class SonarqubeRestClientTest {
 
     @Test
     void GIVEN_all_good_WHEN_sonarqube_connection_tested_THEN_sonarqube_connection_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_success();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_success();
         SonarqubeMeasureResponse generatedSqResponse = TestDataGenerator.generateSonarqubeMeasureResponse();
         ResponseEntity<SonarqubeMeasureResponse> responseEntity =
                 new ResponseEntity<>(generatedSqResponse, HttpStatus.OK);
@@ -91,49 +91,49 @@ public class SonarqubeRestClientTest {
                                    ArgumentMatchers.<Class<SonarqubeMeasureResponse>>any()))
                 .thenReturn(responseEntity);
 
-        SonarqubeConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
+        ConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
 
         assertThat(actual).isEqualTo(connectionResult);
     }
 
     @Test
     void GIVEN_invalid_baseurl_WHEN_sonarqube_connection_tested_THEN_corresponding_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongBaseUrl();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongBaseUrl();
         when(restTemplate.exchange(ArgumentMatchers.anyString(),
                                    any(HttpMethod.class),
                                    any(),
                                    ArgumentMatchers.<Class<SonarqubeMeasureResponse>>any()))
                 .thenThrow(new ResourceAccessException("", new IOException()));
 
-        SonarqubeConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
+        ConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
 
         assertThat(actual).isEqualTo(connectionResult);
     }
 
     @Test
     void GIVEN_invalid_component_WHEN_sonarqube_connection_tested_THEN_corresponding_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongComponent();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongComponent();
         when(restTemplate.exchange(ArgumentMatchers.anyString(),
                                    any(HttpMethod.class),
                                    any(),
                                    ArgumentMatchers.<Class<SonarqubeMeasureResponse>>any()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        SonarqubeConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
+        ConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
 
         assertThat(actual).isEqualTo(connectionResult);
     }
 
     @Test
     void GIVEN_invalid_token_WHEN_sonarqube_connection_tested_THEN_corresponding_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongToken();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult_wrongToken();
         when(restTemplate.exchange(ArgumentMatchers.anyString(),
                                    any(HttpMethod.class),
                                    any(),
                                    ArgumentMatchers.<Class<SonarqubeMeasureResponse>>any()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
 
-        SonarqubeConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
+        ConnectionResult actual = restClient.testSonarqubeConnection("a", "a", "a");
 
         assertThat(actual).isEqualTo(connectionResult);
     }

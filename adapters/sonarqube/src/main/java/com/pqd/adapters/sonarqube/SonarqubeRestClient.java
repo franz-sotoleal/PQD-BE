@@ -1,7 +1,7 @@
 package com.pqd.adapters.sonarqube;
 
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.sonarqube.SonarqubeGateway;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -36,25 +36,25 @@ public class SonarqubeRestClient implements SonarqubeGateway {
     }
 
     @Override
-    public SonarqubeConnectionResult testSonarqubeConnection(String baseUrl, String componentName, String token) {
-        SonarqubeConnectionResult sonarqubeConnectionResult = SonarqubeConnectionResult.builder()
-                                                                                       .connectionOk(true)
-                                                                                       .message("Connection successful")
-                                                                                       .build();
+    public ConnectionResult testSonarqubeConnection(String baseUrl, String componentName, String token) {
+        ConnectionResult connectionResult = ConnectionResult.builder()
+                                                            .connectionOk(true)
+                                                            .message("Connection successful")
+                                                            .build();
         try {
             makeHttpRequest(baseUrl, componentName, token);
         } catch (SonarqubeConnectionRefusedException e) {
-            sonarqubeConnectionResult.setConnectionOk(false);
-            sonarqubeConnectionResult.setMessage("Could not connect to Sonarqube server: " + e.getMessage());
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage("Could not connect to Sonarqube server: " + e.getMessage());
         } catch (SonarqubeRestClientException e) {
-            sonarqubeConnectionResult.setConnectionOk(false);
-            sonarqubeConnectionResult.setMessage("Connection established, but something went wrong: " + e.getMessage());
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage("Connection established, but something went wrong: " + e.getMessage());
         } catch (Exception e) {
-            sonarqubeConnectionResult.setConnectionOk(false);
-            sonarqubeConnectionResult.setMessage(e.getMessage());
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage(e.getMessage());
         }
 
-        return sonarqubeConnectionResult;
+        return connectionResult;
     }
 
     private ResponseEntity<SonarqubeMeasureResponse> makeHttpRequest(String baseUrl, String componentName, String token) {

@@ -1,4 +1,4 @@
-package com.pqd.application.domain.sonarqube;
+package com.pqd.application.domain.connection;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SonarqubeConnectionResult { // TODO make common
+public class ConnectionResult {
 
     boolean connectionOk;
 

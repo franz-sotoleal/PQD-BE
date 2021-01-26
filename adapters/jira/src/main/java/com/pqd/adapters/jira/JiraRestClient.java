@@ -3,6 +3,7 @@ package com.pqd.adapters.jira;
 import com.pqd.adapters.jira.model.JiraActiveSprintResponse;
 import com.pqd.adapters.jira.model.JiraIssueFieldsResponse;
 import com.pqd.adapters.jira.model.JiraSprintIssuesResponse;
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.jira.JiraIssue;
 import com.pqd.application.domain.jira.JiraSprint;
@@ -57,6 +58,28 @@ public class JiraRestClient implements JiraGateway {
                                           .fields(JiraIssueFieldsResponse.buildJiraIssueFields(res))
                                           .build())
                      .collect(Collectors.toList());
+    }
+
+    @Override
+    public ConnectionResult testJiraConnection(JiraInfo jiraInfo) {
+        ConnectionResult connectionResult = ConnectionResult.builder()
+                                                            .connectionOk(true)
+                                                            .message("Connection successful")
+                                                            .build();
+        try {
+            requestActiveSprints(jiraInfo);
+        } catch (JiraConnectionRefusedException e) {
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage("Could not connect to Jira server: " + e.getMessage());
+        } catch (JiraRestClientException e) {
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage("Connection established, but something went wrong: " + e.getMessage());
+        } catch (Exception e) {
+            connectionResult.setConnectionOk(false);
+            connectionResult.setMessage(e.getMessage());
+        }
+
+        return connectionResult;
     }
 
 

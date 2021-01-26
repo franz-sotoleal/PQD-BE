@@ -6,10 +6,10 @@ import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.domain.claim.UserProductClaim;
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 
 public class TestDataGenerator {
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult() {
-        return SonarqubeConnectionResult.builder()
-                                        .message("ok")
-                                        .connectionOk(true)
-                                        .build();
+    public static ConnectionResult generateSonarqubeConnectionResult() {
+        return ConnectionResult.builder()
+                               .message("ok")
+                               .connectionOk(true)
+                               .build();
     }
 
     public static ReleaseInfo generateReleaseInfo() {

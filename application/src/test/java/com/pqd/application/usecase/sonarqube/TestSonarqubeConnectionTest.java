@@ -1,6 +1,6 @@
 package com.pqd.application.usecase.sonarqube;
 
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
+import com.pqd.application.domain.connection.ConnectionResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,10 +20,10 @@ public class TestSonarqubeConnectionTest {
 
     @Test
     void GIVEN_request_WHEN_request_executed_THEN_response_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
         when(gateway.testSonarqubeConnection(any(), any(), any())).thenReturn(connectionResult);
 
-        SonarqubeConnectionResult actual =
+        ConnectionResult actual =
                 testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of("a", "a", "a"))
                                        .getConnectionResult();
         assertThat(actual).isEqualTo(connectionResult);

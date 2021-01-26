@@ -1,6 +1,6 @@
 package com.pqd.application.usecase.sonarqube;
 
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
 import lombok.EqualsAndHashCode;
@@ -17,7 +17,7 @@ public class TestSonarqubeConnection {
     private final SonarqubeGateway gateway;
 
     public Response execute(Request request) {
-        SonarqubeConnectionResult connectionResult =
+        ConnectionResult connectionResult =
                 gateway.testSonarqubeConnection(request.getBaseUrl(), request.getComponentName(), request.getToken());
 
         return Response.of(connectionResult);
@@ -27,7 +27,7 @@ public class TestSonarqubeConnection {
     @EqualsAndHashCode(callSuper = false)
     public static class Response extends AbstractResponse {
 
-        SonarqubeConnectionResult connectionResult;
+        ConnectionResult connectionResult;
     }
 
     @Value(staticConstructor = "of")

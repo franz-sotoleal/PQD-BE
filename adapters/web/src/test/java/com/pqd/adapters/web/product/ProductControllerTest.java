@@ -8,9 +8,9 @@ import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson
 import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.claim.SaveClaim;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
@@ -207,7 +207,7 @@ public class ProductControllerTest {
 
     @Test
     void GIVEN_all_correct_WHEN_testing_sonarqube_connection_THEN_connection_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
+        ConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
         when(testSonarqubeConnection.execute(any())).thenReturn(TestSonarqubeConnection.Response.of(connectionResult));
 
         var actual = controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
