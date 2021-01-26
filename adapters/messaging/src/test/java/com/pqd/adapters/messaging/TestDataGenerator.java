@@ -6,6 +6,7 @@ import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class TestDataGenerator {
     public static Product generateProduct() {
@@ -13,7 +14,7 @@ public class TestDataGenerator {
                       .id(123L)
                       .name("test-product")
                       .token("8257cc3a6b0610da1357f73e03524b090658553a")
-                      .sonarqubeInfo(generateSonarqubeInfo())
+                      .sonarqubeInfo(Optional.of(generateSonarqubeInfo()))
                       .build();
 
     }
