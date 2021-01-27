@@ -3,13 +3,16 @@ package com.pqd.integration;
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.product.json.release.sonarqube.result.ReleaseInfoSonarqubeResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
+import com.pqd.integration.special.SaveProductRequestJsonForIntTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.Base64;
+import java.util.Optional;
 
 public class TestDataGenerator {
     public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_201() {
@@ -154,14 +157,31 @@ public class TestDataGenerator {
         return SaveProductRequestJson.builder()
                                      .name("test12")
                                      .userId(123L)
-                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
+                                     .jiraInfo(Optional.of(generateJiraInfoRequestJson()))
                                      .build();
+    }
+
+    public static SaveProductRequestJsonForIntTest generateSaveProductRequestJson_withoutOptionals() {
+        return new SaveProductRequestJsonForIntTest(123L,
+                                                    "test12",
+                                                    generateSonarqubeInfoRequestJson(),
+                                                    generateJiraInfoRequestJson());
+    }
+
+    private static JiraInfoRequestJson generateJiraInfoRequestJson() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
     }
 
     public static SaveProductRequestJson generateSaveProductRequestJson_withNoUserId() {
         return SaveProductRequestJson.builder()
                                      .name("test12")
-                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
                                      .build();
     }
 

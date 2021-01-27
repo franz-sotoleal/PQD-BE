@@ -3,7 +3,6 @@ package com.pqd.adapters.web.product.json.release.jira.result;
 import com.pqd.application.domain.jira.JiraSprint;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,9 +19,11 @@ public class JiraSprintResultJson {
 
     String name;
 
-    LocalDateTime start;
+    // Integration test purposes
+    String start;
 
-    LocalDateTime end;
+    // Integration test purposes
+    String end;
 
     Long boardId;
 
@@ -36,8 +37,8 @@ public class JiraSprintResultJson {
         return JiraSprintResultJson.builder()
                          .boardId(jiraSprint.getBoardId())
                          .browserUrl(jiraSprint.getBrowserUrl())
-                         .end(jiraSprint.getEnd())
-                         .start(jiraSprint.getStart())
+                         .end(jiraSprint.getEnd().toString())
+                         .start(jiraSprint.getStart().toString())
                          .goal(jiraSprint.getGoal())
                          .issues(jiraSprint.getIssues().stream()
                                        .map(JiraIssueResultJson::buildJiraIssue)

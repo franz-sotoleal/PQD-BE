@@ -15,6 +15,7 @@ import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.integration.TestContainerBase;
 import com.pqd.integration.TestDataGenerator;
+import com.pqd.integration.special.SaveProductRequestJsonForIntTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -108,18 +109,24 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     @Transactional
     @WithMockUser
     void GIVEN_correct_input_WHEN_saving_product_THEN_status_ok_and_product_returned() throws Exception {
-        SaveProductRequestJson requestJson = TestDataGenerator.generateSaveProductRequestJson();
+        SaveProductRequestJsonForIntTest requestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withoutOptionals();
         MvcResult mvcResult = mvc.perform(post("/api/product/save")
                                                   .content(mapper.writeValueAsString(requestJson))
                                                   .contentType(MediaType.APPLICATION_JSON))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$.token", isA(String.class)))
                                  .andExpect(jsonPath("$.id", isA(Number.class)))
-                                 .andExpect(jsonPath("$.name", is(requestJson.getName())))
+                                 .andExpect(jsonPath("$.name", is(requestJson.name)))
                                  .andExpect(jsonPath("$.sonarqubeInfo.baseUrl",
-                                                     is(requestJson.getSonarqubeInfo().getBaseUrl())))
+                                                     is(requestJson.sonarqubeInfo.getBaseUrl())))
                                  .andExpect(jsonPath("$.sonarqubeInfo.componentName",
-                                                     is(requestJson.getSonarqubeInfo().getComponentName())))
+                                                     is(requestJson.sonarqubeInfo.getComponentName())))
+                                 .andExpect(jsonPath("$.jiraInfo.baseUrl",
+                                                     is(requestJson.jiraInfo.getBaseUrl())))
+                                 .andExpect(jsonPath("$.jiraInfo.boardId", isA(Number.class)))
+                                 .andExpect(jsonPath("$.jiraInfo.userEmail",
+                                                     is(requestJson.jiraInfo.getUserEmail())))
                                  .andReturn();
 
         ProductResultJson productResultJson =
@@ -127,13 +134,21 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
 
         ProductEntity entityFromDb = productRepository.findById(productResultJson.getId()).orElse(ProductEntity.builder().build());
 
-        assertThat(entityFromDb.getName()).isEqualTo(requestJson.getName());
+        assertThat(entityFromDb.getName()).isEqualTo(requestJson.name);
         assertThat(entityFromDb.getSonarqubeInfoEntity().getToken())
-                .isEqualTo(requestJson.getSonarqubeInfo().getToken());
+                .isEqualTo(requestJson.sonarqubeInfo.getToken());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
-                .isEqualTo(requestJson.getSonarqubeInfo().getComponentName());
+                .isEqualTo(requestJson.sonarqubeInfo.getComponentName());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getBaseUrl())
-                .isEqualTo(requestJson.getSonarqubeInfo().getBaseUrl());
+                .isEqualTo(requestJson.sonarqubeInfo.getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.jiraInfo.getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBoardId())
+                .isEqualTo(requestJson.jiraInfo.getBoardId());
+        assertThat(entityFromDb.getJiraInfoEntity().getUserEmail())
+                .isEqualTo(requestJson.jiraInfo.getUserEmail());
+        assertThat(entityFromDb.getJiraInfoEntity().getToken())
+                .isEqualTo(requestJson.jiraInfo.getToken());
     }
 
     @Test
