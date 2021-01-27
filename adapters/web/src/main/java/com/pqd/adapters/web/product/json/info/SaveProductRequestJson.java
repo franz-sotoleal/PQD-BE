@@ -26,9 +26,11 @@ public class SaveProductRequestJson {
     String name;
 
     @JsonProperty("sonarqubeInfo")
+    @Builder.Default
     Optional<SonarqubeInfoRequestJson> sonarqubeInfo = Optional.empty();
 
     @JsonProperty("jiraInfo")
+    @Builder.Default
     Optional<JiraInfoRequestJson> jiraInfo = Optional.empty();
 
     public SaveProduct.Request toSaveProductRequest() {

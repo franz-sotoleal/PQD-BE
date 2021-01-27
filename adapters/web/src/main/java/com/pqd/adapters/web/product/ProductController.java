@@ -159,6 +159,7 @@ public class ProductController {
         Optional<SonarqubeInfoRequestJson> sonarqubeInfo = requestJson.getSonarqubeInfo();
         Optional<JiraInfoRequestJson> jiraInfo = requestJson.getJiraInfo();
         if (requestJson.getUserId() == null
+            || sonarqubeInfo.isEmpty() && jiraInfo.isEmpty()
             || sonarqubeInfo.isPresent() && !areSonarqubeFieldsPresent(sonarqubeInfo.get())
             || jiraInfo.isPresent() && !areJiraFieldsPresent(jiraInfo.get())
         ) {

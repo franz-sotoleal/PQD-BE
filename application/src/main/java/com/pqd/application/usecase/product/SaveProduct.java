@@ -20,6 +20,7 @@ public class SaveProduct {
     private final GenerateToken generateToken;
 
     public Response execute(Request request) {
+        checkIfToolInfoExists(request);
         String token = generateToken.execute().getToken();
         Product product = Product.builder()
                                  .token(token)
@@ -45,5 +46,17 @@ public class SaveProduct {
         Optional<SonarqubeInfo> sonarqubeInfo;
 
         Optional<JiraInfo> jiraInfo;
+    }
+
+    private void checkIfToolInfoExists(Request request) {
+        if (request.getJiraInfo().isEmpty() && request.getSonarqubeInfo().isEmpty()) {
+            throw new SaveProductException("At least one tool need to be specified");
+        }
+    }
+
+    public static class SaveProductException extends RuntimeException {
+        public SaveProductException(String message) {
+            super(message);
+        }
     }
 }

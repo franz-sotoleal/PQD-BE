@@ -1,11 +1,11 @@
 package com.pqd.application.domain.sonarqube;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 @Builder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class SonarqubeInfo {
 

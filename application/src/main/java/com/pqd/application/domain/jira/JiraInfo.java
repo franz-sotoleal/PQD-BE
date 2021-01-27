@@ -1,14 +1,12 @@
 package com.pqd.application.domain.jira;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 @Builder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
-@ToString
 public class JiraInfo {
 
     Long id;

@@ -116,9 +116,9 @@ public class ProductControllerTest {
         assertThat(actual.getBody().getId()).isEqualTo(product.getId());
         assertThat(actual.getBody().getToken()).isEqualTo(product.getToken());
         assertThat(actual.getBody().getName()).isEqualTo(product.getName());
-        assertThat(actual.getBody().getSonarqubeInfo().getComponentName()).isEqualTo(product.getSonarqubeInfo().getComponentName());
-        assertThat(actual.getBody().getSonarqubeInfo().getBaseUrl()).isEqualTo(product.getSonarqubeInfo().getBaseUrl());
-        assertThat(actual.getBody().getSonarqubeInfo().getToken()).isEqualTo(product.getSonarqubeInfo().getToken());
+        assertThat(actual.getBody().getSonarqubeInfo().getComponentName()).isEqualTo(product.getSonarqubeInfo().get().getComponentName());
+        assertThat(actual.getBody().getSonarqubeInfo().getBaseUrl()).isEqualTo(product.getSonarqubeInfo().get().getBaseUrl());
+        assertThat(actual.getBody().getSonarqubeInfo().getToken()).isEqualTo(product.getSonarqubeInfo().get().getToken());
     }
 
     @Test
@@ -352,8 +352,8 @@ public class ProductControllerTest {
         verify(saveProduct).execute(saveProductRequestCaptor.capture());
         verify(saveClaim).execute(saveClaimRequestCaptor.capture());
         assertThat(saveProductRequestCaptor.getValue().getName()).isEqualTo(requestJson.getName());
-        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo())
-                .isEqualTo(requestJson.getSonarqubeInfo().toSonarqubeInfo());
+        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo().get())
+                .isEqualTo(requestJson.getSonarqubeInfo().get().toSonarqubeInfo());
 
         assertThat(saveClaimRequestCaptor.getValue().getProductId())
                 .isEqualTo(saveClaimResponse.getUserProductClaim().getProductId());
@@ -367,9 +367,9 @@ public class ProductControllerTest {
         assertThat(responseEntity.getBody().getId()).isEqualTo(saveProductResponse.getProduct().getId());
         assertThat(responseEntity.getBody().getName()).isEqualTo(saveProductResponse.getProduct().getName());
         assertThat(responseEntity.getBody().getSonarqubeInfo().getComponentName())
-                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getComponentName());
+                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().get().getComponentName());
         assertThat(responseEntity.getBody().getSonarqubeInfo().getBaseUrl())
-                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getBaseUrl());
+                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().get().getBaseUrl());
     }
 
     @Test
@@ -382,8 +382,7 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
-    void GIVEN_no_sq_info_WHEN_saving_product_THEN_exception_thrown() {
+    void GIVEN_no_tool_info_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withNoSqInfo();
 
         Exception exception =
@@ -392,7 +391,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_1_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo();
@@ -403,7 +401,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_2_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo2();
@@ -414,7 +411,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_3_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo3();
@@ -425,7 +421,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_4_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo4();
