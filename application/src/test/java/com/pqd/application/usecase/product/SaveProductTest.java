@@ -35,7 +35,7 @@ public class SaveProductTest {
         when(generateToken.execute()).thenReturn(GenerateToken.Response.of(token));
         when(gateway.save(any())).thenReturn(product);
 
-        saveProduct.execute(SaveProduct.Request.of(product.getName(), product.getSonarqubeInfo()));
+        saveProduct.execute(SaveProduct.Request.of(product.getName(), product.getSonarqubeInfo(), product.getJiraInfo()));
 
         verify(gateway).save(captor.capture());
         assertThat(token).isEqualTo(captor.getValue().getToken());

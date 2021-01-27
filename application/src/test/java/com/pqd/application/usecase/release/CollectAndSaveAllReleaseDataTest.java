@@ -1,6 +1,7 @@
 package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.product.Product;
+import com.pqd.application.domain.release.ReleaseInfoJira;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.jira.RetrieveReleaseInfoJira;
 import com.pqd.application.usecase.product.GetProduct;
@@ -42,13 +43,16 @@ public class CollectAndSaveAllReleaseDataTest {
         CollectAndSaveAllReleaseData.Request request = TestDataGenerator.generateCollectAndSaveAllReleaseDataRequest();
         Product product = TestDataGenerator.generateProduct();
         ReleaseInfoSonarqube releaseInfoSonarqube = TestDataGenerator.generateReleaseInfoSonarqube();
+        ReleaseInfoJira releaseInfoJira = TestDataGenerator.generateReleaseInfoJira();
 
         when(getProduct.execute(any())).thenReturn(GetProduct.Response.of(product));
         when(retrieveSonarqubeData
-                     .execute(RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().getBaseUrl(),
-                                                               product.getSonarqubeInfo().getComponentName(),
-                                                               product.getSonarqubeInfo().getToken())))
+                     .execute(RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().get().getBaseUrl(),
+                                                               product.getSonarqubeInfo().get().getComponentName(),
+                                                               product.getSonarqubeInfo().get().getToken())))
                 .thenReturn(RetrieveSonarqubeData.Response.of(releaseInfoSonarqube));
+        when(retrieveReleaseInfoJira.execute(any()))
+                .thenReturn(RetrieveReleaseInfoJira.Response.of(releaseInfoJira.getJiraSprints()));
         when(saveReleaseInfo.execute(any())).thenReturn(
                 SaveReleaseInfo.Response.of(TestDataGenerator.generateReleaseInfo()));
 
@@ -57,6 +61,7 @@ public class CollectAndSaveAllReleaseDataTest {
         verify(saveReleaseInfo).execute(captor.capture());
         assertThat(product.getId()).isEqualTo(captor.getValue().getProductId());
         assertThat(releaseInfoSonarqube).isEqualTo(captor.getValue().getReleaseInfoSonarqube());
+        assertThat(releaseInfoJira).isEqualTo(captor.getValue().getReleaseInfoJira());
     }
 
 }
