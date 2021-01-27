@@ -3,15 +3,13 @@ package com.pqd.application.domain.product;
 import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Optional;
 
 @Builder
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class Product {
 

@@ -72,7 +72,7 @@ public class JiraSprintEntity {
                               .build();
     }
 
-    public static JiraSprintEntity buildJiraSprint(JiraSprint entity) {
+    public static JiraSprintEntity buildJiraSprintEntity(JiraSprint entity) {
         return JiraSprintEntity.builder()
                          .boardId(entity.getBoardId())
                          .browserUrl(entity.getBrowserUrl())

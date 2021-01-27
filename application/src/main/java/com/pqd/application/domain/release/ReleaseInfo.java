@@ -1,27 +1,27 @@
 package com.pqd.application.domain.release;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Builder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class ReleaseInfo {
 
-    private final Long id;
+    Long id;
 
-    private final Long productId;
+    Long productId;
 
     @EqualsAndHashCode.Exclude //testing purposes
-    private final LocalDateTime created;
+    LocalDateTime created;
 
-    private final Double qualityLevel;
+    Double qualityLevel;
 
-    private final Optional<ReleaseInfoSonarqube> releaseInfoSonarqube;
+    Optional<ReleaseInfoSonarqube> releaseInfoSonarqube;
 
-    private final Optional<ReleaseInfoJira> releaseInfoJira;
+    Optional<ReleaseInfoJira> releaseInfoJira;
 }

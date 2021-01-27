@@ -29,13 +29,39 @@ public class ReleaseInfoAdapterTest {
 
     @Test
     void GIVEN_release_info_WHEN_saving_entity_THEN_entity_passed_and_saved() {
-        ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo();
+        ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo_withJira();
+        ReleaseInfoEntity releaseInfoEntity = TestDataGenerator.generateReleaseInfoEntity_withJira();
+        when(repository.save(any())).thenReturn(releaseInfoEntity);
+
+        ReleaseInfo actual = adapter.save(releaseInfo);
+
+        verify(repository, times(2)).save(captor.capture());
+        assertThat(captor.getValue()).isEqualTo(releaseInfoEntity);
+        assertThat(actual).isEqualTo(releaseInfo);
+    }
+
+    @Test
+    void GIVEN_release_info_without_jira_WHEN_saving_entity_THEN_entity_passed_and_saved() {
+        ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo_withoutJira();
         ReleaseInfoEntity releaseInfoEntity = TestDataGenerator.generateReleaseInfoEntity();
         when(repository.save(any())).thenReturn(releaseInfoEntity);
 
         ReleaseInfo actual = adapter.save(releaseInfo);
 
-        verify(repository).save(captor.capture());
+        verify(repository, times(2)).save(captor.capture());
+        assertThat(captor.getValue()).isEqualTo(releaseInfoEntity);
+        assertThat(actual).isEqualTo(releaseInfo);
+    }
+
+    @Test
+    void GIVEN_release_info_without_sonarqube_WHEN_saving_entity_THEN_entity_passed_and_saved() {
+        ReleaseInfo releaseInfo = TestDataGenerator.generateReleaseInfo_withoutSonarqube();
+        ReleaseInfoEntity releaseInfoEntity = TestDataGenerator.generateReleaseInfoEntity_withoutSonarqube();
+        when(repository.save(any())).thenReturn(releaseInfoEntity);
+
+        ReleaseInfo actual = adapter.save(releaseInfo);
+
+        verify(repository, times(2)).save(captor.capture());
         assertThat(captor.getValue()).isEqualTo(releaseInfoEntity);
         assertThat(actual).isEqualTo(releaseInfo);
     }

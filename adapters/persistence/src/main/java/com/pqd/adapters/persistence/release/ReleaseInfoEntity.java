@@ -48,20 +48,29 @@ public class ReleaseInfoEntity {
     private List<JiraSprintEntity> jiraSprintEntity;
 
     public static ReleaseInfo buildReleaseInfo(ReleaseInfoEntity entity) {
-        return ReleaseInfo.builder()
-                          .id(entity.getId())
-                          .qualityLevel(entity.getQualityLevel())
-                          .productId(entity.getProductId())
-                          .releaseInfoSonarqube(
-                                  Optional.of(ReleaseInfoSonarqubeEntity.buildSonarqubeReleaseInfo(
-                                          entity.getSonarqubeReleaseInfoEntity())))
-                          .releaseInfoJira(Optional.of(ReleaseInfoJira.builder()
-                                                                      .jiraSprints(entity.getJiraSprintEntity().stream()
-                                                                                         .map(JiraSprintEntity::buildJiraSprint)
-                                                                                         .collect(Collectors.toList()))
-                                                                      .build()))
-                          .created(entity.getCreated())
-                          .build();
+        ReleaseInfo releaseInfo = ReleaseInfo.builder()
+                                             .id(entity.getId())
+                                             .qualityLevel(entity.getQualityLevel())
+                                             .productId(entity.getProductId())
+                                             .releaseInfoSonarqube(Optional.empty())
+                                             .releaseInfoJira(Optional.empty())
+                                             .created(entity.getCreated())
+                                             .build();
+        if (entity.getSonarqubeReleaseInfoEntity() != null) {
+            releaseInfo.setReleaseInfoSonarqube(Optional.of(ReleaseInfoSonarqubeEntity.buildSonarqubeReleaseInfo(
+                    entity.getSonarqubeReleaseInfoEntity())));
+        }
+        if (entity.getJiraSprintEntity() != null) {
+            releaseInfo.setReleaseInfoJira(Optional.of(ReleaseInfoJira.builder()
+                                                                      .jiraSprints(
+                                                                              entity.getJiraSprintEntity()
+                                                                                    .stream()
+                                                                                    .map(JiraSprintEntity::buildJiraSprint)
+                                                                                    .collect(Collectors.toList()))
+                                                                      .build()));
+        }
+
+        return releaseInfo;
     }
 
     public static ReleaseInfoEntity buildReleaseInfoEnity(ReleaseInfo releaseInfo) {
@@ -79,7 +88,7 @@ public class ReleaseInfoEntity {
         }
         if (releaseInfo.getReleaseInfoJira().isPresent()) {
             entity.setJiraSprintEntity(releaseInfo.getReleaseInfoJira().get().getJiraSprints().stream()
-                                                  .map(JiraSprintEntity::buildJiraSprint)
+                                                  .map(JiraSprintEntity::buildJiraSprintEntity)
                                                   .collect(Collectors.toList()));
         }
 
