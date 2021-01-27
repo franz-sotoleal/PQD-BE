@@ -200,6 +200,14 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
         assertThat(productResultJsons.getSonarqubeInfo().getToken())
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getToken());
+        assertThat(productResultJsons.getJiraInfo().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBaseUrl());
+        assertThat(productResultJsons.getJiraInfo().getBoardId())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBoardId());
+        assertThat(productResultJsons.getJiraInfo().getUserEmail())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getUserEmail());
+        assertThat(productResultJsons.getJiraInfo().getToken())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getToken());
 
         assertThat(entityFromDb.getName()).isEqualTo(requestJson.getProduct().getName());
         assertThat(entityFromDb.getToken()).isEqualTo(productResultJsons.getToken());
@@ -209,6 +217,14 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getBaseUrl());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
+        assertThat(entityFromDb.getJiraInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBoardId())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBoardId());
+        assertThat(entityFromDb.getJiraInfoEntity().getUserEmail())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getUserEmail());
+        assertThat(entityFromDb.getJiraInfoEntity().getToken())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getToken());
     }
 
     @Test
@@ -255,11 +271,20 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         assertThat(productResultJsons.get(0).getToken()).isEqualTo("8257cc3a6b0610da1357f73e03524b090658553a");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
+        assertThat(productResultJsons.get(0).getJiraInfo().getBaseUrl()).isEqualTo("https://kert944.atlassian.net");
+        assertThat(productResultJsons.get(0).getJiraInfo().getToken()).isEqualTo("dlNrqUp5na04fQyacxcx58EF");
+        assertThat(productResultJsons.get(0).getJiraInfo().getUserEmail()).isEqualTo("prinkkert@gmail.com");
+        assertThat(productResultJsons.get(0).getJiraInfo().getBoardId()).isEqualTo(1L);
+
         assertThat(productResultJsons.get(1).getId()).isEqualTo(51L);
         assertThat(productResultJsons.get(1).getName()).isEqualTo("Demo Product 2");
         assertThat(productResultJsons.get(1).getToken()).isEqualTo("7257cc3a6b0610da1357f73e03524b090658553b");
         assertThat(productResultJsons.get(1).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
         assertThat(productResultJsons.get(1).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
+        assertThat(productResultJsons.get(1).getJiraInfo().getBaseUrl()).isEqualTo("https://kert944.atlassian.net");
+        assertThat(productResultJsons.get(1).getJiraInfo().getToken()).isEqualTo("dlNrqUp5na04fQyacxcx58EF");
+        assertThat(productResultJsons.get(1).getJiraInfo().getUserEmail()).isEqualTo("prinkkert@gmail.com");
+        assertThat(productResultJsons.get(1).getJiraInfo().getBoardId()).isEqualTo(1L);
     }
 
     @Test
@@ -311,6 +336,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         assertThat(releaseInfoList.get(0).getQualityLevel()).isEqualTo(0.8);
         assertThat(releaseInfoList.get(0).getReleaseInfoSonarqube())
                 .isEqualTo(TestDataGenerator.generateReleaseInfoSonarqubeResultJson_201());
+        assertThat(releaseInfoList.get(0).getReleaseInfoJira()).isNotNull();
         assertThat(releaseInfoList.get(1).getId()).isEqualTo(151L);
         assertThat(releaseInfoList.get(1).getProductId()).isEqualTo(1L);
         assertThat(releaseInfoList.get(1).getQualityLevel()).isEqualTo(0.4);

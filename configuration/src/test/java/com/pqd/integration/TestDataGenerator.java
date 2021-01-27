@@ -149,6 +149,7 @@ public class TestDataGenerator {
                                                         .name("Demo Product - updated")
                                                         .sonarqubeInfo(
                                                                 generateSonarqubeInfoRequestJson())
+                                                        .jiraInfo(generateJiraInfoRequestJson())
                                                         .build())
                                        .build();
     }
