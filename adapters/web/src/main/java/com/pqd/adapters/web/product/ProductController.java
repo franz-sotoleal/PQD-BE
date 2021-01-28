@@ -15,6 +15,7 @@ import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.jira.TestJiraConnection;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -54,6 +55,8 @@ public class ProductController {
     private final GetProductReleaseInfo getProductReleaseInfo;
 
     private final TestSonarqubeConnection testSonarqubeConnection;
+
+    private final TestJiraConnection testJiraConnection;
 
     @PostMapping("/save")
     public ResponseEntity<ProductResultJson> saveProduct(@RequestBody @NonNull SaveProductRequestJson requestJson) {
@@ -102,6 +105,18 @@ public class ProductController {
         var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),
                                                                                           request.getComponentName(),
                                                                                           request.getToken()));
+
+        var presenter = new ConnectionTestPresenter();
+        presenter.present(response);
+
+        return presenter.getViewModel();
+    }
+
+    @PostMapping("/test/jira/connection")
+    public ResponseEntity<ConnectionResultJson> testJiraConnection(
+            @RequestBody @NonNull JiraInfoRequestJson request) {
+        checkRequiredFieldPresence(request);
+        var response = testJiraConnection.execute(TestJiraConnection.Request.of(request.toJiraInfo()));
 
         var presenter = new ConnectionTestPresenter();
         presenter.present(response);
@@ -179,6 +194,12 @@ public class ProductController {
 
     private void checkRequiredFieldPresence(SonarqubeInfoRequestJson requestJson) {
         if (!areSonarqubeFieldsPresent(requestJson)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
+    private void checkRequiredFieldPresence(JiraInfoRequestJson requestJson) {
+        if (!areJiraFieldsPresent(requestJson)) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }

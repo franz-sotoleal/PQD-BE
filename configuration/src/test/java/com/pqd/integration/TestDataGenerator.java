@@ -170,7 +170,7 @@ public class TestDataGenerator {
                                                     generateJiraInfoRequestJson());
     }
 
-    private static JiraInfoRequestJson generateJiraInfoRequestJson() {
+    public static JiraInfoRequestJson generateJiraInfoRequestJson() {
         return JiraInfoRequestJson.builder()
                                   .userEmail("user@mail.com")
                                   .boardId(1L)
@@ -229,5 +229,40 @@ public class TestDataGenerator {
                                        .baseUrl("base-url")
                                        .token("tokenabc123")
                                        .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_invalidBaseUrl() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("base-url")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBaseUrl() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBoardId() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingUserEmail() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
     }
 }

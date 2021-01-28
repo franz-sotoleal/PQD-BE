@@ -1,7 +1,8 @@
-package com.pqd.application.usecase.sonarqube;
+package com.pqd.application.usecase.jira;
 
 import com.pqd.application.domain.connection.ConnectionResponse;
 import com.pqd.application.domain.connection.ConnectionResult;
+import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.usecase.UseCase;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,12 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 @UseCase
 @Transactional
-public class TestSonarqubeConnection {
+public class TestJiraConnection {
 
-    private final SonarqubeGateway gateway;
+    private final JiraGateway gateway;
 
     public ConnectionResponse execute(Request request) {
-        ConnectionResult connectionResult =
-                gateway.testSonarqubeConnection(request.getBaseUrl(), request.getComponentName(), request.getToken());
+        ConnectionResult connectionResult = gateway.testJiraConnection(request.getJiraInfo());
 
         return ConnectionResponse.of(connectionResult);
     }
@@ -26,10 +26,7 @@ public class TestSonarqubeConnection {
     @Value(staticConstructor = "of")
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
-// TODO refactor sonarqubeInfo
-        String baseUrl;
-        String componentName;
-        String token;
-    }
 
+        JiraInfo jiraInfo;
+    }
 }

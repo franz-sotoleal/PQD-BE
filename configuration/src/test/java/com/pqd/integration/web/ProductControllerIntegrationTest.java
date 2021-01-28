@@ -10,6 +10,7 @@ import com.pqd.adapters.web.authentication.LoginResponseJson;
 import com.pqd.adapters.web.product.json.info.ProductResultJson;
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
@@ -368,7 +369,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     @Test
     @Transactional
     @WithMockUser
-    void GIVEN_syntactically_correct_request_WHEN_testing_sonarqube_connection_THEN_sonarqube_connection_result_returned()
+    void GIVEN_syntactically_correct_request_WHEN_testing_sonarqube_connection_THEN_connection_result_returned()
             throws Exception {
         SonarqubeInfoRequestJson requestJson = TestDataGenerator.generateSonarqubeInfoRequestJson();
 
@@ -438,6 +439,69 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 TestDataGenerator.generateSonarqubeInfoRequestJson_emptyComponentName();
 
         MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_syntactically_correct_request_WHEN_testing_jira_connection_THEN_connection_result_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_invalidBaseUrl();
+
+        mvc.perform(post("/api/product/test/jira/connection")
+                            .content(mapper.writeValueAsString(requestJson))
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.connectionOk", is(false)))
+           .andExpect(jsonPath("$.message", is("URI is not absolute")));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_baseurl_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBaseUrl();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_board_id_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBoardId();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_user_email_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingUserEmail();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
                                                   .content(mapper.writeValueAsString(requestJson))
                                                   .contentType(MediaType.APPLICATION_JSON))
                                  .andExpect(status().is4xxClientError())

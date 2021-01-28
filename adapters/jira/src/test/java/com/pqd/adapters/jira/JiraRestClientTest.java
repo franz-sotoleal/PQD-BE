@@ -165,5 +165,4 @@ public class JiraRestClientTest {
         assertThat(actual).isEqualTo(connectionResult);
     }
 
-
 }

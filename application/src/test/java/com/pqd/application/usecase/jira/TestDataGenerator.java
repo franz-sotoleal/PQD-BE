@@ -1,5 +1,6 @@
 package com.pqd.application.usecase.jira;
 
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.jira.*;
 import com.pqd.application.domain.release.ReleaseInfoJira;
 
@@ -9,6 +10,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class TestDataGenerator {
+
+    public static ConnectionResult generateConnectionResult() {
+        return ConnectionResult.builder()
+                               .connectionOk(true)
+                               .message("One test is enough")
+                               .build();
+    }
+
     public static JiraInfo generateJiraInfo() {
         return JiraInfo.builder()
                        .userEmail("user@mail.com")

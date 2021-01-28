@@ -2,6 +2,7 @@ package com.pqd.adapters.web.product;
 
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class TestDataGenerator {
 
-    public static ConnectionResult generateSonarqubeConnectionResult() {
+    public static ConnectionResult generateConnectionResult() {
         return ConnectionResult.builder()
                                .message("ok")
                                .connectionOk(true)
@@ -251,7 +252,7 @@ public class TestDataGenerator {
                             .build();
     }
 
-    private static JiraInfo generateJiraInfo() {
+    public static JiraInfo generateJiraInfo() {
         return JiraInfo.builder()
                        .userEmail("user@mail.com")
                        .boardId(1L)
@@ -259,6 +260,41 @@ public class TestDataGenerator {
                        .token("token123")
                        .baseUrl("https://pqdunittest.atlassian.net")
                        .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBaseUrl() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBoardId() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingUserEmail() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
     }
 
     public static SaveClaim.Response generateSaveClaimResponse() {

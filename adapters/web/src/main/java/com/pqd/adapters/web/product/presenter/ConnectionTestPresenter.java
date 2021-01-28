@@ -2,8 +2,8 @@ package com.pqd.adapters.web.product.presenter;
 
 import com.pqd.adapters.web.ResponsePresenter;
 import com.pqd.adapters.web.product.json.ConnectionResultJson;
+import com.pqd.application.domain.connection.ConnectionResponse;
 import com.pqd.application.usecase.AbstractResponse;
-import com.pqd.application.usecase.sonarqube.TestSonarqubeConnection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 
@@ -13,7 +13,7 @@ public class ConnectionTestPresenter implements ResponsePresenter {
 
     @Override
     public void present(AbstractResponse response) {
-        var connectionResult = ((TestSonarqubeConnection.Response) response).getConnectionResult();
+        var connectionResult = ((ConnectionResponse) response).getConnectionResult();
         result = ConnectionResultJson.builder()
                                      .connectionOk(connectionResult.isConnectionOk())
                                      .message(connectionResult.getMessage())
