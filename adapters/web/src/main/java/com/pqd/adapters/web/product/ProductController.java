@@ -102,9 +102,7 @@ public class ProductController {
     public ResponseEntity<ConnectionResultJson> testSonarqubeConnection(
             @RequestBody @NonNull SonarqubeInfoRequestJson request) {
         checkRequiredFieldPresence(request);
-        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),
-                                                                                          request.getComponentName(),
-                                                                                          request.getToken()));
+        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.toSonarqubeInfo()));
 
         var presenter = new ConnectionTestPresenter();
         presenter.present(response);

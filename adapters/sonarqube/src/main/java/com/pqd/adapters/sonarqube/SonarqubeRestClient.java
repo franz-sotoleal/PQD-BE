@@ -2,6 +2,7 @@ package com.pqd.adapters.sonarqube;
 
 import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.sonarqube.SonarqubeGateway;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,8 @@ public class SonarqubeRestClient implements SonarqubeGateway {
     private final RestTemplate restTemplate;
 
     @Override
-    public ReleaseInfoSonarqube getSonarqubeReleaseInfo(String baseUrl, String componentName, String token) {
-        ResponseEntity<SonarqubeMeasureResponse> response = makeHttpRequest(baseUrl, componentName, token);
+    public ReleaseInfoSonarqube getSonarqubeReleaseInfo(SonarqubeInfo sonarqubeInfo) {
+        ResponseEntity<SonarqubeMeasureResponse> response = makeHttpRequest(sonarqubeInfo);
 
         return ReleaseInfoSonarqube.builder()
                                    .securityRating(Objects.requireNonNull(response.getBody()).getMetricValue("security_rating"))
@@ -36,13 +37,13 @@ public class SonarqubeRestClient implements SonarqubeGateway {
     }
 
     @Override
-    public ConnectionResult testSonarqubeConnection(String baseUrl, String componentName, String token) {
+    public ConnectionResult testSonarqubeConnection(SonarqubeInfo sonarqubeInfo) {
         ConnectionResult connectionResult = ConnectionResult.builder()
                                                             .connectionOk(true)
                                                             .message("Connection successful")
                                                             .build();
         try {
-            makeHttpRequest(baseUrl, componentName, token);
+            makeHttpRequest(sonarqubeInfo);
         } catch (SonarqubeConnectionRefusedException e) {
             connectionResult.setConnectionOk(false);
             connectionResult.setMessage("Could not connect to Sonarqube server: " + e.getMessage());
@@ -57,10 +58,13 @@ public class SonarqubeRestClient implements SonarqubeGateway {
         return connectionResult;
     }
 
-    private ResponseEntity<SonarqubeMeasureResponse> makeHttpRequest(String baseUrl, String componentName, String token) {
-        String tokenBase = token + ":";
+    private ResponseEntity<SonarqubeMeasureResponse> makeHttpRequest(SonarqubeInfo sonarqubeInfo) {
+        String tokenBase = sonarqubeInfo.getToken() + ":";
         String basicAuth = "Basic " + new String(Base64.getEncoder().encode(tokenBase.getBytes()));
-        String uri = baseUrl + "/api/measures/component?component=" + componentName + "&metricKeys=security_rating,vulnerabilities,reliability_rating,bugs,sqale_rating,sqale_index,code_smells";
+        String uri = sonarqubeInfo.getBaseUrl()
+                     + "/api/measures/component?component="
+                     + sonarqubeInfo.getComponentName()
+                     + "&metricKeys=security_rating,vulnerabilities,reliability_rating,bugs,sqale_rating,sqale_index,code_smells";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -72,7 +76,7 @@ public class SonarqubeRestClient implements SonarqubeGateway {
         try {
             response = restTemplate.exchange(uri, HttpMethod.GET, entity, SonarqubeMeasureResponse.class);
         } catch (ResourceAccessException e) {
-            throw new SonarqubeConnectionRefusedException(String.format("Connection refused for baseurl %s", baseUrl));
+            throw new SonarqubeConnectionRefusedException(String.format("Connection refused for baseurl %s", sonarqubeInfo.getBaseUrl()));
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
                 throw new SonarqubeRestClientException("Connection unauthorized, probably invalid Sonarqube API token");

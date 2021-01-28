@@ -47,9 +47,7 @@ public class CollectAndSaveAllReleaseDataTest {
 
         when(getProduct.execute(any())).thenReturn(GetProduct.Response.of(product));
         when(retrieveSonarqubeData
-                     .execute(RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().get().getBaseUrl(),
-                                                               product.getSonarqubeInfo().get().getComponentName(),
-                                                               product.getSonarqubeInfo().get().getToken())))
+                     .execute(RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().get())))
                 .thenReturn(RetrieveSonarqubeData.Response.of(releaseInfoSonarqube));
         when(retrieveReleaseInfoJira.execute(any()))
                 .thenReturn(RetrieveReleaseInfoJira.Response.of(releaseInfoJira.getJiraSprints()));

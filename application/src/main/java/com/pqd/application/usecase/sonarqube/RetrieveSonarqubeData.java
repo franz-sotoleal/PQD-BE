@@ -1,6 +1,7 @@
 package com.pqd.application.usecase.sonarqube;
 
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
 import lombok.EqualsAndHashCode;
@@ -17,9 +18,7 @@ public class RetrieveSonarqubeData {
     private final SonarqubeGateway sonarqubeGateway;
 
     public Response execute(Request request) {
-        ReleaseInfoSonarqube releaseInfoSonarqube = sonarqubeGateway.getSonarqubeReleaseInfo(request.getBaseUrl(),
-                                                                                             request.getComponentName(),
-                                                                                             request.getToken());
+        ReleaseInfoSonarqube releaseInfoSonarqube = sonarqubeGateway.getSonarqubeReleaseInfo(request.getSonarqubeInfo());
         return Response.of(releaseInfoSonarqube);
     }
 
@@ -34,9 +33,7 @@ public class RetrieveSonarqubeData {
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
 
-        String baseUrl;
-        String componentName;
-        String token;
+        SonarqubeInfo sonarqubeInfo;
     }
 
 }

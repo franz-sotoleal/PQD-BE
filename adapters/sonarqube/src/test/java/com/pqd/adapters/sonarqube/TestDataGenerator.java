@@ -2,8 +2,17 @@ package com.pqd.adapters.sonarqube;
 
 import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 
 public class TestDataGenerator {
+
+    public static SonarqubeInfo generateSonarqubeInfo() {
+        return SonarqubeInfo.builder()
+                            .baseUrl("base-url")
+                            .componentName("component")
+                            .token("token123")
+                            .build();
+    }
 
     public static ConnectionResult generateSonarqubeConnectionResult_success() {
         return ConnectionResult.builder()
@@ -15,7 +24,7 @@ public class TestDataGenerator {
     public static ConnectionResult generateSonarqubeConnectionResult_wrongBaseUrl() {
         return ConnectionResult.builder()
                                .connectionOk(false)
-                               .message("Could not connect to Sonarqube server: Connection refused for baseurl a")
+                               .message("Could not connect to Sonarqube server: Connection refused for baseurl base-url")
                                .build();
     }
 

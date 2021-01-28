@@ -38,9 +38,7 @@ public class CollectAndSaveAllReleaseData {
 
         if (product.hasValidSonarqubeInfo() && product.getSonarqubeInfo().isPresent()) {
             RetrieveSonarqubeData.Request retrieveSqDataRequest =
-                    RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().get().getBaseUrl(),
-                                                     product.getSonarqubeInfo().get().getComponentName(),
-                                                     product.getSonarqubeInfo().get().getToken());
+                    RetrieveSonarqubeData.Request.of(product.getSonarqubeInfo().get());
             releaseInfoSonarqube = retrieveSonarqubeData.execute(retrieveSqDataRequest)
                                                         .getReleaseInfo();
         }
