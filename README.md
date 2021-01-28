@@ -156,3 +156,46 @@ http://localhost:8080/api/messaging/trigger?productId=<product_id>
     * think about what to do when the product doesn't have the support for all the tools
     
 * Implement and improve other relevant parts and do not forget testing
+
+# Statistics 
+Last updated 28.01.2021
+
+## Tests
+**35 integration** tests
+
+**104 unit** tests in total
+* application - 27 unit tests
+* adapters - 77 unit tests:
+  * jira - 8 unit tests
+  * messaging - 6 unit tests
+  * persistence - 20 unit tests
+  * sonarqube - 7 unit tests
+  * web - 36 unit tests
+
+**JaCoCo** report with everything included except test modules (everything related to testing excluded from the report):
+
+| Module                | Class % | Method % | Line % | Branch %    |
+| --------------------- | ------------- | ------ | ---- | -----|
+| application           | 89% (79/88)   | 76% (206/270) | 81% (324/400) | 0% (0/33)* |
+| adapters.web          | 84% (49/58)   | 67% (186/274)	| 71% (403/560) | 0% (0/16)* |
+| adapters.sonarqube    | 87% (7/8)     | 40% (12/30)	| 71% (53/74)	| 100% (0/0)*|
+| adapters.persistence  | 71% (23/32)   | 85% (117/137)	| 91% (308/337) | 100% (0/0)*|
+| adapters.messaging    | 33% (1/3)     | 50% (4/8)	    | 63% (19/30)	| 100% (0/0)*|
+| adapters.jira         | 100% (9/9)    | 70% (35/50)	| 85% (103/121)	| 100% (2/2)*|
+| **Weighted average**  | **84.85% (168/198)**    | **72.82% (560/769)**    | **79.50% (1210/1522)**    | error      |
+
+*Calculation error
+
+## Code 
+
+All files included:
+
+| Extension | Files | Size SUM (kb) | Size MIN (kb) | Size MAX (kb) | Size AVG (kb) | Lines | Lines MIN | Lines MAX | Lines AVG | Lines CODE |
+| ----- | ------ | ------ | ----- | ----- | ------ | ------ | ----- | ----- | ------ | ------ |
+| java	| 161 | 	377 | 0 |  29  | 	2 | 	9081 |	4 |	525 |	56 |	7317 |
+
+Testing related files excluded:
+
+| Extension | Files | Size SUM (kb) | Size MIN (kb) | Size MAX (kb) | Size AVG (kb) | Lines | Lines MIN | Lines MAX | Lines AVG | Lines CODE |
+| ----- | ------ | ------ | ----- | ----- | ------ | ------ | ----- | ----- | ------ | ------ |
+| java	| 112 | 	150 | 0 |  10  | 	1 | 	4276 |	4 |	233 |	38 |	3321 |

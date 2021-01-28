@@ -1,7 +1,8 @@
 package com.pqd.application.usecase.sonarqube;
 
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 
 public class TestDataGenerator {
 
@@ -18,10 +19,18 @@ public class TestDataGenerator {
                                    .build();
     }
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult() {
-        return SonarqubeConnectionResult.builder()
-                                        .connectionOk(true)
-                                        .message("One test is enough")
-                                        .build();
+    public static ConnectionResult generateSonarqubeConnectionResult() {
+        return ConnectionResult.builder()
+                               .connectionOk(true)
+                               .message("One test is enough")
+                               .build();
+    }
+
+    public static SonarqubeInfo generateSonarqubeInfo() {
+        return SonarqubeInfo.builder()
+                            .baseUrl("base-url")
+                            .componentName("component")
+                            .token("token123")
+                            .build();
     }
 }

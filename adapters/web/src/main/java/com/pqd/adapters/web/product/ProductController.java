@@ -1,10 +1,21 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.*;
+import com.pqd.adapters.web.product.json.ConnectionResultJson;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
+import com.pqd.adapters.web.product.presenter.ConnectionTestPresenter;
+import com.pqd.adapters.web.product.presenter.ProductListPresenter;
+import com.pqd.adapters.web.product.presenter.ProductPresenter;
+import com.pqd.adapters.web.product.presenter.ReleaseInfoPresenter;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.jira.TestJiraConnection;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -20,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -43,6 +55,8 @@ public class ProductController {
     private final GetProductReleaseInfo getProductReleaseInfo;
 
     private final TestSonarqubeConnection testSonarqubeConnection;
+
+    private final TestJiraConnection testJiraConnection;
 
     @PostMapping("/save")
     public ResponseEntity<ProductResultJson> saveProduct(@RequestBody @NonNull SaveProductRequestJson requestJson) {
@@ -85,12 +99,22 @@ public class ProductController {
     }
 
     @PostMapping("/test/sonarqube/connection")
-    public ResponseEntity<SonarqubeConnectionResultJson> testSonarqubeConnection(
+    public ResponseEntity<ConnectionResultJson> testSonarqubeConnection(
             @RequestBody @NonNull SonarqubeInfoRequestJson request) {
         checkRequiredFieldPresence(request);
-        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.getBaseUrl(),
-                                                                                          request.getComponentName(),
-                                                                                          request.getToken()));
+        var response = testSonarqubeConnection.execute(TestSonarqubeConnection.Request.of(request.toSonarqubeInfo()));
+
+        var presenter = new ConnectionTestPresenter();
+        presenter.present(response);
+
+        return presenter.getViewModel();
+    }
+
+    @PostMapping("/test/jira/connection")
+    public ResponseEntity<ConnectionResultJson> testJiraConnection(
+            @RequestBody @NonNull JiraInfoRequestJson request) {
+        checkRequiredFieldPresence(request);
+        var response = testJiraConnection.execute(TestJiraConnection.Request.of(request.toJiraInfo()));
 
         var presenter = new ConnectionTestPresenter();
         presenter.present(response);
@@ -144,19 +168,24 @@ public class ProductController {
         }
     }
 
-    // While Sonarqube is the only supported product then SqInfo is required when saving product
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
+        Optional<SonarqubeInfoRequestJson> sonarqubeInfo = requestJson.getSonarqubeInfo();
+        Optional<JiraInfoRequestJson> jiraInfo = requestJson.getJiraInfo();
         if (requestJson.getUserId() == null
-            || !areSonarqubeFieldsPresent(requestJson.getSonarqubeInfo())) {
+            || sonarqubeInfo.isEmpty() && jiraInfo.isEmpty()
+            || sonarqubeInfo.isPresent() && !areSonarqubeFieldsPresent(sonarqubeInfo.get())
+            || jiraInfo.isPresent() && !areJiraFieldsPresent(jiraInfo.get())
+        ) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }
 
     private void checkRequiredFieldPresence(UpdateProductRequestJson requestJson) {
+        SonarqubeInfoRequestJson sonarqubeInfo = requestJson.getProduct().getSonarqubeInfo();
         if (requestJson.getProduct() == null
             || requestJson.getProduct().getName() == null
             || requestJson.getProduct().getName().length() == 0
-            || !areSonarqubeFieldsPresent(requestJson.getProduct().getSonarqubeInfo())) {
+            || sonarqubeInfo != null && !areSonarqubeFieldsPresent(sonarqubeInfo)) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
     }
@@ -167,12 +196,27 @@ public class ProductController {
         }
     }
 
+    private void checkRequiredFieldPresence(JiraInfoRequestJson requestJson) {
+        if (!areJiraFieldsPresent(requestJson)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
     private boolean areSonarqubeFieldsPresent(SonarqubeInfoRequestJson requestJson) {
         return requestJson != null
                && requestJson.getBaseUrl() != null
                && requestJson.getComponentName() != null
                && requestJson.getBaseUrl().length() != 0
                && requestJson.getComponentName().length() != 0;
+    }
+
+    private boolean areJiraFieldsPresent(JiraInfoRequestJson requestJson) {
+        return requestJson != null
+               && requestJson.getBaseUrl() != null
+               && requestJson.getBoardId() != null
+               && requestJson.getUserEmail() != null
+               && requestJson.getBaseUrl().length() != 0
+               && requestJson.getUserEmail().length() != 0;
     }
 
     @ExceptionHandler({HttpClientErrorException.class})

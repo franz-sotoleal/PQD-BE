@@ -1,15 +1,18 @@
 package com.pqd.integration;
 
 import com.pqd.adapters.web.authentication.RegisterUserRequestJson;
-import com.pqd.adapters.web.product.json.ReleaseInfoSonarqubeResultJson;
-import com.pqd.adapters.web.product.json.SaveProductRequestJson;
-import com.pqd.adapters.web.product.json.SonarqubeInfoRequestJson;
-import com.pqd.adapters.web.product.json.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.sonarqube.result.ReleaseInfoSonarqubeResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
+import com.pqd.integration.special.SaveProductRequestJsonForIntTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.Base64;
+import java.util.Optional;
 
 public class TestDataGenerator {
     public static ReleaseInfoSonarqubeResultJson generateReleaseInfoSonarqubeResultJson_201() {
@@ -146,6 +149,7 @@ public class TestDataGenerator {
                                                         .name("Demo Product - updated")
                                                         .sonarqubeInfo(
                                                                 generateSonarqubeInfoRequestJson())
+                                                        .jiraInfo(generateJiraInfoRequestJson())
                                                         .build())
                                        .build();
     }
@@ -154,14 +158,31 @@ public class TestDataGenerator {
         return SaveProductRequestJson.builder()
                                      .name("test12")
                                      .userId(123L)
-                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
+                                     .jiraInfo(Optional.of(generateJiraInfoRequestJson()))
                                      .build();
+    }
+
+    public static SaveProductRequestJsonForIntTest generateSaveProductRequestJson_withoutOptionals() {
+        return new SaveProductRequestJsonForIntTest(123L,
+                                                    "test12",
+                                                    generateSonarqubeInfoRequestJson(),
+                                                    generateJiraInfoRequestJson());
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
     }
 
     public static SaveProductRequestJson generateSaveProductRequestJson_withNoUserId() {
         return SaveProductRequestJson.builder()
                                      .name("test12")
-                                     .sonarqubeInfo(generateSonarqubeInfoRequestJson())
+                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
                                      .build();
     }
 
@@ -208,5 +229,40 @@ public class TestDataGenerator {
                                        .baseUrl("base-url")
                                        .token("tokenabc123")
                                        .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_invalidBaseUrl() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("base-url")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBaseUrl() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingBoardId() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("user@mail.com")
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
+    }
+
+    public static JiraInfoRequestJson generateJiraInfoRequestJson_missingUserEmail() {
+        return JiraInfoRequestJson.builder()
+                                  .userEmail("")
+                                  .boardId(1L)
+                                  .token("token123")
+                                  .baseUrl("https://pqdunittest.atlassian.net")
+                                  .build();
     }
 }

@@ -1,7 +1,10 @@
 CREATE SEQUENCE user_seq INCREMENT 50;
 CREATE SEQUENCE product_seq INCREMENT 50;
 CREATE SEQUENCE sq_info_seq INCREMENT 50;
+CREATE SEQUENCE jira_info_seq INCREMENT 50;
+CREATE SEQUENCE jira_issue_seq INCREMENT 50;
 CREATE SEQUENCE release_info_sq_seq INCREMENT 50;
+CREATE SEQUENCE release_info_jira_sprint_seq INCREMENT 50;
 CREATE SEQUENCE release_info_seq INCREMENT 50;
 CREATE SEQUENCE user_product_claim_seq INCREMENT 50;
 
@@ -23,12 +26,22 @@ CREATE TABLE public.sq_info
     token           TEXT
 );
 
+CREATE TABLE public.jira_info
+(
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('jira_info_seq'),
+    base_url        TEXT                    NOT NULL,
+    board_id        BIGINT                  NOT NULL,
+    user_email      TEXT                    NOT NULL,
+    token           TEXT                    NOT NULL
+);
+
 CREATE TABLE public.product
 (
     id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('product_seq'),
     name            TEXT                    NOT NULL,
     token           TEXT,
-    sq_info_id      BIGINT                              REFERENCES public.sq_info(id)
+    sq_info_id      BIGINT                              REFERENCES public.sq_info(id),
+    jira_info_id    BIGINT                              REFERENCES public.jira_info(id)
     -- add other tool references here with another changelist by modifying this table
 );
 
@@ -59,7 +72,33 @@ CREATE TABLE public.release_info
     created         TIMESTAMP   WITHOUT     TIME ZONE   DEFAULT Now(),
     quality_level   DECIMAL,
     release_info_sq_id  BIGINT                          REFERENCES public.release_info_sq(id)
-    -- add other tool references here by modifying the table if you add support for another tool
+    -- add other tool references here by modifying the table if you add support for another tool (or in case of a list,
+    -- add the release info reference to the other table)
+);
+
+CREATE TABLE public.release_info_jira_sprint
+(
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('release_info_jira_sprint_seq'),
+    release_info_id BIGINT                              REFERENCES public.release_info(id),
+    sprint_id       BIGINT,
+    board_id        BIGINT,
+    name            TEXT,
+    start_time      TIMESTAMP,
+    end_time        TIMESTAMP,
+    goal            TEXT,
+    browser_url     TEXT
+);
+
+CREATE TABLE public.jira_issue
+(
+    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('jira_issue_seq'),
+    jira_sprint_id  BIGINT                  NOT NULL    REFERENCES public.release_info_jira_sprint(id),
+    issue_id        BIGINT                  NOT NULL,
+    key             TEXT                    NOT NULL,
+    description     TEXT,
+    icon_url        TEXT,
+    name            TEXT,
+    browser_url     TEXT
 );
 
 -- To add database support for another tool:

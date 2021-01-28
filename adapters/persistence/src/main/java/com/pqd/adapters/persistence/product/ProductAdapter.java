@@ -1,10 +1,8 @@
 package com.pqd.adapters.persistence.product;
 
 import com.pqd.adapters.persistence.claim.UserProductClaimAdapter;
-import com.pqd.adapters.persistence.product.sonarqube.SonarqubeInfoEntity;
 import com.pqd.adapters.persistence.release.ReleaseInfoAdapter;
 import com.pqd.application.domain.product.Product;
-import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import com.pqd.application.usecase.product.ProductGateway;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -27,13 +25,13 @@ public class ProductAdapter implements ProductGateway {
 
     @Override
     public Optional<Product> findById(Long id) {
-        return repository.findById(id).map(this::buildProduct);
+        return repository.findById(id).map(ProductEntity::buildProduct);
     }
 
     @Override
     public Product save(Product product) {
-        ProductEntity savedProductEntity = repository.save(buildProductEntity(product));
-        return buildProduct(savedProductEntity);
+        ProductEntity savedProductEntity = repository.save(ProductEntity.buildProductEntity(product));
+        return ProductEntity.buildProduct(savedProductEntity);
     }
 
     @Override
@@ -44,13 +42,22 @@ public class ProductAdapter implements ProductGateway {
                                   String.format("ProductEntity with id %s not found", product.getId())));
         productEntity.setName(product.getName());
         productEntity.setToken(product.getToken());
-        productEntity.getSonarqubeInfoEntity().setToken(product.getSonarqubeInfo().getToken());
-        productEntity.getSonarqubeInfoEntity().setBaseUrl(product.getSonarqubeInfo().getBaseUrl());
-        productEntity.getSonarqubeInfoEntity().setComponentName(product.getSonarqubeInfo().getComponentName());
+
+        if (product.getSonarqubeInfo().isPresent()) {
+            productEntity.getSonarqubeInfoEntity().setToken(product.getSonarqubeInfo().get().getToken());
+            productEntity.getSonarqubeInfoEntity().setBaseUrl(product.getSonarqubeInfo().get().getBaseUrl());
+            productEntity.getSonarqubeInfoEntity().setComponentName(product.getSonarqubeInfo().get().getComponentName());
+        }
+        if (product.getJiraInfo().isPresent()) {
+            productEntity.getJiraInfoEntity().setBaseUrl(product.getJiraInfo().get().getBaseUrl());
+            productEntity.getJiraInfoEntity().setBoardId(product.getJiraInfo().get().getBoardId());
+            productEntity.getJiraInfoEntity().setUserEmail(product.getJiraInfo().get().getUserEmail());
+            productEntity.getJiraInfoEntity().setToken(product.getJiraInfo().get().getToken());
+        }
 
         ProductEntity savedEntity = repository.save(productEntity);
 
-        return buildProduct(savedEntity);
+        return ProductEntity.buildProduct(savedEntity);
     }
 
     @Override
@@ -62,34 +69,6 @@ public class ProductAdapter implements ProductGateway {
         userProductClaimAdapter.deleteAllByProductId(productEntity.getId());
 
         repository.delete(productEntity);
-    }
-
-    private Product buildProduct(ProductEntity entity) {
-        return Product.builder()
-                      .sonarqubeInfo(
-                              SonarqubeInfo.builder()
-                                           .baseUrl(entity.getSonarqubeInfoEntity().getBaseUrl())
-                                           .componentName(entity.getSonarqubeInfoEntity().getComponentName())
-                                           .token(entity.getSonarqubeInfoEntity().getToken())
-                                           .id(entity.getSonarqubeInfoEntity().getId())
-                                           .build())
-                      .name(entity.getName())
-                      .token(entity.getToken())
-                      .id(entity.getId())
-                      .build();
-    }
-
-    private ProductEntity buildProductEntity(Product product) {
-        return ProductEntity.builder()
-                            .name(product.getName())
-                            .token(product.getToken())
-                            .sonarqubeInfoEntity(SonarqubeInfoEntity.builder()
-                                                                    .token(product.getSonarqubeInfo().getToken())
-                                                                    .baseUrl(product.getSonarqubeInfo().getBaseUrl())
-                                                                    .componentName(product.getSonarqubeInfo()
-                                                                                          .getComponentName())
-                                                                    .build())
-                            .build();
     }
 
     @NoArgsConstructor

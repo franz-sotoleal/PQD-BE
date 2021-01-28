@@ -31,6 +31,7 @@ public class ProductAdapterTest {
     void setup() {
         repository = mock(ProductRepository.class);
         releaseInfoAdapter = mock(ReleaseInfoAdapter.class);
+        userProductClaimAdapter = mock(UserProductClaimAdapter.class);
         adapter = new ProductAdapter(repository, releaseInfoAdapter, userProductClaimAdapter);
         MockitoAnnotations.initMocks(this);
     }
@@ -59,6 +60,32 @@ public class ProductAdapterTest {
     void GIVEN_product_WHEN_saving_entity_THEN_entity_passed_and_saved() {
         Product product = TestDataGenerator.generateProduct();
         ProductEntity productEntity = TestDataGenerator.generateProductEntity();
+        when(repository.save(any())).thenReturn(productEntity);
+
+        Product actual = adapter.save(product);
+
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue()).hasSameClassAs(productEntity);
+        assertThat(actual).isEqualTo(product);
+    }
+
+    @Test
+    void GIVEN_product_without_sonarqube_WHEN_saving_entity_THEN_entity_passed_and_saved() {
+        Product product = TestDataGenerator.generateProduct_withoutSonarqube();
+        ProductEntity productEntity = TestDataGenerator.generateProductEntity_withoutSonarqube();
+        when(repository.save(any())).thenReturn(productEntity);
+
+        Product actual = adapter.save(product);
+
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue()).hasSameClassAs(productEntity);
+        assertThat(actual).isEqualTo(product);
+    }
+
+    @Test
+    void GIVEN_product_without_jira_WHEN_saving_entity_THEN_entity_passed_and_saved() {
+        Product product = TestDataGenerator.generateProduct_withoutJira();
+        ProductEntity productEntity = TestDataGenerator.generateProductEntity_withoutJira();
         when(repository.save(any())).thenReturn(productEntity);
 
         Product actual = adapter.save(product);

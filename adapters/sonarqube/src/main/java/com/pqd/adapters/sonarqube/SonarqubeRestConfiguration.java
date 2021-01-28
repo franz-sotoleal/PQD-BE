@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+// TODO move to common
 @Configuration
 public class SonarqubeRestConfiguration {
     @Bean

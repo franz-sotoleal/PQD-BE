@@ -1,36 +1,45 @@
 package com.pqd.adapters.sonarqube;
 
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
+import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 
 public class TestDataGenerator {
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult_success() {
-        return SonarqubeConnectionResult.builder()
-                                        .connectionOk(true)
-                                        .message("Connection successful")
-                                        .build();
+    public static SonarqubeInfo generateSonarqubeInfo() {
+        return SonarqubeInfo.builder()
+                            .baseUrl("base-url")
+                            .componentName("component")
+                            .token("token123")
+                            .build();
     }
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult_wrongBaseUrl() {
-        return SonarqubeConnectionResult.builder()
-                                        .connectionOk(false)
-                                        .message("Could not connect to Sonarqube server: Connection refused for baseurl a")
-                                        .build();
+    public static ConnectionResult generateSonarqubeConnectionResult_success() {
+        return ConnectionResult.builder()
+                               .connectionOk(true)
+                               .message("Connection successful")
+                               .build();
     }
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult_wrongComponent() {
-        return SonarqubeConnectionResult.builder()
-                                        .connectionOk(false)
-                                        .message("Connection established, but something went wrong: 404 NOT_FOUND")
-                                        .build();
+    public static ConnectionResult generateSonarqubeConnectionResult_wrongBaseUrl() {
+        return ConnectionResult.builder()
+                               .connectionOk(false)
+                               .message("Could not connect to Sonarqube server: Connection refused for baseurl base-url")
+                               .build();
     }
 
-    public static SonarqubeConnectionResult generateSonarqubeConnectionResult_wrongToken() {
-        return SonarqubeConnectionResult.builder()
-                                        .connectionOk(false)
-                                        .message("Connection established, but something went wrong: Connection unauthorized, probably invalid Sonarqube API token")
-                                        .build();
+    public static ConnectionResult generateSonarqubeConnectionResult_wrongComponent() {
+        return ConnectionResult.builder()
+                               .connectionOk(false)
+                               .message("Connection established, but something went wrong: 404 NOT_FOUND")
+                               .build();
+    }
+
+    public static ConnectionResult generateSonarqubeConnectionResult_wrongToken() {
+        return ConnectionResult.builder()
+                               .connectionOk(false)
+                               .message("Connection established, but something went wrong: Connection unauthorized, probably invalid Sonarqube API token")
+                               .build();
     }
 
     public static SonarqubeMeasureResponse generateSonarqubeMeasureResponse() {

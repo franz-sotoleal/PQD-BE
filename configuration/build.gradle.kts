@@ -7,8 +7,9 @@ dependencies {
     implementation(project(":application"))
     implementation(project(":adapters:web"))
     implementation(project(":adapters:persistence"))
-    implementation(project(":adapters:sonarqube"))
     implementation(project(":adapters:messaging"))
+    implementation(project(":adapters:sonarqube"))
+    implementation(project(":adapters:jira"))
 
     implementation("org.flywaydb:flyway-core")
 

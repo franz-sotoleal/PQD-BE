@@ -7,10 +7,16 @@ import com.pqd.adapters.persistence.product.ProductRepository;
 import com.pqd.adapters.persistence.release.ReleaseInfoEntity;
 import com.pqd.adapters.persistence.release.ReleaseInfoRepository;
 import com.pqd.adapters.web.authentication.LoginResponseJson;
-import com.pqd.adapters.web.product.json.*;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.integration.TestContainerBase;
 import com.pqd.integration.TestDataGenerator;
+import com.pqd.integration.special.SaveProductRequestJsonForIntTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -104,18 +110,24 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     @Transactional
     @WithMockUser
     void GIVEN_correct_input_WHEN_saving_product_THEN_status_ok_and_product_returned() throws Exception {
-        SaveProductRequestJson requestJson = TestDataGenerator.generateSaveProductRequestJson();
+        SaveProductRequestJsonForIntTest requestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withoutOptionals();
         MvcResult mvcResult = mvc.perform(post("/api/product/save")
                                                   .content(mapper.writeValueAsString(requestJson))
                                                   .contentType(MediaType.APPLICATION_JSON))
                                  .andExpect(status().isOk())
                                  .andExpect(jsonPath("$.token", isA(String.class)))
                                  .andExpect(jsonPath("$.id", isA(Number.class)))
-                                 .andExpect(jsonPath("$.name", is(requestJson.getName())))
+                                 .andExpect(jsonPath("$.name", is(requestJson.name)))
                                  .andExpect(jsonPath("$.sonarqubeInfo.baseUrl",
-                                                     is(requestJson.getSonarqubeInfo().getBaseUrl())))
+                                                     is(requestJson.sonarqubeInfo.getBaseUrl())))
                                  .andExpect(jsonPath("$.sonarqubeInfo.componentName",
-                                                     is(requestJson.getSonarqubeInfo().getComponentName())))
+                                                     is(requestJson.sonarqubeInfo.getComponentName())))
+                                 .andExpect(jsonPath("$.jiraInfo.baseUrl",
+                                                     is(requestJson.jiraInfo.getBaseUrl())))
+                                 .andExpect(jsonPath("$.jiraInfo.boardId", isA(Number.class)))
+                                 .andExpect(jsonPath("$.jiraInfo.userEmail",
+                                                     is(requestJson.jiraInfo.getUserEmail())))
                                  .andReturn();
 
         ProductResultJson productResultJson =
@@ -123,13 +135,21 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
 
         ProductEntity entityFromDb = productRepository.findById(productResultJson.getId()).orElse(ProductEntity.builder().build());
 
-        assertThat(entityFromDb.getName()).isEqualTo(requestJson.getName());
+        assertThat(entityFromDb.getName()).isEqualTo(requestJson.name);
         assertThat(entityFromDb.getSonarqubeInfoEntity().getToken())
-                .isEqualTo(requestJson.getSonarqubeInfo().getToken());
+                .isEqualTo(requestJson.sonarqubeInfo.getToken());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
-                .isEqualTo(requestJson.getSonarqubeInfo().getComponentName());
+                .isEqualTo(requestJson.sonarqubeInfo.getComponentName());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getBaseUrl())
-                .isEqualTo(requestJson.getSonarqubeInfo().getBaseUrl());
+                .isEqualTo(requestJson.sonarqubeInfo.getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.jiraInfo.getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBoardId())
+                .isEqualTo(requestJson.jiraInfo.getBoardId());
+        assertThat(entityFromDb.getJiraInfoEntity().getUserEmail())
+                .isEqualTo(requestJson.jiraInfo.getUserEmail());
+        assertThat(entityFromDb.getJiraInfoEntity().getToken())
+                .isEqualTo(requestJson.jiraInfo.getToken());
     }
 
     @Test
@@ -181,6 +201,14 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
         assertThat(productResultJsons.getSonarqubeInfo().getToken())
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getToken());
+        assertThat(productResultJsons.getJiraInfo().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBaseUrl());
+        assertThat(productResultJsons.getJiraInfo().getBoardId())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBoardId());
+        assertThat(productResultJsons.getJiraInfo().getUserEmail())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getUserEmail());
+        assertThat(productResultJsons.getJiraInfo().getToken())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getToken());
 
         assertThat(entityFromDb.getName()).isEqualTo(requestJson.getProduct().getName());
         assertThat(entityFromDb.getToken()).isEqualTo(productResultJsons.getToken());
@@ -190,6 +218,14 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getBaseUrl());
         assertThat(entityFromDb.getSonarqubeInfoEntity().getComponentName())
                 .isEqualTo(requestJson.getProduct().getSonarqubeInfo().getComponentName());
+        assertThat(entityFromDb.getJiraInfoEntity().getBaseUrl())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBaseUrl());
+        assertThat(entityFromDb.getJiraInfoEntity().getBoardId())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getBoardId());
+        assertThat(entityFromDb.getJiraInfoEntity().getUserEmail())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getUserEmail());
+        assertThat(entityFromDb.getJiraInfoEntity().getToken())
+                .isEqualTo(requestJson.getProduct().getJiraInfo().getToken());
     }
 
     @Test
@@ -236,11 +272,20 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         assertThat(productResultJsons.get(0).getToken()).isEqualTo("8257cc3a6b0610da1357f73e03524b090658553a");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
         assertThat(productResultJsons.get(0).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
+        assertThat(productResultJsons.get(0).getJiraInfo().getBaseUrl()).isEqualTo("https://kert944.atlassian.net");
+        assertThat(productResultJsons.get(0).getJiraInfo().getToken()).isEqualTo("dlNrqUp5na04fQyacxcx58EF");
+        assertThat(productResultJsons.get(0).getJiraInfo().getUserEmail()).isEqualTo("prinkkert@gmail.com");
+        assertThat(productResultJsons.get(0).getJiraInfo().getBoardId()).isEqualTo(1L);
+
         assertThat(productResultJsons.get(1).getId()).isEqualTo(51L);
         assertThat(productResultJsons.get(1).getName()).isEqualTo("Demo Product 2");
         assertThat(productResultJsons.get(1).getToken()).isEqualTo("7257cc3a6b0610da1357f73e03524b090658553b");
         assertThat(productResultJsons.get(1).getSonarqubeInfo().getBaseUrl()).isEqualTo("http://localhost:9000");
         assertThat(productResultJsons.get(1).getSonarqubeInfo().getComponentName()).isEqualTo("ESI-builtit");
+        assertThat(productResultJsons.get(1).getJiraInfo().getBaseUrl()).isEqualTo("https://kert944.atlassian.net");
+        assertThat(productResultJsons.get(1).getJiraInfo().getToken()).isEqualTo("dlNrqUp5na04fQyacxcx58EF");
+        assertThat(productResultJsons.get(1).getJiraInfo().getUserEmail()).isEqualTo("prinkkert@gmail.com");
+        assertThat(productResultJsons.get(1).getJiraInfo().getBoardId()).isEqualTo(1L);
     }
 
     @Test
@@ -292,6 +337,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
         assertThat(releaseInfoList.get(0).getQualityLevel()).isEqualTo(0.8);
         assertThat(releaseInfoList.get(0).getReleaseInfoSonarqube())
                 .isEqualTo(TestDataGenerator.generateReleaseInfoSonarqubeResultJson_201());
+        assertThat(releaseInfoList.get(0).getReleaseInfoJira()).isNotNull();
         assertThat(releaseInfoList.get(1).getId()).isEqualTo(151L);
         assertThat(releaseInfoList.get(1).getProductId()).isEqualTo(1L);
         assertThat(releaseInfoList.get(1).getQualityLevel()).isEqualTo(0.4);
@@ -323,7 +369,7 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
     @Test
     @Transactional
     @WithMockUser
-    void GIVEN_syntactically_correct_request_WHEN_testing_sonarqube_connection_THEN_sonarqube_connection_result_returned()
+    void GIVEN_syntactically_correct_request_WHEN_testing_sonarqube_connection_THEN_connection_result_returned()
             throws Exception {
         SonarqubeInfoRequestJson requestJson = TestDataGenerator.generateSonarqubeInfoRequestJson();
 
@@ -393,6 +439,69 @@ public class ProductControllerIntegrationTest extends TestContainerBase {
                 TestDataGenerator.generateSonarqubeInfoRequestJson_emptyComponentName();
 
         MvcResult mvcResult = mvc.perform(post("/api/product/test/sonarqube/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_syntactically_correct_request_WHEN_testing_jira_connection_THEN_connection_result_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_invalidBaseUrl();
+
+        mvc.perform(post("/api/product/test/jira/connection")
+                            .content(mapper.writeValueAsString(requestJson))
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.connectionOk", is(false)))
+           .andExpect(jsonPath("$.message", is("URI is not absolute")));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_baseurl_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBaseUrl();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_board_id_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBoardId();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
+                                                  .content(mapper.writeValueAsString(requestJson))
+                                                  .contentType(MediaType.APPLICATION_JSON))
+                                 .andExpect(status().is4xxClientError())
+                                 .andReturn();
+        assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser
+    void GIVEN_missing_user_email_WHEN_testing_jira_connection_THEN_400_returned()
+            throws Exception {
+        JiraInfoRequestJson requestJson = TestDataGenerator.generateJiraInfoRequestJson_missingUserEmail();
+
+        MvcResult mvcResult = mvc.perform(post("/api/product/test/jira/connection")
                                                   .content(mapper.writeValueAsString(requestJson))
                                                   .contentType(MediaType.APPLICATION_JSON))
                                  .andExpect(status().is4xxClientError())

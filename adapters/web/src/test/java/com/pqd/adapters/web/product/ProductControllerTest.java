@@ -1,12 +1,20 @@
 package com.pqd.adapters.web.product;
 
-import com.pqd.adapters.web.product.json.*;
+import com.pqd.adapters.web.product.json.ConnectionResultJson;
+import com.pqd.adapters.web.product.json.info.ProductResultJson;
+import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
+import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
+import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
+import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
+import com.pqd.application.domain.connection.ConnectionResponse;
+import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
-import com.pqd.application.domain.sonarqube.SonarqubeConnectionResult;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.jira.TestJiraConnection;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
 import com.pqd.application.usecase.product.SaveProduct;
@@ -49,6 +57,8 @@ public class ProductControllerTest {
 
     private TestSonarqubeConnection testSonarqubeConnection;
 
+    private TestJiraConnection testJiraConnection;
+
     @Captor
     private ArgumentCaptor<SaveProduct.Request> saveProductRequestCaptor;
 
@@ -65,6 +75,7 @@ public class ProductControllerTest {
         jwtTokenUtil = mock(JwtTokenUtil.class);
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
         testSonarqubeConnection = mock(TestSonarqubeConnection.class);
+        testJiraConnection = mock(TestJiraConnection.class);
         controller = new ProductController(saveProduct,
                                            updateProduct,
                                            deleteProduct,
@@ -72,7 +83,8 @@ public class ProductControllerTest {
                                            getProductList,
                                            jwtTokenUtil,
                                            getProductReleaseInfo,
-                                           testSonarqubeConnection);
+                                           testSonarqubeConnection,
+                                           testJiraConnection);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -111,9 +123,9 @@ public class ProductControllerTest {
         assertThat(actual.getBody().getId()).isEqualTo(product.getId());
         assertThat(actual.getBody().getToken()).isEqualTo(product.getToken());
         assertThat(actual.getBody().getName()).isEqualTo(product.getName());
-        assertThat(actual.getBody().getSonarqubeInfo().getComponentName()).isEqualTo(product.getSonarqubeInfo().getComponentName());
-        assertThat(actual.getBody().getSonarqubeInfo().getBaseUrl()).isEqualTo(product.getSonarqubeInfo().getBaseUrl());
-        assertThat(actual.getBody().getSonarqubeInfo().getToken()).isEqualTo(product.getSonarqubeInfo().getToken());
+        assertThat(actual.getBody().getSonarqubeInfo().getComponentName()).isEqualTo(product.getSonarqubeInfo().get().getComponentName());
+        assertThat(actual.getBody().getSonarqubeInfo().getBaseUrl()).isEqualTo(product.getSonarqubeInfo().get().getBaseUrl());
+        assertThat(actual.getBody().getSonarqubeInfo().getToken()).isEqualTo(product.getSonarqubeInfo().get().getToken());
     }
 
     @Test
@@ -202,8 +214,8 @@ public class ProductControllerTest {
 
     @Test
     void GIVEN_all_correct_WHEN_testing_sonarqube_connection_THEN_connection_result_returned() {
-        SonarqubeConnectionResult connectionResult = TestDataGenerator.generateSonarqubeConnectionResult();
-        when(testSonarqubeConnection.execute(any())).thenReturn(TestSonarqubeConnection.Response.of(connectionResult));
+        ConnectionResult connectionResult = TestDataGenerator.generateConnectionResult();
+        when(testSonarqubeConnection.execute(any())).thenReturn(ConnectionResponse.of((connectionResult)));
 
         var actual = controller.testSonarqubeConnection(SonarqubeInfoRequestJson.builder()
                                                                                 .baseUrl("a")
@@ -211,7 +223,7 @@ public class ProductControllerTest {
                                                                                 .token("a")
                                                                                 .build());
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(actual.getBody()).isInstanceOf(SonarqubeConnectionResultJson.class);
+        assertThat(actual.getBody()).isInstanceOf(ConnectionResultJson.class);
         assertThat(actual.getBody().isConnectionOk()).isEqualTo(true);
         assertThat(actual.getBody().getMessage()).isEqualTo("ok");
     }
@@ -259,6 +271,44 @@ public class ProductControllerTest {
                                                                                               .componentName("")
                                                                                               .token("a")
                                                                                               .build()));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_all_correct_WHEN_testing_jira_connection_THEN_connection_result_returned() {
+        ConnectionResult connectionResult = TestDataGenerator.generateConnectionResult();
+        JiraInfoRequestJson jiraInfoRequestJson = TestDataGenerator.generateJiraInfoRequestJson();
+        when(testJiraConnection.execute(any())).thenReturn(ConnectionResponse.of((connectionResult)));
+
+        var actual = controller.testJiraConnection(jiraInfoRequestJson);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isInstanceOf(ConnectionResultJson.class);
+        assertThat(actual.getBody().isConnectionOk()).isEqualTo(true);
+        assertThat(actual.getBody().getMessage()).isEqualTo("ok");
+    }
+
+    @Test
+    void GIVEN_missing_baseurl_WHEN_testing_jira_connection_THEN_exception_thrown() {
+        JiraInfoRequestJson jiraInfoRequestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBaseUrl();
+        Exception exception =
+                assertThrows(Exception.class, () -> controller.testJiraConnection(jiraInfoRequestJson));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_missing_board_id_WHEN_testing_jira_connection_THEN_exception_thrown() {
+        JiraInfoRequestJson jiraInfoRequestJson = TestDataGenerator.generateJiraInfoRequestJson_missingBoardId();
+        Exception exception =
+                assertThrows(Exception.class, () -> controller.testJiraConnection(jiraInfoRequestJson));
+        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+    }
+
+    @Test
+    void GIVEN_missing_user_email_WHEN_testing_jira_connection_THEN_exception_thrown() {
+        JiraInfoRequestJson jiraInfoRequestJson = TestDataGenerator.generateJiraInfoRequestJson_missingUserEmail();
+        Exception exception =
+                assertThrows(Exception.class, () -> controller.testJiraConnection(jiraInfoRequestJson));
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
     }
 
@@ -347,8 +397,8 @@ public class ProductControllerTest {
         verify(saveProduct).execute(saveProductRequestCaptor.capture());
         verify(saveClaim).execute(saveClaimRequestCaptor.capture());
         assertThat(saveProductRequestCaptor.getValue().getName()).isEqualTo(requestJson.getName());
-        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo())
-                .isEqualTo(requestJson.getSonarqubeInfo().toSonarqubeInfo());
+        assertThat(saveProductRequestCaptor.getValue().getSonarqubeInfo().get())
+                .isEqualTo(requestJson.getSonarqubeInfo().get().toSonarqubeInfo());
 
         assertThat(saveClaimRequestCaptor.getValue().getProductId())
                 .isEqualTo(saveClaimResponse.getUserProductClaim().getProductId());
@@ -362,9 +412,9 @@ public class ProductControllerTest {
         assertThat(responseEntity.getBody().getId()).isEqualTo(saveProductResponse.getProduct().getId());
         assertThat(responseEntity.getBody().getName()).isEqualTo(saveProductResponse.getProduct().getName());
         assertThat(responseEntity.getBody().getSonarqubeInfo().getComponentName())
-                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getComponentName());
+                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().get().getComponentName());
         assertThat(responseEntity.getBody().getSonarqubeInfo().getBaseUrl())
-                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().getBaseUrl());
+                .isEqualTo(saveProductResponse.getProduct().getSonarqubeInfo().get().getBaseUrl());
     }
 
     @Test
@@ -377,8 +427,7 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
-    void GIVEN_no_sq_info_WHEN_saving_product_THEN_exception_thrown() {
+    void GIVEN_no_tool_info_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withNoSqInfo();
 
         Exception exception =
@@ -387,7 +436,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_1_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo();
@@ -398,7 +446,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_2_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo2();
@@ -409,7 +456,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_3_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo3();
@@ -420,7 +466,6 @@ public class ProductControllerTest {
     }
 
     @Test
-        // While Sonarqube is only supported product then it is required if saving product
     void GIVEN_invalid_sq_info_4_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo4();
