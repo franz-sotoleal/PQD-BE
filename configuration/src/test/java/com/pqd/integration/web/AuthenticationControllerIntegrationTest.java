@@ -50,7 +50,7 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(jwtRequest))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("INVALID_CREDENTIALS"));
+           .andExpect(content().string("{\"message\":\"INVALID_CREDENTIALS\"}"));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("Username too short"));
+           .andExpect(content().string("{\"message\":\"Username too short\"}"));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("Password too short"));
+           .andExpect(content().string("{\"message\":\"Password too short\"}"));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("Email invalid"));
+           .andExpect(content().string("{\"message\":\"Email invalid\"}"));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("Email already in use"));
+           .andExpect(content().string("{\"message\":\"Email already in use\"}"));
     }
 
     @Test
@@ -115,6 +115,6 @@ public class AuthenticationControllerIntegrationTest extends TestContainerBase {
                             .content(objectMapper.writeValueAsString(input))
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().is4xxClientError())
-           .andExpect(content().string("Username already in use"));
+           .andExpect(content().string("{\"message\":\"Username already in use\"}"));
     }
 }
