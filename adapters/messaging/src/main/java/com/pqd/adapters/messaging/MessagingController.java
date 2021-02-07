@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/messaging")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class MessagingController {
 
