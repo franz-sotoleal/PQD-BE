@@ -22,9 +22,14 @@ public class SaveReleaseInfo {
     private final CalculateQualityLevel calculateQualityLevel;
 
     public Response execute(Request request) {
-        Double qualityLevel =
-                calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getReleaseInfoSonarqube()))
-                                     .getQualityLevel();
+        Double qualityLevel = null;
+        if (request.getReleaseInfoSonarqube() != null
+            && request.getReleaseInfoSonarqube().getMaintainabilityRating() != null) {
+            qualityLevel =
+                    calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getReleaseInfoSonarqube()))
+                                         .getQualityLevel();
+        }
+
         ReleaseInfo releaseInfo = ReleaseInfo.builder()
                                              .created(LocalDateTime.now())
                                              .releaseInfoSonarqube(Optional.of(request.getReleaseInfoSonarqube()))
