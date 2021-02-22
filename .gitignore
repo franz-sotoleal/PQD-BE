@@ -7,3 +7,5 @@
 /adapters/sonarqube/build/
 /adapters/messaging/build/
 /adapters/jira/build/
+/build/
+/adapters/build/

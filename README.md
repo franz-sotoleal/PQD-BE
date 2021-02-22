@@ -97,6 +97,19 @@ git clone git@github.com:Kert944/PQD-BE.git
             * Use component name (project key) _ESI-builtit_ so that you can trigger release info collection with the 
               test user 
               that is already inserted into the DB
+              
+
+Containerize and run the app in Docker:
+* Run gradle clean and gradle build to get the last state of the app
+* At the root folder, run the following command:
+
+     ```
+     docker-compose -f pqd-be.yml up --build -d
+     ```
+* To kill the containerz, run:
+    ```
+     docker-compose -f pqd-be.yml down
+    ```
 
 ### Database changelog
 Flyway is used for database changelog. Migration files are located at:
