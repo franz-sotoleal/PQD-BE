@@ -1,5 +1,6 @@
 package com.pqd.adapters.web.product;
 
+import com.pqd.adapters.web.common.ExceptionResponseJson;
 import com.pqd.adapters.web.product.json.ConnectionResultJson;
 import com.pqd.adapters.web.product.json.info.ProductResultJson;
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/product")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -221,7 +222,8 @@ public class ProductController {
 
     @ExceptionHandler({HttpClientErrorException.class})
     public ResponseEntity<?> handleBadRequestException(Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(ExceptionResponseJson.builder().message(e.getMessage()).build());
     }
 
     static class NoClaimsException extends HttpClientErrorException {

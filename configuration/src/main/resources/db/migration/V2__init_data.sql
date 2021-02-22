@@ -24,16 +24,16 @@ INSERT INTO public.release_info_sq(sec_rating, rel_rating, maint_rating, sec_vul
 INSERT INTO public.release_info_sq(sec_rating, rel_rating, maint_rating, sec_vulns, rel_bugs, maint_debt, maint_smells) VALUES (1.0, 3.0, 3.0, 0, 5, 326, 65);
 INSERT INTO public.release_info_sq(sec_rating, rel_rating, maint_rating, sec_vulns, rel_bugs, maint_debt, maint_smells) VALUES (1.0, 5.0, 2.0, 0, 5, 326, 65);
 INSERT INTO public.release_info_sq(sec_rating, rel_rating, maint_rating, sec_vulns, rel_bugs, maint_debt, maint_smells) VALUES (1.0, 5.0, 2.0, 0, 5, 326, 65);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (1, 0.75, 1);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (1, 0.50, 51);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (1, 0.35, 101);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (1, 0.40, 151);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (1, 0.8, 201);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (51, 0.50, 251);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (51, 0.75, 301);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (51, 0.75, 351);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (101, 0.9, 401);
-INSERT INTO public.release_info(product_id, quality_level, release_info_sq_id) VALUES (101, 0.85, 451);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (1, '2020-12-12 13:46:31.067172', 0.75, 1);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (1, '2021-01-01 12:46:31.067172',0.50, 51);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (1, '2021-01-16 17:46:31.067172',0.35, 101);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (1, '2021-02-14 18:30:31.067172',0.40, 151);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (1, '2021-02-16 17:46:20.067172',0.8, 201);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (51, '2021-02-13 17:46:31.067172',0.50, 251);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (51, '2021-02-14 17:46:31.067172',0.75, 301);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (51, '2021-02-15 17:46:31.067172',0.75, 351);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (101, '2021-02-12 17:46:31.067172',0.9, 401);
+INSERT INTO public.release_info(product_id, created, quality_level, release_info_sq_id) VALUES (101, '2021-02-16 17:46:31.067172',0.85, 451);
 
 -- JIRA
 INSERT INTO public.jira_info(base_url, board_id, user_email, token) VALUES ('https://kert944.atlassian.net', 1, 'prinkkert@gmail.com', 'dlNrqUp5na04fQyacxcx58EF');

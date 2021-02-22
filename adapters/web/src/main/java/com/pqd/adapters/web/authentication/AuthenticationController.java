@@ -1,5 +1,6 @@
 package com.pqd.adapters.web.authentication;
 
+import com.pqd.adapters.web.common.ExceptionResponseJson;
 import com.pqd.adapters.web.security.jwt.JwtRequest;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserDetailsService;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/authentication")
-@CrossOrigin
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -88,13 +89,15 @@ public class AuthenticationController {
     }
 
     @ExceptionHandler({RegisterUser.InvalidFieldException.class})
-    public ResponseEntity<?> handleInvalidFieldException(Exception e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ExceptionResponseJson> handleInvalidFieldException(Exception e) {
+        return ResponseEntity.badRequest()
+                             .body(ExceptionResponseJson.builder().message(e.getMessage()).build());
     }
 
     @ExceptionHandler({BadCredentialsException.class})
-    public ResponseEntity<?> handleBadCredentialsException(Exception e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("INVALID_CREDENTIALS");
+    public ResponseEntity<ExceptionResponseJson> handleBadCredentialsException(Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body(ExceptionResponseJson.builder().message("INVALID_CREDENTIALS").build());
     }
 
 }
