@@ -185,21 +185,23 @@ Last updated 28.01.2021
   * sonarqube - 7 unit tests
   * web - 36 unit tests
 
-**JaCoCo** report with everything included except test modules (everything related to testing excluded from the report):
+**JaCoCo** report with everything included except test modules (everything related to testing excluded from the 
+report), created on 28. Jan 2021:
 
-| Module                | Class % | Method % | Line % | Branch %    |
-| --------------------- | ------------- | ------ | ---- | -----|
-| application           | 89% (79/88)   | 76% (206/270) | 81% (324/400) | 0% (0/33)* |
-| adapters.web          | 84% (49/58)   | 67% (186/274)	| 71% (403/560) | 0% (0/16)* |
-| adapters.sonarqube    | 87% (7/8)     | 40% (12/30)	| 71% (53/74)	| 100% (0/0)*|
-| adapters.persistence  | 71% (23/32)   | 85% (117/137)	| 91% (308/337) | 100% (0/0)*|
-| adapters.messaging    | 33% (1/3)     | 50% (4/8)	    | 63% (19/30)	| 100% (0/0)*|
-| adapters.jira         | 100% (9/9)    | 70% (35/50)	| 85% (103/121)	| 100% (2/2)*|
-| **Weighted average**  | **84.85% (168/198)**    | **72.82% (560/769)**    | **79.50% (1210/1522)**    | error      |
+| Module                | Class % | Method % | Line % | 
+| --------------------- | ------------- | ------ | ---- | 
+| application           | 89% (79/88)   | 76% (206/270) | 81% (324/400) | 
+| adapters.web          | 84% (49/58)   | 67% (186/274)	| 71% (403/560) | 
+| adapters.sonarqube    | 87% (7/8)     | 40% (12/30)	| 71% (53/74)	| 
+| adapters.persistence  | 71% (23/32)   | 85% (117/137)	| 91% (308/337) | 
+| adapters.messaging    | 33% (1/3)     | 50% (4/8)	    | 63% (19/30)	| 
+| adapters.jira         | 100% (9/9)    | 70% (35/50)	| 85% (103/121)	|
+| **Weighted average**  | **84.85% (168/198)**    | **72.82% (560/769)**    | **79.50% (1210/1522)**    | 
 
 *Calculation error
 
 ## Code 
+Created 28. Jan 2021
 
 All files included:
 
