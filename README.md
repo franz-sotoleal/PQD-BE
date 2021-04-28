@@ -5,7 +5,7 @@ The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-
 
 The high level architecture of the current version of PQD is the following:
 
-<img src="img/2021_03_04_pqd_high_level_system.png" width="350" title="hover text">
+<img src="img/2021_03_04_pqd_high_level_system.png" width="500" title="hover text">
 
 # Product Quality Dashboard API
 
