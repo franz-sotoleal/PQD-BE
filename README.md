@@ -1,3 +1,7 @@
+# Product Quality Dashboard
+
+The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-API is the main component of the system. The PQD-API is implemented using Hexagonal architecture. PQD-Front is the user interface of the system. PQD-DB is the database of the system, that is used by the PQD-API 
+
 # Product Quality Dashboard API
 
 Here you can read about the business use case of the API, how it was built and what to keep in mind while
