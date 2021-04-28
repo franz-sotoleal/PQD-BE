@@ -1,0 +1,28 @@
+version: '2'
+services:
+  db:
+    image: postgres:11.6
+    container_name: postgres_db
+    volumes:
+      - ./postgres_init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+    ports:
+      - 5432:5432
+
+  pqd-be:
+    image: pqd-be
+    container_name: pqd-be-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/pqd
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD:

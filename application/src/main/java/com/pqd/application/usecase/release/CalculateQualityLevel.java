@@ -14,13 +14,17 @@ public class CalculateQualityLevel {
     public Response execute(Request request) {
         int totalCharacteristics = 3;
 
-        Double sqSecurityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getSecurityRating());
-        Double sqReliabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getReliabilityRating());
-        Double sqMaintainabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getMaintainabilityRating());
+        ReleaseInfoSonarqube releaseInfoSq = request.getReleaseInfoSonarqube();
 
-        Double qualityLevel = (sqSecurityRating / totalCharacteristics)
-                              + (sqReliabilityRating / totalCharacteristics)
-                              + (sqMaintainabilityRating / totalCharacteristics);
+        Double sqSecurityRating =
+                transformSonarqubeRating(releaseInfoSq.getSecurityRating());
+        Double sqReliabilityRating =
+                transformSonarqubeRating(releaseInfoSq.getReliabilityRating());
+        Double sqMaintainabilityRating =
+                transformSonarqubeRating(releaseInfoSq.getMaintainabilityRating());
+
+        Double qualityLevel =
+                (sqSecurityRating + sqReliabilityRating + sqMaintainabilityRating) / totalCharacteristics;
 
         return Response.of(qualityLevel);
     }
@@ -29,7 +33,6 @@ public class CalculateQualityLevel {
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
         ReleaseInfoSonarqube releaseInfoSonarqube;
-
     }
 
     @Value(staticConstructor = "of")

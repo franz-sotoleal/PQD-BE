@@ -1,7 +1,7 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/pqd
+    url: jdbc:postgresql://postgres_db:5432/pqd
     username: postgres
     password:
   flyway:

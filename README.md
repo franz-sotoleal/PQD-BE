@@ -1,25 +1,85 @@
-# Product Quality Dashboard API
+# Product Quality Dashboard
 
-Here you can read about the business use case of the API, how it was built and what to keep in mind while
-implementing additional functionality.
-
-## Purpose of the API
+### Intro
 The PQD stands for Product Quality Dashboard, which is a system that I implemented during my master thesis at the
 University of Tartu (Software Engineering curriculum).
 In short, the idea is to read data from different static
 analysis tools and visualize them all together in a dashboard to provide easier overview of the software product quality
 metrics, extracted from various sources.
 In addition, the system provides a quality level between 0 and 1 (or 0 - 100%) to
-make it easier to track the changes of quality through time. The purpose from the beginning was to lay a foundation
-and implement a minimum viable product (MVP) that can be later improved (after my thesis).
-The MVP supports one tool, Sonarqube, and reads info about three quality characteristics from there.
+make it easier to track the changes of quality through time. 
 
-This backend system is the core of the PQD. It stores the data and contains the business logic. The actual dashboard 
-at the frontend part is just a visualization layer that contains minimal amount of business logic.
+The PQD is a system that collects data from tools, such as SonarQube and Jira, calculates software quality level, and displays the data into a dashboard. The PQD is meant to provide straightforward overview of quality, and it is built with future extension kept in mind.
+
+The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-API is the main component of the system. The PQD-API is implemented using Hexagonal architecture. PQD-Front is the user interface of the system. PQD-DB is the database of the system, that is used by the PQD-API.
+
+PQD-API and PQD-DB files are included in this repository.
+PQD-Front is included in [here.](https://github.com/Kert944/PQD-Front-React)
+
+The **high-level architecture** of the current version of PQD is the following:
+
+<img src="img/2021_03_04_pqd_high_level_system.png" width="500" title="High level architecture of the PQD">
+
+
+### Deploy to web
+The PQD can be run on a local machine with no containers for development activities. However, **to deploy the PQD to a web instance**, such as AWS EC2, there are some simple steps you would have to follow:
+
+1. Create AWS EC2 Linux instance (doesn't have to be AWS, its just an example I used) (more information can be read from [here](https://medium.com/@umairnadeem/deploy-to-aws-using-docker-compose-simple-210d71f43e67)).
+2. Install Docker and docker-compose
+~~~~
+sudo yum update
+sudo yum install docker
+sudo curl -L https://github.com/docker/compose/releases/download/1.29.1/docker-compose-`uname -s`-`uname -m` | sudo tee /usr/local/bin/docker-compose > /dev/null
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+~~~~
+3. Download and unpack PQD-API and PQD-Front in your home directory:
+~~~~
+sudo wget -c https://github.com/Kert944/PQD-BE/archive/5.tar.gz | sudo tar -xz
+sudo tar xzvf  5.tar.gz 
+sudo rm 5.tar.gz
+~~~~
+
+~~~~
+sudo wget -c https://github.com/Kert944/PQD-Front-React/archive/9.tar.gz | sudo tar -xz
+sudo tar xzvf  9.tar.gz 
+sudo rm 9.tar.gz
+~~~~
+4. Start Docker
+~~~~
+sudo service docker start
+~~~~
+5. Start PQD-API container in the PQD-API directory
+~~~~
+sudo docker-compose -f pqd-be.yml up --build -d
+(to bring down: sudo docker-compose -f pqd-be.yml down)
+~~~~
+6. Stat PQD-Front container in the PQD-Front directory
+~~~~
+sudo docker-compose up -d --build
+(to bring down: sudo docker-compose down)
+~~~~
+7. Check that the containers are up and running the application
+~~~~
+sudo docker container ps 
+sudo docker ps -a
+sudo docker container logs <container_id> 
+~~~~
+8. Access your application from port 3000
+~~~~
+<url_to_your_instance>:3000/#/login
+~~~~
+
+# PQD-API
+
+Here you can read about the business use case of the PQD-API, how it was built and what to keep in mind while
+implementing additional functionality.
 
 ## Technical description
 The project is written using characteristics of hexagonal architecture (aka ports and adapters pattern) and domain 
 driven design. The components are separated by gradle modules.
+
+<img src="img/2021_03_04_pqd_hexagon.png" width="500" title="PQD-API architecture">
 
 At the center lies the core business logic, that doesn't know anything about the other modules.
 It doesn't care where the data is coming or where it is going. The core business logic is implemented by use
@@ -46,12 +106,18 @@ cannot access or implement each other. They can only access the core layer. Keep
 and to the core module. Integration tests are written in the configuration module using MockMvc and Testcontainers. 
 You can find the description, of how to add a support for an additional tool, below.
 
+The domain consists of two major objects: product and release info. The lastly updated version of the PQD domain is described with the following figure: 
+
+<img src="img/2021_04_04_class_diagram_2.png" width="500" title="PQD-API architecture">
+
+
 ### Directory structure:
 ```
 adapters/          adapters for implementing outside communication (with unit tests)
     messaging/     rest api (one endpoint) for triggering release info collection, responsible for security
     persistence/   adapter for database connection (stores data)
-    sonarqube/     adapter for sonarqube api connection (asks raw data)
+    sonarqube/     adapter for sonarqube api connection (asks data)
+    jira/          adapter for jira api connection (asks data)
     web/           rest api for web communication, responsible for security 
 application/       core business logic (with unit tests)
 configuration/     spring boot module and all configurations, builds docker image (with integration tests)
@@ -97,6 +163,19 @@ git clone git@github.com:Kert944/PQD-BE.git
             * Use component name (project key) _ESI-builtit_ so that you can trigger release info collection with the 
               test user 
               that is already inserted into the DB
+              
+
+Containerize and run the app in Docker:
+* Run gradle clean and gradle build to get the last state of the app
+* At the root folder, run the following command:
+
+     ```
+     docker-compose -f pqd-be.yml up --build -d
+     ```
+* To kill the containerz, run:
+    ```
+     docker-compose -f pqd-be.yml down
+    ```
 
 ### Database changelog
 Flyway is used for database changelog. Migration files are located at:
@@ -172,21 +251,23 @@ Last updated 28.01.2021
   * sonarqube - 7 unit tests
   * web - 36 unit tests
 
-**JaCoCo** report with everything included except test modules (everything related to testing excluded from the report):
+**JaCoCo** report with everything included except test modules (everything related to testing excluded from the 
+report), created on 28. Jan 2021:
 
-| Module                | Class % | Method % | Line % | Branch %    |
-| --------------------- | ------------- | ------ | ---- | -----|
-| application           | 89% (79/88)   | 76% (206/270) | 81% (324/400) | 0% (0/33)* |
-| adapters.web          | 84% (49/58)   | 67% (186/274)	| 71% (403/560) | 0% (0/16)* |
-| adapters.sonarqube    | 87% (7/8)     | 40% (12/30)	| 71% (53/74)	| 100% (0/0)*|
-| adapters.persistence  | 71% (23/32)   | 85% (117/137)	| 91% (308/337) | 100% (0/0)*|
-| adapters.messaging    | 33% (1/3)     | 50% (4/8)	    | 63% (19/30)	| 100% (0/0)*|
-| adapters.jira         | 100% (9/9)    | 70% (35/50)	| 85% (103/121)	| 100% (2/2)*|
-| **Weighted average**  | **84.85% (168/198)**    | **72.82% (560/769)**    | **79.50% (1210/1522)**    | error      |
+| Module                | Class % | Method % | Line % | 
+| --------------------- | ------------- | ------ | ---- | 
+| application           | 89% (79/88)   | 76% (206/270) | 81% (324/400) | 
+| adapters.web          | 84% (49/58)   | 67% (186/274)	| 71% (403/560) | 
+| adapters.sonarqube    | 87% (7/8)     | 40% (12/30)	| 71% (53/74)	| 
+| adapters.persistence  | 71% (23/32)   | 85% (117/137)	| 91% (308/337) | 
+| adapters.messaging    | 33% (1/3)     | 50% (4/8)	    | 63% (19/30)	| 
+| adapters.jira         | 100% (9/9)    | 70% (35/50)	| 85% (103/121)	|
+| **Weighted average**  | **84.85% (168/198)**    | **72.82% (560/769)**    | **79.50% (1210/1522)**    | 
 
 *Calculation error
 
 ## Code 
+Created 28. Jan 2021
 
 All files included:
 
