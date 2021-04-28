@@ -1,4 +1,14 @@
 # Product Quality Dashboard
+
+### Intro
+The PQD stands for Product Quality Dashboard, which is a system that I implemented during my master thesis at the
+University of Tartu (Software Engineering curriculum).
+In short, the idea is to read data from different static
+analysis tools and visualize them all together in a dashboard to provide easier overview of the software product quality
+metrics, extracted from various sources.
+In addition, the system provides a quality level between 0 and 1 (or 0 - 100%) to
+make it easier to track the changes of quality through time. 
+
 The PQD is a system that collects data from tools, such as SonarQube and Jira, calculates software quality level, and displays the data into a dashboard. The PQD is meant to provide straightforward overview of quality, and it is built with future extension kept in mind.
 
 The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-API is the main component of the system. The PQD-API is implemented using Hexagonal architecture. PQD-Front is the user interface of the system. PQD-DB is the database of the system, that is used by the PQD-API.
@@ -56,33 +66,21 @@ sudo docker container ps
 sudo docker ps -a
 sudo docker container logs <container_id> 
 ~~~~
-7. Access your application from port 3000 :3000/#/products/all
+7. Access your application from port 3000
 ~~~~
 <url_to_your_instance>:3000/#/login
 ~~~~
 
-# Product Quality Dashboard API
+# PQD-API
 
-Here you can read about the business use case of the API, how it was built and what to keep in mind while
+Here you can read about the business use case of the PQD-API, how it was built and what to keep in mind while
 implementing additional functionality.
-
-## Purpose of the API
-The PQD stands for Product Quality Dashboard, which is a system that I implemented during my master thesis at the
-University of Tartu (Software Engineering curriculum).
-In short, the idea is to read data from different static
-analysis tools and visualize them all together in a dashboard to provide easier overview of the software product quality
-metrics, extracted from various sources.
-In addition, the system provides a quality level between 0 and 1 (or 0 - 100%) to
-make it easier to track the changes of quality through time. The purpose from the beginning was to lay a foundation
-and implement a minimum viable product (MVP) that can be later improved (after my thesis).
-The MVP supports one tool, Sonarqube, and reads info about three quality characteristics from there.
-
-This backend system is the core of the PQD. It stores the data and contains the business logic. The actual dashboard 
-at the frontend part is just a visualization layer that contains minimal amount of business logic.
 
 ## Technical description
 The project is written using characteristics of hexagonal architecture (aka ports and adapters pattern) and domain 
 driven design. The components are separated by gradle modules.
+
+<img src="img/2021_03_04_pqd_hexagon.png" width="500" title="PQD-API architecture">
 
 At the center lies the core business logic, that doesn't know anything about the other modules.
 It doesn't care where the data is coming or where it is going. The core business logic is implemented by use
@@ -114,7 +112,8 @@ You can find the description, of how to add a support for an additional tool, be
 adapters/          adapters for implementing outside communication (with unit tests)
     messaging/     rest api (one endpoint) for triggering release info collection, responsible for security
     persistence/   adapter for database connection (stores data)
-    sonarqube/     adapter for sonarqube api connection (asks raw data)
+    sonarqube/     adapter for sonarqube api connection (asks data)
+    jira/          adapter for jira api connection (asks data)
     web/           rest api for web communication, responsible for security 
 application/       core business logic (with unit tests)
 configuration/     spring boot module and all configurations, builds docker image (with integration tests)
