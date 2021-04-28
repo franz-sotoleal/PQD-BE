@@ -1,6 +1,10 @@
 # Product Quality Dashboard
+The PQD is a system that collects data from tools, such as SonarQube and Jira, calculates software quality level, and displays the data into a dashboard. The PQD is meant to provide straightforward overview of quality, and it is built with future extension kept in mind.
 
-The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-API is the main component of the system. The PQD-API is implemented using Hexagonal architecture. PQD-Front is the user interface of the system. PQD-DB is the database of the system, that is used by the PQD-API 
+The PQD system is made of three components: PQD-API, PQD-Front, and PQD-DB. PQD-API is the main component of the system. The PQD-API is implemented using Hexagonal architecture. PQD-Front is the user interface of the system. PQD-DB is the database of the system, that is used by the PQD-API.
+
+The high level architecture of the current version of PQD is the following:
+![alt text](https://github.com/Kert944/PQD-BE/blob/PQD-11/img/2021_03_04_pqd_high_level_system.png)
 
 # Product Quality Dashboard API
 
