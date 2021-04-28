@@ -22,7 +22,7 @@ The **high-level architecture** of the current version of PQD is the following:
 
 
 ### Deploy to web
-The PQd can be run on a local machine with no containers for development activities. However, **to deploy the PQD to a web instance**, such as AWS EC2, there are some simple steps you would have to follow:
+The PQD can be run on a local machine with no containers for development activities. However, **to deploy the PQD to a web instance**, such as AWS EC2, there are some simple steps you would have to follow:
 
 1. Create AWS EC2 instance, install Docker, and docker-compose (more information can be read from [here](https://medium.com/@umairnadeem/deploy-to-aws-using-docker-compose-simple-210d71f43e67)). Follow the steps:
 1.1. Create AWS EC2 Linux instance (doesn't have to be AWS, its just an example I used)
