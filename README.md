@@ -10,6 +10,55 @@ The **high-level architecture** of the current version of PQD is the following:
 
 <img src="img/2021_03_04_pqd_high_level_system.png" width="500" title="High level architecture of the PQD">
 
+The PQd can be run on a local machine with no containers for development activities. However, to deploy the PQD to a web instance, such as AWS EC2, then there are some simple steps you would have to follow:
+
+1. Create AWS EC2 instance, install Docker, and docker-compose (more information can be read from [here](https://medium.com/@umairnadeem/deploy-to-aws-using-docker-compose-simple-210d71f43e67)). Follow the steps:
+1.1. Create AWS EC2 Linux instance (doesn't have to be AWS, its just an example I used)
+1.2. Install Docker and docker-compose
+~~~~
+sudo yum update
+sudo yum install docker
+sudo curl -L https://github.com/docker/compose/releases/download/1.29.1/docker-compose-`uname -s`-`uname -m` | sudo tee /usr/local/bin/docker-compose > /dev/null
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+~~~~
+2. Download and unpack PQD-API and PQD-Front in your home directory:
+2.1. Download and unpack PQD-API
+~~~~
+sudo wget -c https://github.com/Kert944/PQD-BE/archive/5.tar.gz | sudo tar -xz
+sudo tar xzvf  5.tar.gz 
+sudo rm 5.tar.gz
+~~~~
+2.2. Download and unpack PQD-Front
+~~~~
+sudo wget -c https://github.com/Kert944/PQD-Front-React/archive/9.tar.gz | sudo tar -xz
+sudo tar xzvf  9.tar.gz 
+sudo rm 9.tar.gz
+~~~~
+3. Start Docker
+~~~~
+sudo service docker start
+~~~~
+4. Start PQD-API container in the PQD-API directory
+~~~~
+sudo docker-compose -f pqd-be.yml up --build -d
+(to bring down: sudo docker-compose -f pqd-be.yml down)
+~~~~
+5. Stat PQD-Front container in the PQD-Front directory
+~~~~
+sudo docker-compose up -d --build
+(to bring down: sudo docker-compose down)
+~~~~
+6. Check that the containers are up and running the application
+~~~~
+sudo docker container ps 
+sudo docker ps -a
+sudo docker container logs <container_id> 
+~~~~
+7. Access your application from port 3000 :3000/#/products/all
+~~~~
+<url_to_your_instance>:3000/#/login
+~~~~
 
 # Product Quality Dashboard API
 
