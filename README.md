@@ -106,6 +106,11 @@ cannot access or implement each other. They can only access the core layer. Keep
 and to the core module. Integration tests are written in the configuration module using MockMvc and Testcontainers. 
 You can find the description, of how to add a support for an additional tool, below.
 
+The domain consists of two major objects: product and release info. The lastly updated version of the PQD domain is described with the following figure: 
+
+<img src="img/2021_04_04_class_diagram_2.png" width="500" title="PQD-API architecture">
+
+
 ### Directory structure:
 ```
 adapters/          adapters for implementing outside communication (with unit tests)
