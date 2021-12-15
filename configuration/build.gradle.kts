@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":adapters:messaging"))
     implementation(project(":adapters:sonarqube"))
     implementation(project(":adapters:jira"))
+    implementation(project(":adapters:jenkins"))
 
     implementation("org.flywaydb:flyway-core")
 

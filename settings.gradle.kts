@@ -7,5 +7,6 @@ include(
         "adapters:persistence",
         "adapters:messaging",
         "adapters:sonarqube",
-        "adapters:jira"
+        "adapters:jira",
+        "adapters:jenkins"
 )
