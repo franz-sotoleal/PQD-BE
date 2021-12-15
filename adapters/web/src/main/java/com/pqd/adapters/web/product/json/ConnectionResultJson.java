@@ -9,7 +9,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 public class ConnectionResultJson {
 
-    boolean connectionOk;
+    public boolean connectionOk;
 
     String message;
 }

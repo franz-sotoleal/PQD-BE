@@ -24,4 +24,6 @@ public class ReleaseInfo {
     Optional<ReleaseInfoSonarqube> releaseInfoSonarqube;
 
     Optional<ReleaseInfoJira> releaseInfoJira;
+
+    Optional<ReleaseInfoJenkins> releaseInfoJenkins;
 }

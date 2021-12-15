@@ -1,6 +1,7 @@
 package com.pqd.application.usecase.release;
 
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoJenkins;
 import com.pqd.application.domain.release.ReleaseInfoJira;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.AbstractResponse;
@@ -23,10 +24,10 @@ public class SaveReleaseInfo {
 
     public Response execute(Request request) {
         Double qualityLevel = null;
-        if (request.getReleaseInfoSonarqube() != null
-            && request.getReleaseInfoSonarqube().getMaintainabilityRating() != null) {
+        if ((request.getReleaseInfoSonarqube() != null
+            && request.getReleaseInfoSonarqube().getMaintainabilityRating() != null) || request.getReleaseInfoSonarqube() != null ) {
             qualityLevel =
-                    calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getReleaseInfoSonarqube()))
+                    calculateQualityLevel.execute(CalculateQualityLevel.Request.of(request.getReleaseInfoSonarqube(), request.getReleaseInfoJenkins()))
                                          .getQualityLevel();
         }
 
@@ -34,6 +35,7 @@ public class SaveReleaseInfo {
                                              .created(LocalDateTime.now())
                                              .releaseInfoSonarqube(Optional.of(request.getReleaseInfoSonarqube()))
                                              .releaseInfoJira(Optional.of(request.getReleaseInfoJira()))
+                                             .releaseInfoJenkins(Optional.of(request.getReleaseInfoJenkins()))
                                              .productId(request.getProductId())
                                              .qualityLevel(qualityLevel)
                                              .build();
@@ -47,6 +49,7 @@ public class SaveReleaseInfo {
     public static class Request {
         ReleaseInfoSonarqube releaseInfoSonarqube;
         ReleaseInfoJira releaseInfoJira;
+        ReleaseInfoJenkins releaseInfoJenkins;
         Long productId;
     }
 

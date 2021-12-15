@@ -30,7 +30,8 @@ public class ProductAdapter implements ProductGateway {
 
     @Override
     public Product save(Product product) {
-        ProductEntity savedProductEntity = repository.save(ProductEntity.buildProductEntity(product));
+        ProductEntity entity = ProductEntity.buildProductEntity(product);
+        ProductEntity savedProductEntity = repository.save(entity);
         return ProductEntity.buildProduct(savedProductEntity);
     }
 
@@ -53,6 +54,12 @@ public class ProductAdapter implements ProductGateway {
             productEntity.getJiraInfoEntity().setBoardId(product.getJiraInfo().get().getBoardId());
             productEntity.getJiraInfoEntity().setUserEmail(product.getJiraInfo().get().getUserEmail());
             productEntity.getJiraInfoEntity().setToken(product.getJiraInfo().get().getToken());
+        }
+        if (product.getJenkinsInfo().isPresent()) {
+            productEntity.getJenkinsInfoEntity().setBaseUrl(product.getJenkinsInfo().get().getBaseUrl());
+            productEntity.getJenkinsInfoEntity().setToken(product.getJenkinsInfo().get().getToken());
+            productEntity.getJenkinsInfoEntity().setUsername(product.getJenkinsInfo().get().getUsername());
+            productEntity.getJenkinsInfoEntity().setLastBuildNumber(product.getJenkinsInfo().get().getLastBuildNumber());
         }
 
         ProductEntity savedEntity = repository.save(productEntity);

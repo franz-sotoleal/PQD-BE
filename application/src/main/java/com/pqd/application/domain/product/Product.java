@@ -1,5 +1,6 @@
 package com.pqd.application.domain.product;
 
+import com.pqd.application.domain.jenkins.JenkinsInfo;
 import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
 import lombok.Builder;
@@ -23,6 +24,8 @@ public class Product {
 
     Optional<JiraInfo> jiraInfo;
 
+    Optional<JenkinsInfo> jenkinsInfo;
+
     public boolean hasValidSonarqubeInfo() {
         return sonarqubeInfo.isPresent()
                && sonarqubeInfo.get().getBaseUrl() != null
@@ -38,6 +41,16 @@ public class Product {
                && jiraInfo.get().getUserEmail() != null
                && jiraInfo.get().getBaseUrl().length() > 0
                && jiraInfo.get().getUserEmail().length() > 0;
+    }
+
+    public boolean hasValidJenkinsInfo() {
+        return jenkinsInfo.isPresent()
+               && jenkinsInfo.get().getBaseUrl() != null
+               && jenkinsInfo.get().getUsername() != null
+               && jenkinsInfo.get().getToken() != null
+               && jenkinsInfo.get().getBaseUrl().length() > 0
+               && jenkinsInfo.get().getUsername().length() > 0
+               && jenkinsInfo.get().getToken().length() > 0;
     }
 
 }

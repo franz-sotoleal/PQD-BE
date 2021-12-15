@@ -14,6 +14,7 @@ import com.pqd.application.domain.connection.ConnectionResult;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.jenkins.TestJenkinsConnection;
 import com.pqd.application.usecase.jira.TestJiraConnection;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
@@ -59,6 +60,8 @@ public class ProductControllerTest {
 
     private TestJiraConnection testJiraConnection;
 
+    private TestJenkinsConnection testJenkinsConnection;
+
     @Captor
     private ArgumentCaptor<SaveProduct.Request> saveProductRequestCaptor;
 
@@ -76,15 +79,17 @@ public class ProductControllerTest {
         getProductReleaseInfo = mock(GetProductReleaseInfo.class);
         testSonarqubeConnection = mock(TestSonarqubeConnection.class);
         testJiraConnection = mock(TestJiraConnection.class);
+        testJenkinsConnection = mock(TestJenkinsConnection.class);
         controller = new ProductController(saveProduct,
-                                           updateProduct,
-                                           deleteProduct,
-                                           saveClaim,
-                                           getProductList,
-                                           jwtTokenUtil,
-                                           getProductReleaseInfo,
-                                           testSonarqubeConnection,
-                                           testJiraConnection);
+                updateProduct,
+                deleteProduct,
+                saveClaim,
+                getProductList,
+                jwtTokenUtil,
+                getProductReleaseInfo,
+                testSonarqubeConnection,
+                testJiraConnection,
+                testJenkinsConnection);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -421,18 +426,14 @@ public class ProductControllerTest {
     void GIVEN_no_user_id_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withNoUserId();
 
-        Exception exception =
-                assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
-        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+        assertMissingFieldException(saveProductRequestJson);
     }
 
     @Test
     void GIVEN_no_tool_info_WHEN_saving_product_THEN_exception_thrown() {
         SaveProductRequestJson saveProductRequestJson = TestDataGenerator.generateSaveProductRequestJson_withNoSqInfo();
 
-        Exception exception =
-                assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
-        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+        assertMissingFieldException(saveProductRequestJson);
     }
 
     @Test
@@ -440,9 +441,7 @@ public class ProductControllerTest {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo();
 
-        Exception exception =
-                assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
-        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+        assertMissingFieldException(saveProductRequestJson);
     }
 
     @Test
@@ -450,9 +449,7 @@ public class ProductControllerTest {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo2();
 
-        Exception exception =
-                assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
-        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+        assertMissingFieldException(saveProductRequestJson);
     }
 
     @Test
@@ -460,9 +457,7 @@ public class ProductControllerTest {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo3();
 
-        Exception exception =
-                assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
-        assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");
+        assertMissingFieldException(saveProductRequestJson);
     }
 
     @Test
@@ -470,6 +465,42 @@ public class ProductControllerTest {
         SaveProductRequestJson saveProductRequestJson =
                 TestDataGenerator.generateSaveProductRequestJson_withInvalidSqInfo4();
 
+        assertMissingFieldException(saveProductRequestJson);
+    }
+
+    @Test
+    void GIVEN_invalid_jenkins_info_noInfo_WHEN_saving_product_THEN_exception_thrown() {
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidJenkinsInfo();
+
+        assertMissingFieldException(saveProductRequestJson);
+    }
+
+    @Test
+    void GIVEN_invalid_jenkins_info_baseUrl_WHEN_saving_product_THEN_exception_thrown() {
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidJenkinsInfoBaseUrl();
+
+        assertMissingFieldException(saveProductRequestJson);
+    }
+
+    @Test
+    void GIVEN_invalid_jenkins_info_username_WHEN_saving_product_THEN_exception_thrown() {
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidJenkinsInfoUsername();
+
+        assertMissingFieldException(saveProductRequestJson);
+    }
+
+    @Test
+    void GIVEN_invalid_jenkins_info_token_WHEN_saving_product_THEN_exception_thrown() {
+        SaveProductRequestJson saveProductRequestJson =
+                TestDataGenerator.generateSaveProductRequestJson_withInvalidJenkinsInfoToken();
+
+        assertMissingFieldException(saveProductRequestJson);
+    }
+
+    private void assertMissingFieldException(SaveProductRequestJson saveProductRequestJson) {
         Exception exception =
                 assertThrows(Exception.class, () -> controller.saveProduct(saveProductRequestJson));
         assertThat(exception).hasStackTraceContaining("Required field missing, empty or wrong format");

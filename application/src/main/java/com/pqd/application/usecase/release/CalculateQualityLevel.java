@@ -1,5 +1,6 @@
 package com.pqd.application.usecase.release;
 
+import com.pqd.application.domain.release.ReleaseInfoJenkins;
 import com.pqd.application.domain.release.ReleaseInfoSonarqube;
 import com.pqd.application.usecase.AbstractResponse;
 import com.pqd.application.usecase.UseCase;
@@ -18,9 +19,12 @@ public class CalculateQualityLevel {
         Double sqReliabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getReliabilityRating());
         Double sqMaintainabilityRating = transformSonarqubeRating(request.getReleaseInfoSonarqube().getMaintainabilityRating());
 
+        Double jenkinsQualityLevel = request.getReleaseInfoJenkins().getJenkinsBuilds().stream().mapToDouble(build -> build.getBuildScore()).average().orElse(Double.NaN);
+        if (jenkinsQualityLevel != null) totalCharacteristics++;
+
         Double qualityLevel = (sqSecurityRating / totalCharacteristics)
-                              + (sqReliabilityRating / totalCharacteristics)
-                              + (sqMaintainabilityRating / totalCharacteristics);
+                + (sqReliabilityRating / totalCharacteristics)
+                + (sqMaintainabilityRating / totalCharacteristics) + jenkinsQualityLevel / 100;
 
         return Response.of(qualityLevel);
     }
@@ -29,7 +33,7 @@ public class CalculateQualityLevel {
     @EqualsAndHashCode(callSuper = false)
     public static class Request {
         ReleaseInfoSonarqube releaseInfoSonarqube;
-
+        ReleaseInfoJenkins releaseInfoJenkins;
     }
 
     @Value(staticConstructor = "of")
@@ -39,6 +43,9 @@ public class CalculateQualityLevel {
     }
 
     private Double transformSonarqubeRating(Double rating) {
+
+        if (rating == null) return 0.0;
+
         if (rating == 1.0) {
             return 1.0;
         } else if (rating == 2.0) {

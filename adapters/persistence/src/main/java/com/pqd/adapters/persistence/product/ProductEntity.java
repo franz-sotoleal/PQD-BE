@@ -1,7 +1,9 @@
 package com.pqd.adapters.persistence.product;
 
+import com.pqd.adapters.persistence.product.jenkins.JenkinsInfoEntity;
 import com.pqd.adapters.persistence.product.jira.JiraInfoEntity;
 import com.pqd.adapters.persistence.product.sonarqube.SonarqubeInfoEntity;
+import com.pqd.application.domain.jenkins.JenkinsInfo;
 import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
@@ -41,11 +43,16 @@ public class ProductEntity {
     @JoinColumn(name = "jira_info_id", referencedColumnName = "id")
     private JiraInfoEntity jiraInfoEntity;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "jenkins_info_id", referencedColumnName = "id")
+    private JenkinsInfoEntity jenkinsInfoEntity;
+
     public static Product buildProduct(ProductEntity entity) {
         Product product = Product.builder()
                                  .name(entity.getName())
                                  .sonarqubeInfo(Optional.empty())
                                  .jiraInfo(Optional.empty())
+                                 .jenkinsInfo(Optional.empty())
                                  .token(entity.getToken())
                                  .id(entity.getId())
                                  .build();
@@ -66,6 +73,16 @@ public class ProductEntity {
                             .id(entity.getJiraInfoEntity().getId())
                             .token(entity.getJiraInfoEntity().getToken())
                             .baseUrl(entity.getJiraInfoEntity().getBaseUrl())
+                            .build()));
+        }
+        if (entity.getJenkinsInfoEntity() != null) {
+            product.setJenkinsInfo(Optional.of(
+                    JenkinsInfo.builder()
+                            .token(entity.getJenkinsInfoEntity().getToken())
+                            .baseUrl(entity.getJenkinsInfoEntity().getBaseUrl())
+                            .username(entity.getJenkinsInfoEntity().getUsername())
+                            .id(entity.getJenkinsInfoEntity().getId())
+                            .lastBuildNumber(entity.getJenkinsInfoEntity().getLastBuildNumber())
                             .build()));
         }
 
@@ -94,6 +111,14 @@ public class ProductEntity {
                                                    .boardId(product.getJiraInfo().get().getBoardId())
                                                    .baseUrl(product.getJiraInfo().get().getBaseUrl())
                                                    .build());
+        }
+        if (product.getJenkinsInfo().isPresent()) {
+            entity.setJenkinsInfoEntity(JenkinsInfoEntity.builder()
+                    .token(product.getJenkinsInfo().get().getToken())
+                    .baseUrl(product.getJenkinsInfo().get().getBaseUrl())
+                    .username(product.getJenkinsInfo().get().getUsername())
+                    .lastBuildNumber(product.getJenkinsInfo().get().getLastBuildNumber())
+                    .build());
         }
         return entity;
     }

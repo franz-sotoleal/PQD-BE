@@ -1,6 +1,7 @@
 package com.pqd.adapters.web.product.json.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pqd.adapters.web.product.json.info.jenkins.JenkinsInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.application.domain.product.Product;
@@ -49,6 +50,9 @@ public class UpdateProductRequestJson {
         @JsonProperty("jiraInfo")
         JiraInfoRequestJson jiraInfo;
 
+        @JsonProperty("jenkinsInfo")
+        JenkinsInfoRequestJson jenkinsInfo;
+
         public Product toProduct() {
             Product product = Product.builder()
                                    .id(id)
@@ -56,12 +60,16 @@ public class UpdateProductRequestJson {
                                    .token(token)
                                    .sonarqubeInfo(Optional.empty())
                                    .jiraInfo(Optional.empty())
+                                   .jenkinsInfo(Optional.empty())
                                    .build();
             if (sonarqubeInfo != null) {
                 product.setSonarqubeInfo(Optional.of(sonarqubeInfo.toSonarqubeInfo()));
             }
             if (jiraInfo != null) {
                 product.setJiraInfo(Optional.of(jiraInfo.toJiraInfo()));
+            }
+            if (jenkinsInfo != null) {
+                product.setJenkinsInfo(Optional.of(jenkinsInfo.toJenkinsInfo()));
             }
             return product;
         }

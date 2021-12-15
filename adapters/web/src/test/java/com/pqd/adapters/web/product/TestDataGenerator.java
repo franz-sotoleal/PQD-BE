@@ -2,6 +2,7 @@ package com.pqd.adapters.web.product;
 
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jenkins.JenkinsInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
@@ -35,12 +36,13 @@ public class TestDataGenerator {
 
     public static ReleaseInfo generateReleaseInfo() {
         return ReleaseInfo.builder()
-                          .releaseInfoSonarqube(Optional.of(generateReleaseInfoSonarqube()))
-                          .productId(1L)
-                          .qualityLevel(0.83)
-                          .created(LocalDateTime.of(LocalDate.of(2021, 1, 3),
-                                                    LocalTime.of(18, 30, 23)))
-                          .releaseInfoJira(Optional.of(generateReleaseInfoJira()))
+                .releaseInfoSonarqube(Optional.of(generateReleaseInfoSonarqube()))
+                .productId(1L)
+                .qualityLevel(0.83)
+                .created(LocalDateTime.of(LocalDate.of(2021, 1, 3),
+                        LocalTime.of(18, 30, 23)))
+                .releaseInfoJira(Optional.of(generateReleaseInfoJira()))
+                .releaseInfoJenkins(Optional.empty())
                           .build();
     }
 
@@ -96,8 +98,9 @@ public class TestDataGenerator {
 
     public static ReleaseInfo generateReleaseInfo2() {
         return ReleaseInfo.builder()
-                          .releaseInfoSonarqube(Optional.of(generateReleaseInfoSonarqube()))
-                          .releaseInfoJira(Optional.empty())
+                .releaseInfoSonarqube(Optional.of(generateReleaseInfoSonarqube()))
+                .releaseInfoJira(Optional.empty())
+                .releaseInfoJenkins(Optional.empty())
                           .productId(1L)
                           .qualityLevel(0.5)
                           .created(LocalDateTime.of(LocalDate.of(2021, 1, 7),
@@ -122,11 +125,12 @@ public class TestDataGenerator {
         return List.of(1L, 2L)
                    .stream()
                    .map(id -> Product.builder()
-                                     .id(id)
-                                     .token("product-token" + id)
-                                     .name("product-name" + id)
-                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfo()))
-                                     .jiraInfo(Optional.empty())
+                           .id(id)
+                           .token("product-token" + id)
+                           .name("product-name" + id)
+                           .sonarqubeInfo(Optional.of(generateSonarqubeInfo()))
+                           .jiraInfo(Optional.empty())
+                           .jenkinsInfo(Optional.empty())
                                      .build()).collect(Collectors.toList());
     }
 
@@ -222,10 +226,11 @@ public class TestDataGenerator {
 
     public static SaveProductRequestJson generateSaveProductRequestJson() {
         return SaveProductRequestJson.builder()
-                                     .name("test12")
-                                     .userId(123L)
-                                     .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
-                                     .jiraInfo(Optional.empty())
+                .name("test12")
+                .userId(123L)
+                .sonarqubeInfo(Optional.of(generateSonarqubeInfoRequestJson()))
+                .jiraInfo(Optional.empty())
+                .jenkinsInfo(Optional.empty())
                                      .build();
     }
 
@@ -235,11 +240,12 @@ public class TestDataGenerator {
 
     public static Product generateProduct() {
         return Product.builder()
-                      .id(12367L)
-                      .token("product-token")
-                      .name("product-name")
-                      .sonarqubeInfo(Optional.of(generateSonarqubeInfo()))
-                      .jiraInfo(Optional.of(generateJiraInfo()))
+                .id(12367L)
+                .token("product-token")
+                .name("product-name")
+                .sonarqubeInfo(Optional.of(generateSonarqubeInfo()))
+                .jiraInfo(Optional.of(generateJiraInfo()))
+                .jenkinsInfo(Optional.empty())
                       .build();
     }
 
@@ -378,16 +384,48 @@ public class TestDataGenerator {
 
     private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_invalid3() {
         return SonarqubeInfoRequestJson.builder()
-                                       .baseUrl("base-url")
-                                       .token("tokenabc123")
-                                       .build();
+                .baseUrl("base-url")
+                .token("tokenabc123")
+                .build();
     }
 
     private static SonarqubeInfoRequestJson generateSonarqubeInfoRequestJson_invalid4() {
         return SonarqubeInfoRequestJson.builder()
-                                       .baseUrl("base-url")
-                                       .componentName("")
-                                       .token("tokenabc123")
-                                       .build();
+                .baseUrl("base-url")
+                .componentName("")
+                .token("tokenabc123")
+                .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withInvalidJenkinsInfo() {
+        return SaveProductRequestJson.builder()
+                .name("test12")
+                .userId(123L)
+                .jenkinsInfo(Optional.of(JenkinsInfoRequestJson.builder().build()))
+                .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withInvalidJenkinsInfoBaseUrl() {
+        return SaveProductRequestJson.builder()
+                .name("test12")
+                .userId(123L)
+                .jenkinsInfo(Optional.of(JenkinsInfoRequestJson.builder().username("valid_user").token("validToken").build()))
+                .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withInvalidJenkinsInfoUsername() {
+        return SaveProductRequestJson.builder()
+                .name("test12")
+                .userId(123L)
+                .jenkinsInfo(Optional.of(JenkinsInfoRequestJson.builder().baseUrl("http://localhost:9090").token("validToken").build()))
+                .build();
+    }
+
+    public static SaveProductRequestJson generateSaveProductRequestJson_withInvalidJenkinsInfoToken() {
+        return SaveProductRequestJson.builder()
+                .name("test12")
+                .userId(123L)
+                .jenkinsInfo(Optional.of(JenkinsInfoRequestJson.builder().baseUrl("http://localhost:9090").username("valid_user").build()))
+                .build();
     }
 }

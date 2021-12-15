@@ -1,5 +1,7 @@
 package com.pqd.adapters.web.product.json.release;
 
+import com.pqd.adapters.web.product.json.release.jenkins.result.JenkinsJobResultJson;
+import com.pqd.adapters.web.product.json.release.jenkins.result.ReleaseInfoJenkinsResultJson;
 import com.pqd.adapters.web.product.json.release.jira.result.JiraSprintResultJson;
 import com.pqd.adapters.web.product.json.release.jira.result.ReleaseInfoJiraResultJson;
 import com.pqd.adapters.web.product.json.release.sonarqube.result.ReleaseInfoSonarqubeResultJson;
@@ -27,6 +29,8 @@ public class ReleaseInfoResultJson {
 
     ReleaseInfoJiraResultJson releaseInfoJira;
 
+    ReleaseInfoJenkinsResultJson releaseInfoJenkins;
+
     public static ReleaseInfoResultJson buildResultJson(ReleaseInfo releaseInfo) {
         ReleaseInfoResultJson resultJson = ReleaseInfoResultJson.builder()
                                                                 .id(releaseInfo.getId())
@@ -50,6 +54,18 @@ public class ReleaseInfoResultJson {
                                                                   .map(JiraSprintResultJson::buildJiraSprint)
                                                                   .collect(Collectors.toList()))
                                              .build());
+        }
+        if (releaseInfo.getReleaseInfoJenkins().isPresent()) {
+            resultJson.setReleaseInfoJenkins(
+                    ReleaseInfoJenkinsResultJson.builder()
+                            .jenkinsJobs(releaseInfo
+                                    .getReleaseInfoJenkins()
+                                    .get()
+                                    .getJenkinsBuilds()
+                                    .stream()
+                                    .map(JenkinsJobResultJson::buildResultJson)
+                                    .collect(Collectors.toList()))
+                            .build());
         }
         return resultJson;
     }

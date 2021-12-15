@@ -1,8 +1,11 @@
 package com.pqd.adapters.persistence.release;
 
+import com.pqd.adapters.persistence.product.jenkins.JenkinsInfoEntity;
+import com.pqd.adapters.persistence.release.jenkins.JenkinsBuildEntity;
 import com.pqd.adapters.persistence.release.jira.JiraSprintEntity;
 import com.pqd.adapters.persistence.release.sonarqube.ReleaseInfoSonarqubeEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
+import com.pqd.application.domain.release.ReleaseInfoJenkins;
 import com.pqd.application.domain.release.ReleaseInfoJira;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,31 +46,45 @@ public class ReleaseInfoEntity {
     private ReleaseInfoSonarqubeEntity sonarqubeReleaseInfoEntity;
 
     @OneToMany(mappedBy = "releaseInfo",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<JiraSprintEntity> jiraSprintEntity;
+
+    @OneToMany(mappedBy = "releaseInfo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<JenkinsBuildEntity> jenkinsBuildEntity;
 
     public static ReleaseInfo buildReleaseInfo(ReleaseInfoEntity entity) {
         ReleaseInfo releaseInfo = ReleaseInfo.builder()
-                                             .id(entity.getId())
-                                             .qualityLevel(entity.getQualityLevel())
-                                             .productId(entity.getProductId())
-                                             .releaseInfoSonarqube(Optional.empty())
-                                             .releaseInfoJira(Optional.empty())
-                                             .created(entity.getCreated())
-                                             .build();
+                .id(entity.getId())
+                .qualityLevel(entity.getQualityLevel())
+                .productId(entity.getProductId())
+                .releaseInfoSonarqube(Optional.empty())
+                .releaseInfoJira(Optional.empty())
+                .created(entity.getCreated())
+                .build();
         if (entity.getSonarqubeReleaseInfoEntity() != null) {
             releaseInfo.setReleaseInfoSonarqube(Optional.of(ReleaseInfoSonarqubeEntity.buildSonarqubeReleaseInfo(
                     entity.getSonarqubeReleaseInfoEntity())));
         }
         if (entity.getJiraSprintEntity() != null) {
             releaseInfo.setReleaseInfoJira(Optional.of(ReleaseInfoJira.builder()
-                                                                      .jiraSprints(
-                                                                              entity.getJiraSprintEntity()
-                                                                                    .stream()
-                                                                                    .map(JiraSprintEntity::buildJiraSprint)
-                                                                                    .collect(Collectors.toList()))
-                                                                      .build()));
+                    .jiraSprints(
+                            entity.getJiraSprintEntity()
+                                    .stream()
+                                    .map(JiraSprintEntity::buildJiraSprint)
+                                    .collect(Collectors.toList()))
+                    .build()));
+        }
+        if (entity.getJenkinsBuildEntity() != null) {
+            releaseInfo.setReleaseInfoJenkins(Optional.of(ReleaseInfoJenkins.builder()
+                    .jenkinsBuilds(
+                            entity.getJenkinsBuildEntity()
+                                    .stream()
+                                    .map(JenkinsBuildEntity::buildReleaseInfoJenkins)
+                                    .collect(Collectors.toList()))
+                    .build()));
         }
 
         return releaseInfo;
@@ -83,13 +100,19 @@ public class ReleaseInfoEntity {
         if (releaseInfo.getReleaseInfoSonarqube().isPresent()) {
             entity.setSonarqubeReleaseInfoEntity(
                     ReleaseInfoSonarqubeEntity.buildReleaseInfoSonarqubeEntity(releaseInfo
-                                                                                       .getReleaseInfoSonarqube()
-                                                                                       .get()));
+                            .getReleaseInfoSonarqube()
+                            .get()));
         }
         if (releaseInfo.getReleaseInfoJira().isPresent()) {
             entity.setJiraSprintEntity(releaseInfo.getReleaseInfoJira().get().getJiraSprints().stream()
-                                                  .map(JiraSprintEntity::buildJiraSprintEntity)
-                                                  .collect(Collectors.toList()));
+                    .map(JiraSprintEntity::buildJiraSprintEntity)
+                    .collect(Collectors.toList()));
+        }
+
+        if (releaseInfo.getReleaseInfoJenkins().isPresent()) {
+            entity.setJenkinsBuildEntity(releaseInfo.getReleaseInfoJenkins().get().getJenkinsBuilds().stream()
+                    .map(JenkinsBuildEntity::buildJenkinsBuildEntity)
+                    .collect(Collectors.toList()));
         }
 
         return entity;

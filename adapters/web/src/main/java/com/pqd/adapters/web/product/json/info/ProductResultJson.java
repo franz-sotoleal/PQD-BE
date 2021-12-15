@@ -1,5 +1,6 @@
 package com.pqd.adapters.web.product.json.info;
 
+import com.pqd.adapters.web.product.json.info.jenkins.JenkinsInfoResultJson;
 import com.pqd.adapters.web.product.json.info.jira.JiraInfoResultJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoResultJson;
 import com.pqd.application.domain.product.Product;
@@ -21,6 +22,8 @@ public class ProductResultJson {
     SonarqubeInfoResultJson sonarqubeInfo;
 
     JiraInfoResultJson jiraInfo;
+
+    JenkinsInfoResultJson jenkinsInfo;
 
     public static ProductResultJson buildResultJson(Product product) {
         ProductResultJson resultJson = ProductResultJson.builder()
@@ -46,6 +49,15 @@ public class ProductResultJson {
                                       .userEmail(product.getJiraInfo().get().getUserEmail())
                                       .token(product.getJiraInfo().get().getToken())
                                       .build());
+        }
+        if (product.getJenkinsInfo().isPresent()) {
+            resultJson.setJenkinsInfo(
+                    JenkinsInfoResultJson
+                            .builder()
+                            .baseUrl(product.getJenkinsInfo().get().getBaseUrl())
+                            .username(product.getJenkinsInfo().get().getUsername())
+                            .token(product.getJenkinsInfo().get().getToken())
+                            .build());
         }
         return resultJson;
     }

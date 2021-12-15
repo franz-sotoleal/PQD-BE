@@ -4,6 +4,7 @@ import com.pqd.adapters.web.ResponsePresenter;
 import com.pqd.adapters.web.product.json.ConnectionResultJson;
 import com.pqd.application.domain.connection.ConnectionResponse;
 import com.pqd.application.usecase.AbstractResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 
@@ -23,6 +24,6 @@ public class ConnectionTestPresenter implements ResponsePresenter {
     @Override
     public ResponseEntity<ConnectionResultJson> getViewModel() {
         Assert.notNull(result, () -> "Result must be presented");
-        return ResponseEntity.ok(result);
+        return result.connectionOk ? ResponseEntity.ok(result) : ResponseEntity.unprocessableEntity().body(result);
     }
 }

@@ -1,5 +1,6 @@
 package com.pqd.adapters.persistence.release;
 
+import com.pqd.adapters.persistence.release.jenkins.JenkinsBuildEntity;
 import com.pqd.adapters.persistence.release.jira.JiraSprintEntity;
 import com.pqd.application.domain.release.ReleaseInfo;
 import com.pqd.application.usecase.release.ReleaseInfoGateway;
@@ -21,7 +22,9 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
     public ReleaseInfo save(ReleaseInfo releaseInfo) {
         ReleaseInfoEntity releaseInfoEntity = ReleaseInfoEntity.buildReleaseInfoEnity(releaseInfo);
         List<JiraSprintEntity> jiraSprintEntity = releaseInfoEntity.getJiraSprintEntity();
+        List<JenkinsBuildEntity> jenkinsBuildEntities = releaseInfoEntity.getJenkinsBuildEntity();
         releaseInfoEntity.setJiraSprintEntity(null);
+        releaseInfoEntity.setJenkinsBuildEntity(null);
         ReleaseInfoEntity savedReleaseInfo = repository.save(releaseInfoEntity);
         savedReleaseInfo.setJiraSprintEntity(
                 jiraSprintEntity.stream()
@@ -33,8 +36,16 @@ public class ReleaseInfoAdapter implements ReleaseInfoGateway {
                                 })
                                 .collect(Collectors.toList()));
 
+        savedReleaseInfo.setJenkinsBuildEntity(
+                jenkinsBuildEntities.stream()
+                        .peek(entity -> {
+                            entity.setReleaseInfo(savedReleaseInfo);
+                        })
+                        .collect(Collectors.toList()));
+
         // Set DB generated id to release_info_jira sprint
         ReleaseInfoEntity updatedReleaseInfo = repository.save(savedReleaseInfo);
+
         return ReleaseInfoEntity.buildReleaseInfo(updatedReleaseInfo);
     }
 

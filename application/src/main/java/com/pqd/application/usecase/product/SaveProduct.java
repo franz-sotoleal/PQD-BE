@@ -1,5 +1,6 @@
 package com.pqd.application.usecase.product;
 
+import com.pqd.application.domain.jenkins.JenkinsInfo;
 import com.pqd.application.domain.jira.JiraInfo;
 import com.pqd.application.domain.product.Product;
 import com.pqd.application.domain.sonarqube.SonarqubeInfo;
@@ -27,6 +28,7 @@ public class SaveProduct {
                                  .name(request.getName())
                                  .sonarqubeInfo(request.getSonarqubeInfo())
                                  .jiraInfo(request.getJiraInfo())
+                                 .jenkinsInfo(request.getJenkinsInfo())
                                  .build();
 
         return Response.of(productGateway.save(product));
@@ -46,10 +48,12 @@ public class SaveProduct {
         Optional<SonarqubeInfo> sonarqubeInfo;
 
         Optional<JiraInfo> jiraInfo;
+
+        Optional<JenkinsInfo> jenkinsInfo;
     }
 
     private void checkIfToolInfoExists(Request request) {
-        if (request.getJiraInfo().isEmpty() && request.getSonarqubeInfo().isEmpty()) {
+        if (request.getJiraInfo().isEmpty() && request.getSonarqubeInfo().isEmpty() && request.getJenkinsInfo().isEmpty()) {
             throw new SaveProductException("At least one tool need to be specified");
         }
     }

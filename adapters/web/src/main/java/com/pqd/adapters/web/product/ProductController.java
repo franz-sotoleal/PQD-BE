@@ -5,6 +5,7 @@ import com.pqd.adapters.web.product.json.ConnectionResultJson;
 import com.pqd.adapters.web.product.json.info.ProductResultJson;
 import com.pqd.adapters.web.product.json.info.SaveProductRequestJson;
 import com.pqd.adapters.web.product.json.info.UpdateProductRequestJson;
+import com.pqd.adapters.web.product.json.info.jenkins.JenkinsInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.jira.JiraInfoRequestJson;
 import com.pqd.adapters.web.product.json.info.sonarqube.SonarqubeInfoRequestJson;
 import com.pqd.adapters.web.product.json.release.ReleaseInfoResultJson;
@@ -15,7 +16,9 @@ import com.pqd.adapters.web.product.presenter.ReleaseInfoPresenter;
 import com.pqd.adapters.web.security.jwt.JwtTokenUtil;
 import com.pqd.adapters.web.security.jwt.JwtUserProductClaim;
 import com.pqd.application.domain.claim.ClaimLevel;
+import com.pqd.application.domain.jenkins.JenkinsInfo;
 import com.pqd.application.usecase.claim.SaveClaim;
+import com.pqd.application.usecase.jenkins.TestJenkinsConnection;
 import com.pqd.application.usecase.jira.TestJiraConnection;
 import com.pqd.application.usecase.product.DeleteProduct;
 import com.pqd.application.usecase.product.GetProductList;
@@ -58,6 +61,8 @@ public class ProductController {
     private final TestSonarqubeConnection testSonarqubeConnection;
 
     private final TestJiraConnection testJiraConnection;
+
+    private final TestJenkinsConnection testJenkinsConnection;
 
     @PostMapping("/save")
     public ResponseEntity<ProductResultJson> saveProduct(@RequestBody @NonNull SaveProductRequestJson requestJson) {
@@ -123,6 +128,18 @@ public class ProductController {
         return presenter.getViewModel();
     }
 
+    @PostMapping("/test/jenkins/connection")
+    public ResponseEntity<ConnectionResultJson> testJenkinsConnection(
+            @RequestBody @NonNull JenkinsInfoRequestJson request) {
+        checkRequiredFieldPresence(request);
+        var response = testJenkinsConnection.execute(TestJenkinsConnection.Request.of(request.toJenkinsInfo()));
+
+        var presenter = new ConnectionTestPresenter();
+        presenter.present(response);
+
+        return presenter.getViewModel();
+    }
+
     @GetMapping("/get/all")
     public ResponseEntity<List<ProductResultJson>> getUserProductList(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
@@ -172,10 +189,12 @@ public class ProductController {
     private void checkRequiredFieldPresence(SaveProductRequestJson requestJson) {
         Optional<SonarqubeInfoRequestJson> sonarqubeInfo = requestJson.getSonarqubeInfo();
         Optional<JiraInfoRequestJson> jiraInfo = requestJson.getJiraInfo();
+        Optional<JenkinsInfoRequestJson> jenkinsInfo = requestJson.getJenkinsInfo();
         if (requestJson.getUserId() == null
-            || sonarqubeInfo.isEmpty() && jiraInfo.isEmpty()
+            || sonarqubeInfo.isEmpty() && jiraInfo.isEmpty() && jenkinsInfo.isEmpty()
             || sonarqubeInfo.isPresent() && !areSonarqubeFieldsPresent(sonarqubeInfo.get())
             || jiraInfo.isPresent() && !areJiraFieldsPresent(jiraInfo.get())
+            || jenkinsInfo.isPresent() && !areJenkinsFieldsPresent(jenkinsInfo.get())
         ) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
         }
@@ -203,6 +222,12 @@ public class ProductController {
         }
     }
 
+    private void checkRequiredFieldPresence(JenkinsInfoRequestJson requestJson) {
+        if (!areJenkinsFieldsPresent(requestJson)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Required field missing, empty or wrong format");
+        }
+    }
+
     private boolean areSonarqubeFieldsPresent(SonarqubeInfoRequestJson requestJson) {
         return requestJson != null
                && requestJson.getBaseUrl() != null
@@ -218,6 +243,16 @@ public class ProductController {
                && requestJson.getUserEmail() != null
                && requestJson.getBaseUrl().length() != 0
                && requestJson.getUserEmail().length() != 0;
+    }
+
+    private boolean areJenkinsFieldsPresent(JenkinsInfoRequestJson requestJson) {
+        return requestJson != null
+               && requestJson.getBaseUrl() != null
+               && requestJson.getUsername() != null
+               && requestJson.getToken() != null
+               && requestJson.getBaseUrl().length() != 0
+               && requestJson.getUsername().length() != 0
+               && requestJson.getToken().length() != 0;
     }
 
     @ExceptionHandler({HttpClientErrorException.class})
