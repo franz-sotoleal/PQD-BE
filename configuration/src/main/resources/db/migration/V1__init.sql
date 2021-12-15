@@ -2,11 +2,13 @@ CREATE SEQUENCE user_seq INCREMENT 50;
 CREATE SEQUENCE product_seq INCREMENT 50;
 CREATE SEQUENCE sq_info_seq INCREMENT 50;
 CREATE SEQUENCE jira_info_seq INCREMENT 50;
+CREATE SEQUENCE jenkins_info_seq INCREMENT 50;
 CREATE SEQUENCE jira_issue_seq INCREMENT 50;
 CREATE SEQUENCE release_info_sq_seq INCREMENT 50;
 CREATE SEQUENCE release_info_jira_sprint_seq INCREMENT 50;
 CREATE SEQUENCE release_info_seq INCREMENT 50;
 CREATE SEQUENCE user_product_claim_seq INCREMENT 50;
+CREATE SEQUENCE release_info_jenkins_seq INCREMENT 50;
 
 CREATE TABLE public.user
 (
@@ -35,13 +37,23 @@ CREATE TABLE public.jira_info
     token           TEXT                    NOT NULL
 );
 
+CREATE TABLE public.jenkins_info
+(
+    id            BIGINT PRIMARY KEY NOT NULL    DEFAULT nextval('jenkins_info_seq'),
+    base_url      TEXT               NOT NULL,
+    username      TEXT               NOT NULL,
+    token         TEXT               NOT NULL,
+    last_build_number   INT
+);
+
 CREATE TABLE public.product
 (
-    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('product_seq'),
-    name            TEXT                    NOT NULL,
+    id              BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('product_seq'),
+    name            TEXT               NOT NULL,
     token           TEXT,
-    sq_info_id      BIGINT                              REFERENCES public.sq_info(id),
-    jira_info_id    BIGINT                              REFERENCES public.jira_info(id)
+    sq_info_id      BIGINT REFERENCES public.sq_info (id),
+    jira_info_id    BIGINT REFERENCES public.jira_info (id),
+    jenkins_info_id BIGINT REFERENCES public.jenkins_info (id)
     -- add other tool references here with another changelist by modifying this table
 );
 
@@ -91,14 +103,30 @@ CREATE TABLE public.release_info_jira_sprint
 
 CREATE TABLE public.jira_issue
 (
-    id              BIGINT  PRIMARY KEY     NOT NULL    DEFAULT nextval('jira_issue_seq'),
-    jira_sprint_id  BIGINT                  NOT NULL    REFERENCES public.release_info_jira_sprint(id),
-    issue_id        BIGINT                  NOT NULL,
-    key             TEXT                    NOT NULL,
-    description     TEXT,
-    icon_url        TEXT,
+    id             BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('release_info_jenkins_seq'),
+    jira_sprint_id BIGINT             NOT NULL REFERENCES public.release_info_jira_sprint (id),
+    issue_id       BIGINT             NOT NULL,
+    key            TEXT               NOT NULL,
+    description    TEXT,
+    icon_url       TEXT,
+    name           TEXT,
+    browser_url    TEXT
+);
+
+CREATE TABLE public.release_info_jenkins
+(
+    id              BIGINT PRIMARY KEY NOT NULL DEFAULT nextval('release_info_jenkins_seq'),
+    release_info_id BIGINT REFERENCES public.release_info (id),
     name            TEXT,
-    browser_url     TEXT
+    description     TEXT,
+    last_build      TEXT,
+    status          TEXT,
+    build_score     BIGINT,
+    build_report    TEXT,
+    deployment_frequency    TEXT,
+    lead_time_for_change    TEXT,
+    time_to_restore_service    TEXT,
+    change_failure_rate    TEXT
 );
 
 -- To add database support for another tool:
