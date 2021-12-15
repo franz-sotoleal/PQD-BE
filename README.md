@@ -17,6 +17,18 @@ The MVP supports one tool, Sonarqube, and reads info about three quality charact
 This backend system is the core of the PQD. It stores the data and contains the business logic. The actual dashboard 
 at the frontend part is just a visualization layer that contains minimal amount of business logic.
 
+## How to run with Jenkins
+In order to manually test the Jenkins integration you can set up a local Jenkins server. Once it is set up the easiest
+way to test it is to integrate with a github project (or another vsc tool).
+
+If you are running both the PQD and the Jenkins server you will need to change the port of one of them, since they both
+run in port 8080 by default
+
+Another problem you may have if you run everything locally is that depending on your operating system the PQD-API is
+not able to connect to the Jenkins server running locally using docker. Therefore you can use a tool such as 
+[ngrok](https://ngrok.com/) to establish a public HTTP url.
+  
+
 ## Technical description
 The project is written using characteristics of hexagonal architecture (aka ports and adapters pattern) and domain 
 driven design. The components are separated by gradle modules.
